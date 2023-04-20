@@ -8,8 +8,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 WORKDIR /app/GlobalRedPyme
-EXPOSE 8001
+EXPOSE 8002
 RUN python manage.py crontab add
 
-CMD ["sh", "-c", "cron && python manage.py runserver 0.0.0.0:8001"]
+CMD ["sh", "-c", "cron && python manage.py runserver 0.0.0.0:8002"]
 

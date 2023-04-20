@@ -43,7 +43,7 @@ sudo docker pull james46007/grp-backend-coop:dev
 
 ## 5.Construir el contenedor , este comando deja corriebdo el contenedor
 ```shell
-sudo docker run -d -p 8001:8001 -it --log-opt max-size=10m --log-opt max-file=3 --name grp-backend-g-coop --restart always james46007/grp-backend-coop:dev
+sudo docker run -d -p 8002:8002 -it --log-opt max-size=10m --log-opt max-file=3 --name grp-backend-g-coop --restart always james46007/grp-backend-coop:dev
 ```
 
 ## 6.Para iniciar el contenedor
