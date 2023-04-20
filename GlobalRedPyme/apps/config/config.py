@@ -69,7 +69,7 @@ if PRODUCTION:
     DATABASES = {
         'default': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_central',
+            'NAME': 'grp_g_coop_central',
             'ENFORCE_SCHEMA': False,
             'CLIENT': {
                 'host': env.str('MONGODB_ATLAS'),
@@ -84,9 +84,9 @@ if PRODUCTION:
                 },
             },
         },
-        'grp_g_ifi_personas_db': {
+        'grp_g_coop_personas_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_personas',
+            'NAME': 'grp_g_coop_personas',
             'ENFORCE_SCHEMA': False,
             'CLIENT': {
                 'host': env.str('MONGODB_ATLAS'),
@@ -101,9 +101,9 @@ if PRODUCTION:
                 },
             },
         },
-        'grp_g_ifi_core_db': {
+        'grp_g_coop_core_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_core',
+            'NAME': 'grp_g_coop_core',
             'ENFORCE_SCHEMA': False,
             'CLIENT': {
                 'host': env.str('MONGODB_ATLAS'),
@@ -118,9 +118,9 @@ if PRODUCTION:
                 },
             },
         },
-        'grp_g_ifi_pymes_db': {
+        'grp_g_coop_pymes_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_pymes',
+            'NAME': 'grp_g_coop_pymes',
             'ENFORCE_SCHEMA': False,
             'CLIENT': {
                 'host': env.str('MONGODB_ATLAS'),
@@ -135,9 +135,9 @@ if PRODUCTION:
                 },
             },
         },
-        'grp_g_ifi_corp_db': {
+        'grp_g_coop_corp_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_corp',
+            'NAME': 'grp_g_coop_corp',
             'ENFORCE_SCHEMA': False,
             'CLIENT': {
                 'host': env.str('MONGODB_ATLAS'),
@@ -152,9 +152,9 @@ if PRODUCTION:
                 },
             },
         },
-        'grp_g_ifi_mdm_db': {
+        'grp_g_coop_mdm_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_mdm',
+            'NAME': 'grp_g_coop_mdm',
             'ENFORCE_SCHEMA': False,
             'CLIENT': {
                 'host': env.str('MONGODB_ATLAS'),
@@ -169,9 +169,9 @@ if PRODUCTION:
                 },
             },
         },
-        'grp_g_ifi_mdp_db': {
+        'grp_g_coop_mdp_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_mdp',
+            'NAME': 'grp_g_coop_mdp',
             'ENFORCE_SCHEMA': False,
             'CLIENT': {
                 'host': env.str('MONGODB_ATLAS'),
@@ -186,9 +186,9 @@ if PRODUCTION:
                 },
             },
         },
-        'grp_g_ifi_mdo_db': {
+        'grp_g_coop_mdo_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_mdo',
+            'NAME': 'grp_g_coop_mdo',
             'ENFORCE_SCHEMA': False,
             'CLIENT': {
                 'host': env.str('MONGODB_ATLAS'),
@@ -203,9 +203,9 @@ if PRODUCTION:
                 },
             },
         },
-        'grp_g_ifi_gdo_db': {
+        'grp_g_coop_gdo_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_gdo',
+            'NAME': 'grp_g_coop_gdo',
             'ENFORCE_SCHEMA': False,
             'CLIENT': {
                 'host': env.str('MONGODB_ATLAS'),
@@ -220,9 +220,9 @@ if PRODUCTION:
                 },
             },
         },
-        'grp_g_ifi_gde_db': {
+        'grp_g_coop_gde_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_gde',
+            'NAME': 'grp_g_coop_gde',
             'ENFORCE_SCHEMA': False,
             'CLIENT': {
                 'host': env.str('MONGODB_ATLAS'),
@@ -272,52 +272,52 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_central',
+            'NAME': 'grp_g_coop_central',
             'ENFORCE_SCHEMA': False,
         },
-        'grp_g_ifi_personas_db': {
+        'grp_g_coop_personas_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_personas',
+            'NAME': 'grp_g_coop_personas',
             'ENFORCE_SCHEMA': False,
         },
-        'grp_g_ifi_core_db': {
+        'grp_g_coop_core_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_core',
+            'NAME': 'grp_g_coop_core',
             'ENFORCE_SCHEMA': False,
         },
-        'grp_g_ifi_pymes_db': {
+        'grp_g_coop_pymes_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_pymes',
+            'NAME': 'grp_g_coop_pymes',
             'ENFORCE_SCHEMA': False,
         },
-        'grp_g_ifi_corp_db': {
+        'grp_g_coop_corp_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_corp',
+            'NAME': 'grp_g_coop_corp',
             'ENFORCE_SCHEMA': False,
         },
-        'grp_g_ifi_mdm_db': {
+        'grp_g_coop_mdm_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_mdm',
+            'NAME': 'grp_g_coop_mdm',
             'ENFORCE_SCHEMA': False,
         },
-        'grp_g_ifi_mdp_db': {
+        'grp_g_coop_mdp_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_mdp',
+            'NAME': 'grp_g_coop_mdp',
             'ENFORCE_SCHEMA': False,
         },
-        'grp_g_ifi_mdo_db': {
+        'grp_g_coop_mdo_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_mdo',
+            'NAME': 'grp_g_coop_mdo',
             'ENFORCE_SCHEMA': False,
         },
-        'grp_g_ifi_gdo_db': {
+        'grp_g_coop_gdo_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_gdo',
+            'NAME': 'grp_g_coop_gdo',
             'ENFORCE_SCHEMA': False,
         },
-        'grp_g_ifi_gde_db': {
+        'grp_g_coop_gde_db': {
             'ENGINE': 'djongo',
-            'NAME': 'grp_g_ifi_gde',
+            'NAME': 'grp_g_coop_gde',
             'ENFORCE_SCHEMA': False,
         },
     }
