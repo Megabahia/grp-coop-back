@@ -462,6 +462,10 @@ def factura_update_fisica(request, pk):
                 if 'Procesar' == request.data['estado']:
                     query.estado = 'Aprobado'
                     query.save()
+                    getCreditoPersona = CreditoPersonas.objects.filter(_id=ObjectId(query.credito_id)).first()
+                    if getCreditoPersona is not None:
+                        getCreditoPersona.montoAprobado = getCreditoPersona.montoAprobado - float(query.precio)
+                        getCreditoPersona.save()
                 if 'Procesado' == request.data['estado']:
                     credito = CreditoPersonas.objects.filter(_id=ObjectId(request.data['credito_id'])).first()
                     credito.montoDisponible = credito.montoDisponible - float(request.data['precio'])

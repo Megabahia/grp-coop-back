@@ -1005,12 +1005,13 @@ def firmar(request, dct, nombreArchivo):
 
 
 def enviarCorreoNegado(montoAprobado, email):
-    subject, from_email, to = 'Su solicitud de crédito de consumo ha sido NEGADO', "08d77fe1da-d09822@inbox.mailtrap.io", \
+    subject, from_email, to = 'Solicitud de Crédito NEGADA', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
         <h1>¡LO SENTIMOS!</h1>
                             
-        Su solicitud de crédito para realizar compras en las mejores Casas Comerciales con un crédito otorgado por una Cooperativa de Ahorro y Crédito regulada ha sido NEGADA.
+        Su Solicitud de Crédito para realizar compras en los mejores Locales Comerciales del país con un Crédito 
+        otorgado por una Cooperativa de Ahorro y Crédito regulada, ha sido NEGADA.
         
         Contáctese con su asesor a través de nuestro link de WhatsApp: https://wa.link/e8b3sa
         
@@ -1023,7 +1024,10 @@ def enviarCorreoNegado(montoAprobado, email):
                     <body>
                         <h1>¡LO SENTIMOS!</h1>
                         <br>
-                        <h2>Su solicitud de crédito para realizar compras en las mejores Casas Comerciales con un crédito otorgado por una Cooperativa de Ahorro y Crédito regulada ha sido NEGADA.</h2>
+                        <h2>
+                        Su Solicitud de Crédito para realizar compras en los mejores Locales Comerciales del país 
+                        con un Crédito otorgado por una Cooperativa de Ahorro y Crédito regulada, ha sido NEGADA.
+                        </h2>
                         <p>
                         Contáctese con su asesor a través de nuestro link de WhatsApp: <a href='https://wa.link/e8b3sa'>LINK</a>
                         </p>
@@ -1039,13 +1043,13 @@ def enviarCorreoNegado(montoAprobado, email):
 
 
 def enviarCorreoPorcompletar(montoAprobado, email):
-    subject, from_email, to = 'DEVUELTA PARA COMPLETAR INFORMACIÓN', "08d77fe1da-d09822@inbox.mailtrap.io", \
+    subject, from_email, to = 'Solicitud de Crédito DEVUELTA para Completar información', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
         ¡LO SENTIMOS!
                                                     
-        Su solicitud de crédito para realizar compras en las mejores Casas Comerciales con un crédito 
-        otorgado por una Cooperativa de Ahorro y Crédito regulada ha sido DEVUELTA PARA COMPLETAR INFORMACIÓN.
+        Su Solicitud de Crédito para realizar compras en los mejores Locales Comerciales del país con un Crédito 
+        otorgado por una Cooperativa de Ahorro y Crédito regulada, ha sido DEVUELTA para completar información.
                                 
         Contáctese con su asesor a través de nuestro link de WhatsApp: https://wa.link/szsyad
         
@@ -1059,8 +1063,9 @@ def enviarCorreoPorcompletar(montoAprobado, email):
                         <h1>¡LO SENTIMOS!</h1>
                         <br>
                         <p>
-                        Su solicitud de crédito para realizar compras en las mejores Casas Comerciales con un crédito 
-                        otorgado por una Cooperativa de Ahorro y Crédito regulada ha sido DEVUELTA PARA COMPLETAR INFORMACIÓN.
+                        Su Solicitud de Crédito para realizar compras en los mejores Locales Comerciales del país con 
+                        un Crédito otorgado por una Cooperativa de Ahorro y Crédito regulada, 
+                        ha sido DEVUELTA para completar información.
                         </p>
                         <br>
                         <p>Contáctese con su asesor a través de nuestro link de WhatsApp: <a href='https://wa.link/szsyad'>LINK</a></p>
