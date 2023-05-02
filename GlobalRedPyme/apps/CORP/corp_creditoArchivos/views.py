@@ -539,33 +539,41 @@ def insertarDato_creditoPreaprobado_empleado(dato, empresa_financiera):
 def enviarCodigoCorreo(codigo, monto, email):
     subject, from_email, to = 'Generacion de codigo de credito pre-aprobado', "08d77fe1da-d09822@inbox.mailtrap.io", email
     txt_content = f"""
-        Se acaba de generar el codigo de verificación de su cuenta
-        
-        USTED TIENE UN CREDITO PRE-APROBADO DE $ {monto}, PARA QUE REALICE LA COMPRA EN www.credicompra.com,
-        Por favor ingrese a la plataforma www.credicompra.com y disfrute de su compra: Link
-        
-        {config.API_FRONT_END_BIGPUNTOS}/pages/preApprovedCreditConsumer
-        
-        Al ingresar por favor digitar el siguiente código: {codigo} en la siguiente pagina
+        FELICIDADES!
 
-        Saludos,
-        Equipo Global Red Pymes.
+        La Cooperativa $$NOMBRE_DE_LA_COOP_QUE_CARGÓ_EL_CRÉDITO le acaba de preaprobar un 
+        crédito de $ {monto} para que realice compras en lo Locales Comerciales afiliados
+        
+        Ingrese al siguiente  {config.API_FRONT_END_BIGPUNTOS}/pages/preApprovedCreditConsumer
+        
+        Su código para acceder a su crédito es: {codigo}
+
+        Saludos
+
+        Equipo CrediCompra - Big Puntos
     """
-    html_content = """
+    html_content = f"""
             <html>
                 <body>
-                    <h1>Se acaba de generar el codigo de verificación de su cuenta</h1>
-
-                    <p>USTED TIENE UN CREDITO PRE-APROBADO DE $ """ + monto + """, PARA QUE REALICE LA COMPRA EN www.credicompra.com, 
-                    Por favor ingrese a la plataforma www.credicompra.com y disfrute de su compra: <a href='www.credicompra.com'>Link</a>
+                    <h1>FELICIDADES!</h1>
+                    <br>
+                    <p>
+                        La Cooperativa $$NOMBRE_DE_LA_COOP_QUE_CARGÓ_EL_CRÉDITO le acaba de preaprobar un 
+                        crédito de $ {monto} para que realice compras en lo Locales Comerciales afiliados 
+                        <a href='https://credicompra.com'>www.credicompra.com</a>
                     </p>
-
-                    <a href='""" + config.API_FRONT_END_BIGPUNTOS + """/pages/preApprovedCreditConsumer'>Link</a>
-
-                    Al ingresar por favor digitar el siguiente código: """ + codigo + """ en la siguiente pagina<br>                    
-
-                    Saludos,<br>
-                    Equipo Global Red Pymes.<br>
+                    <br>
+                    <p>
+                    Ingrese al siguiente <a href='{config.API_FRONT_END_BIGPUNTOS}/pages/preApprovedCreditConsumer'>ENLACE</a>
+                    </p
+                    <br>
+                    <p>
+                    Su código para acceder a su crédito es: {codigo}
+                    </p>
+                    <br>
+                    Saludos
+                    <br>
+                    Equipo CrediCompra - Big Puntos
                 </body>
             </html>
             """
