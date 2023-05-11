@@ -253,13 +253,15 @@ def creditoPersonas_update(request, pk):
                 if email == '' or email is None:
                     email = serializer.data['empresaInfo']['correo']
                 if serializer.data['estado'] == 'Negado':
-                    # Publicar en la cola
-                    publish(serializer.data)
-                    enviarCorreoNegado(serializer.data['montoLiquidar'], email)
+                    if serializer.data['alcance'] != 'LOCAL':
+                        # Publicar en la cola
+                        publish(serializer.data)
+                        enviarCorreoNegado(serializer.data['montoLiquidar'], email)
                 if serializer.data['estado'] == 'Por Completar':
-                    # Publicar en la cola
-                    publish(serializer.data)
-                    enviarCorreoPorcompletar(serializer.data['montoLiquidar'], email)
+                    if serializer.data['alcance'] != 'LOCAL':
+                        # Publicar en la cola
+                        publish(serializer.data)
+                        enviarCorreoPorcompletar(serializer.data['montoLiquidar'], email)
                 if serializer.data['estado'] == 'Aprobado':
                     if serializer.data['montoLiquidar']:
                         enviarCorreoAprobado(serializer.data['montoAprobado'], email)
@@ -267,8 +269,14 @@ def creditoPersonas_update(request, pk):
                     if request.data['tipoCredito'] == '':
                         credito = serializer.data
                         credito['tipoCredito'] = credito['canal']
-                        # Publicar en la cola
-                        publish(credito)
+                        if serializer.data['alcance'] != 'LOCAL':
+                            # Publicar en la cola
+                            publish(credito)
+                if "estado" in request.data:
+                    if request.data["estado"] == 'Enviado':
+                        query.enviado = 1
+                        query.save()
+
                 return Response(serializer.data)
             createLog(logModel, serializer.errors, logExcepcion)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -427,6 +435,13 @@ def creditoPersonas_list(request):
             if "cargarOrigen" in request.data:
                 if request.data["cargarOrigen"] != '':
                     filters['cargarOrigen'] = str(request.data["cargarOrigen"])
+
+            if "alcance" in request.data:
+                if request.data["alcance"] != '':
+                    filters['alcance__icontains'] = request.data["alcance"]
+
+            if "enviado" in request.data:
+                filters['enviado'] = request.data["enviado"]
 
             # Serializar los datos
             query = CreditoPersonas.objects.filter(**filters).order_by('-created_at')
@@ -1005,36 +1020,36 @@ def firmar(request, dct, nombreArchivo):
 
 
 def enviarCorreoNegado(montoAprobado, email):
-    subject, from_email, to = 'Solicitud de Crédito NEGADA', "08d77fe1da-d09822@inbox.mailtrap.io", \
+    subject, from_email, to = 'Solicitud de Línea de Crédito NEGADA', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
         <h1>¡LO SENTIMOS!</h1>
                             
-        Su Solicitud de Crédito para realizar compras en los mejores Locales Comerciales del país con un Crédito 
-        otorgado por una Cooperativa de Ahorro y Crédito regulada, ha sido NEGADA.
+        Su Solicitud de Línea de Crédito para realizar pagos a sus proveedores otorgado por una Cooperativa de 
+        Ahorro y Crédito regulada ha sido NEGADA.
         
         Contáctese con su asesor a través de nuestro link de WhatsApp: https://wa.link/e8b3sa
         
         Atentamente,
         
-        CrediCompra – Big Puntos
+        Equipo Global Redpyme – Crédito Pagos
     """
     html_content = f"""
                 <html>
                     <body>
                         <h1>¡LO SENTIMOS!</h1>
                         <br>
-                        <h2>
-                        Su Solicitud de Crédito para realizar compras en los mejores Locales Comerciales del país 
-                        con un Crédito otorgado por una Cooperativa de Ahorro y Crédito regulada, ha sido NEGADA.
-                        </h2>
+                        <p>
+                        Su Solicitud de Línea de Crédito para realizar pagos a sus proveedores otorgado por una 
+                        Cooperativa de Ahorro y Crédito regulada ha sido <b>NEGADA</b>.
+                        </p>
                         <p>
                         Contáctese con su asesor a través de nuestro link de WhatsApp: <a href='https://wa.link/e8b3sa'>LINK</a>
                         </p>
                         <br>
                         Atentamente,
                         <br>
-                        CrediCompra – Big Puntos
+                        Equipo Global Redpyme – Crédito Pagos
                         <br>
                     </body>
                 </html>

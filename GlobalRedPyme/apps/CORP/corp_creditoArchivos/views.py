@@ -12,6 +12,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from django.conf import settings
+
+from ...CENTRAL.central_catalogo.models import Catalogo
 from ...config import config
 # Importar boto3
 import boto3
@@ -432,6 +434,8 @@ def insertarDato_creditoPreaprobadoNegocio(dato, empresa_financiera):
         data['empresaIfis_id'] = empresa_financiera
         data['empresasAplican'] = dato[20]
         data['created_at'] = str(timezone_now)
+        catalogo = Catalogo.objects.filter(tipo='ALCANCE_VISADO_DOCUMENTOS', state=1).order_by('-created_at').first()
+        data['alcance'] = catalogo.valor
         # Genera el codigo
         codigo = (''.join(random.choice(string.digits) for _ in range(int(6))))
         data['codigoPreaprobado'] = codigo
@@ -440,9 +444,10 @@ def insertarDato_creditoPreaprobadoNegocio(dato, empresa_financiera):
         credito.external_id = credito._id
         credito.save()
         creditoSerializer = CreditoPersonasSerializer(credito, data=data, partial=True)
-        enviarCodigoCorreo(codigo, monto=data['monto'], email=dato[16])
         if creditoSerializer.is_valid():
-            publish_credit(creditoSerializer.data)
+            enviarCodigoCorreo(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'])
+            if creditoSerializer.data['alcance'].upper() != 'LOCAL':
+                publish_credit(creditoSerializer.data)
         return 'Dato insertado correctamente'
     except Exception as e:
         return str(e)
@@ -474,6 +479,8 @@ def insertarDato_creditoPreaprobado(dato, empresa_financiera):
         data['canal'] = 'Negocio-PreAprobado'
         data['cargarOrigen'] = 'IFIS'
         data['created_at'] = str(timezone_now)
+        catalogo = Catalogo.objects.filter(tipo='ALCANCE_VISADO_DOCUMENTOS', state=1).order_by('-created_at').first()
+        data['alcance'] = catalogo.valor
         # Genera el codigo
         codigo = (''.join(random.choice(string.digits) for _ in range(int(6))))
         data['codigoPreaprobado'] = codigo
@@ -484,7 +491,8 @@ def insertarDato_creditoPreaprobado(dato, empresa_financiera):
         creditoSerializer = CreditoPersonasSerializer(credito, data=data, partial=True)
         enviarCodigoCorreoMicroCredito(data['razonSocial'], codigo, monto=data['monto'], email=dato[18])
         if creditoSerializer.is_valid():
-            publish_credit(creditoSerializer.data)
+            if creditoSerializer.data['alcance'].upper() != 'LOCAL':
+                publish_credit(creditoSerializer.data)
         return 'Dato insertado correctamente'
     except Exception as e:
         return str(e)
@@ -520,6 +528,8 @@ def insertarDato_creditoPreaprobado_empleado(dato, empresa_financiera):
         data['empresaIfis_id'] = empresa_financiera
         data['empresasAplican'] = dato[22]
         data['created_at'] = str(timezone_now)
+        catalogo = Catalogo.objects.filter(tipo='ALCANCE_VISADO_DOCUMENTOS', state=1).order_by('-created_at').first()
+        data['alcance'] = catalogo.valor
         # Genera el codigo
         codigo = (''.join(random.choice(string.digits) for _ in range(int(6))))
         data['codigoPreaprobado'] = codigo
@@ -528,23 +538,28 @@ def insertarDato_creditoPreaprobado_empleado(dato, empresa_financiera):
         credito.external_id = credito._id
         credito.save()
         creditoSerializer = CreditoPersonasSerializer(credito, data=data, partial=True)
-        enviarCodigoCorreo(codigo, monto=data['monto'], email=dato[16])
         if creditoSerializer.is_valid():
-            publish_credit(creditoSerializer.data)
+            enviarCodigoCorreo(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'], empresa=dato[21])
+            if creditoSerializer.data['alcance'].upper() != 'LOCAL':
+                publish_credit(creditoSerializer.data)
         return 'Dato insertado correctamente'
     except Exception as e:
         return str(e)
 
 
-def enviarCodigoCorreo(codigo, monto, email):
+def enviarCodigoCorreo(codigo, monto, email, alcance, empresa='COOP SANJOSE'):
+    if alcance.upper() == 'LOCAL':
+        url = config.API_FRONT_END_SANJOSE+"/pages/preApprovedCreditConsumer"
+    else:
+        url = config.API_FRONT_END_BIGPUNTOS+"/pages/preApprovedCreditConsumer"
     subject, from_email, to = 'Generacion de codigo de credito pre-aprobado', "08d77fe1da-d09822@inbox.mailtrap.io", email
     txt_content = f"""
         FELICIDADES!
 
-        La Cooperativa $$NOMBRE_DE_LA_COOP_QUE_CARGÓ_EL_CRÉDITO le acaba de preaprobar un 
+        La Cooperativa {empresa} le acaba de preaprobar un 
         crédito de $ {monto} para que realice compras en lo Locales Comerciales afiliados
         
-        Ingrese al siguiente  {config.API_FRONT_END_BIGPUNTOS}/pages/preApprovedCreditConsumer
+        Ingrese al siguiente  {url}
         
         Su código para acceder a su crédito es: {codigo}
 
@@ -564,7 +579,7 @@ def enviarCodigoCorreo(codigo, monto, email):
                     </p>
                     <br>
                     <p>
-                    Ingrese al siguiente <a href='{config.API_FRONT_END_BIGPUNTOS}/pages/preApprovedCreditConsumer'>ENLACE</a>
+                    Ingrese al siguiente <a href='{url}'>ENLACE</a>
                     </p
                     <br>
                     <p>
@@ -820,6 +835,8 @@ def insertarDato_creditoPreaprobado_microCredito(dato, empresa_financiera, empre
         codigo = (''.join(random.choice(string.digits) for _ in range(int(6))))
         data['codigoPreaprobado'] = codigo
         data['created_at'] = str(timezone_now)
+        catalogo = Catalogo.objects.filter(tipo='ALCANCE_VISADO_DOCUMENTOS', state=1).order_by('-created_at').first()
+        data['alcance'] = catalogo.valor
         # inserto el dato con los campos requeridos
         creditoPreAprobado = CreditoPersonas.objects.create(**data)
         creditoSerializer = CreditoPersonasSerializer(creditoPreAprobado)
@@ -829,7 +846,7 @@ def insertarDato_creditoPreaprobado_microCredito(dato, empresa_financiera, empre
             Estimad@ {data['nombresCompleto']}
             
             Nos complace comunicarle que usted tiene una LÍNEA DE CRÉDITO PRE-APROBADA por $ {data['monto']}
-            para que pueda realizar pagos a sus PROVEEDORES con un crédito otorgado {dato[13]}
+            para que pueda realizar pagos a sus PROVEEDORES con un crédito otorgado por {dato[13]}
             
             Para acceder a su Línea de Crédito para pago a proveedores haga click en el siguiente enlace:
             {config.API_FRONT_END_CENTRAL}/pages/preApprovedCreditLine
@@ -848,14 +865,15 @@ def insertarDato_creditoPreaprobado_microCredito(dato, empresa_financiera, empre
                         <br>
                         <p>
                          Nos complace comunicarle que usted tiene una LÍNEA DE CRÉDITO PRE-APROBADA por $ {data['monto']}
-                         para que pueda realizar pagos a sus PROVEEDORES con un crédito otorgado {dato[13]}
+                         para que pueda realizar pagos a sus PROVEEDORES con un crédito otorgado por {dato[13]}
                         </p>
                         <br>
                         <p>Para acceder a su Línea de Crédito para pago a proveedores haga click en el siguiente enlace:
                         <a href='{config.API_FRONT_END_CENTRAL}/pages/preApprovedCreditLine'>Link</a>
                         </p>
 
-                        Su código de ingreso es: {codigo}
+                        <p>Su código de ingreso es: {codigo}</p>
+                        <br>
                         <br>
                         <b>Crédito Pagos en la mejor opción de crecimiento para su negocio</b>
                         <br>

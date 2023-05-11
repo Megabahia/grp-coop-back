@@ -78,30 +78,32 @@ def enviarEmailAsignacionPassword(reset_password_token):
         else:
             url = config.API_FRONT_END + config.endpointEmailAsignacionPassword + "?token=" + reset_password_token.key + "&email=" + reset_password_token.user.email
         # url=config.API_FRONT_END+config.endpointEmailAsignacionPassword+"?token="+reset_password_token.key+"&email="+reset_password_token.user.email
-        subject, from_email, to = 'Registro de cuenta-contraseña Crédito Pagos', "08d77fe1da-d09822@inbox.mailtrap.io", reset_password_token.user.email
+        subject, from_email, to = 'Registro de Cuenta', "08d77fe1da-d09822@inbox.mailtrap.io", reset_password_token.user.email
         txt_content = f"""
-                Registro de Contraseña Crédito Pagos
-                Hola
-                Para poder ingresar a la Plataforma de Global Red Pyme-Crédito Pagos usted debe registrar su contraseña.
-                Haga click en el siguiente enlace: {url}
-                Si al hacer click en el enlace anterior no funciona, copie y pegue el siguiente URL en una ventana del navegador {url}
+                Registro de Contraseña
+                
+                Para completar su registro, haga click en el siguiente enlace: {url}
+                Si al hacer click en el enlace anteriori no funciona, copie y pegue la siguiente URL en una ventana del navegador.
+                 {url}
                 Atentamente,
-                Global Red Pyme-Crédito Pagos.
+                Equipo Global Redpyme
         """
         html_content = f"""
         <html>
             <body>
-                <h1>Registro de Contraseña Crédito Pagos</h1>
-                <h3>Hola</h3>
-                <p>Para poder ingresar a la <b>Plataforma de Global Red Pyme-Crédito Pagos</b> usted debe registrar su contraseña.</p>
+                <h1>Registro de Contraseña</h1>
                 <br>
-                <p>Haga click en el siguiente enlace: <a href='{url}'>Clic Aquí!</a></p>
+                <p>Para completar su registro, haga click en el siguiente enlace: <a href='{url}'>Clic Aquí!</a></p>
                 <br>
-                <p>Si al hacer click en el enlace anterior no funciona, copie y pegue el siguiente URL en una ventana del navegador {url}</p>
+                <p>
+                Si al hacer click en el enlace anteriori no funciona, copie y pegue la siguiente URL en una ventana del navegador.
+                 </p>
+                <br>
+                <p>{url}</p>
                 <br>
                 Atentamente,
                 <br>
-                <b>Global Red Pyme-Crédito Pagos.</b>
+                <b>Equipo Global Redpyme</b>
                 <br>
             </body>
         </html>

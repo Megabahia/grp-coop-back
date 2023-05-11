@@ -116,6 +116,8 @@ class CreditoPersonas(models.Model):
     estadoCuentaTarjeta = models.FileField(blank=True, null=True, upload_to=upload_path)
     facturasPendiente = models.FileField(blank=True, null=True, upload_to=upload_path)
     cargarOrigen = models.TextField(null=True, blank=True)
+    alcance = models.TextField(null=True, blank=True)
+    enviado = models.SmallIntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)
