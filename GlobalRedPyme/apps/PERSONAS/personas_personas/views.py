@@ -3,6 +3,7 @@ from apps.PERSONAS.personas_personas.models import  Personas, ValidarCuenta
 from apps.PERSONAS.personas_personas.serializers import (
     PersonasSerializer, PersonasUpdateSerializer, PersonasImagenSerializer, ValidarCuentaSerializer, PersonasUpdateSinImagenSerializer
 )
+from .security import encriptar
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
@@ -374,7 +375,8 @@ def personas_listOne_cedula(request):
     }
     try:
         try:
-            query = Personas.objects.filter(identificacion=str(request.data['identificacion']), state=1).first()
+            hash_resultado = encriptar(request.data['identificacion'])
+            query = Personas.objects.filter(identificacion=hash_resultado, state=1).first()
         except Personas.DoesNotExist:
             err={"error":"No existe"}  
             createLog(logModel,err,logExcepcion)
