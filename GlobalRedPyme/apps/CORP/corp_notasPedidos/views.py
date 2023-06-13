@@ -389,7 +389,7 @@ def factura_generar_codigos_envios(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def factura_create_fisica(request):
     request.POST._mutable = True
     timezone_now = timezone.localtime(timezone.now())
@@ -464,7 +464,7 @@ def factura_update_fisica(request, pk):
                     query.save()
                     getCreditoPersona = CreditoPersonas.objects.filter(_id=ObjectId(query.credito_id)).first()
                     if getCreditoPersona is not None:
-                        getCreditoPersona.montoAprobado = getCreditoPersona.montoAprobado - float(query.precio)
+                        getCreditoPersona.montoDisponible = getCreditoPersona.montoDisponible - float(query.precio)
                         getCreditoPersona.save()
                 if 'Procesado' == request.data['estado']:
                     credito = CreditoPersonas.objects.filter(_id=ObjectId(request.data['credito_id'])).first()
@@ -538,6 +538,9 @@ def factura_list_facturaFisica(request):
             # Filtros
             filters = {"state": "1"}
 
+            if 'estado' in request.data and request.data['estado']:
+                filters['estado__icontains'] = request.data['estado']
+
             # Serializar los datos
             query = FacturasFisicas.objects.filter(**filters).order_by('-created_at')
             serializer = FacturasFisicasSerializer(query[offset:limit], many=True)
@@ -554,7 +557,21 @@ def factura_list_facturaFisica(request):
 def enviarCorreoNegado(email, valorCompra, valorDesembolso, observacion):
     subject, from_email, to = 'Ha ocurrido un ERROR', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
-    txt_content = f"""{valorDesembolso}"""
+    txt_content = f"""
+        PAGO FALLIDO
+        
+        Lo sentimos!
+                                
+        Ha ocurrido un error al intentar realizar el pago de su factura por {valorCompra} debido a {observacion} 
+                                
+        Su motivo es: {observacion}
+    
+        Si requiere asistencia personalizada, contáctenos a través del siguiente 
+        LINK
+        Atentamente,
+        
+        CrediCompra – Big Puntos
+    """
     html_content = f"""
                 <html>
                     <body>

@@ -1,8 +1,9 @@
 from apps.CENTRAL.central_catalogo.models import  Catalogo
 from apps.PERSONAS.personas_personas.models import  Personas, ValidarCuenta
-from apps.PERSONAS.personas_personas.serializers import (
+from .serializers import (
     PersonasSerializer, PersonasUpdateSerializer, PersonasImagenSerializer, ValidarCuentaSerializer, PersonasUpdateSinImagenSerializer
 )
+from ...CORP.corp_creditoPersonas.models import CreditoPersonas
 from .security import encriptar
 from rest_framework import status
 from rest_framework.response import Response
@@ -421,6 +422,10 @@ def personas_update_empresa(request, pk):
             serializer = PersonasUpdateSinImagenSerializer(query, data=request.data,partial=True)
             if serializer.is_valid():
                 serializer.save()
+                creditos = CreditoPersonas.objects.filter(email=serializer.data['empresaInfo']['correo'], numeroIdentificacion=serializer.data['empresaInfo']['rucEmpresa'], state=1)
+                for credito in creditos:
+                    credito.user_id = str(serializer.data['user_id'])
+                    credito.save()
                 createLog(logModel,serializer.data,logTransaccion)
                 return Response(serializer.data)
             createLog(logModel,serializer.errors,logExcepcion)

@@ -191,7 +191,7 @@ class FacturasFisicasSerializer(serializers.ModelSerializer):
         cliente = json.loads(data['cliente'])
         # Quitar los credito de la factura
         try:
-            archivos = ArchivosFirmados.objects.get(numeroIdentificacion=cliente['identificacion'])
+            archivos = ArchivosFirmados.objects.filter(numeroIdentificacion=cliente['identificacion']).first()
             archivosSerializer = ArchivosFirmadosSerializer(archivos).data
             data.update({"archivos": archivosSerializer})
         except ArchivosFirmados.DoesNotExist:

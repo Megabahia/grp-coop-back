@@ -30,6 +30,9 @@ from apps.CENTRAL.central_logs.methods import createLog,datosUsuarios,datosTipoL
 from django_rest_passwordreset.views import ResetPasswordRequestToken
 #enviar email usuario creado
 from apps.CENTRAL.central_autenticacion.password_reset import resetPasswordNewUser, enviarEmailCreacionPersona
+
+from ...CORP.corp_creditoPersonas.models import CreditoPersonas
+
 #declaracion variables log
 datosAux=datosUsuarios()
 datosTipoLogAux=datosTipoLog()
@@ -441,6 +444,11 @@ def usuario_create(request):
             data = {}
             if serializer.is_valid():
                 account = serializer.save()
+
+                # creditos = CreditoPersonas.objects.filter(email=request.data['email'], state=1)
+                # for credito in creditos:
+                #     credito.user_id = str(account.pk)
+                #     credito.save()
 
                 if 'roles' in request.data:
                     if request.data['roles'] != '':

@@ -1,4 +1,5 @@
 # lib token
+from ...CORP.corp_empresas.models import Empresas
 from django_rest_passwordreset.serializers import EmailSerializer
 from django_rest_passwordreset.models import ResetPasswordToken, clear_expired, get_password_reset_token_expiry_time, \
     get_password_reset_lookup_field
@@ -70,6 +71,7 @@ def resetPasswordNewUser(emailUsuario):
 
 def enviarEmailAsignacionPassword(reset_password_token):
     try:
+        empresaIfis = Empresas.objects.filter(tipoEmpresa='ifis',state=1).order_by('-created_at').first()
         # enviar por email
         if reset_password_token.user.tipoUsuario.nombre == 'core':
             url = config.API_FRONT_END_CENTRAL + config.endpointEmailReseteoPassword + "?token=" + reset_password_token.key + "&email=" + reset_password_token.user.email
@@ -82,28 +84,33 @@ def enviarEmailAsignacionPassword(reset_password_token):
         txt_content = f"""
                 Registro de Contraseña
                 
-                Para completar su registro, haga click en el siguiente enlace: {url}
-                Si al hacer click en el enlace anteriori no funciona, copie y pegue la siguiente URL en una ventana del navegador.
-                 {url}
+                Para completar su registro en el portal de la Cooperativa {empresaIfis.nombreEmpresa}
+                a para acceder a su Crédito de Consumo y realizar compras en los mejores Locales 
+                Comerciales del país, haga Click en el siguiente enlace: {url}
+
+                Si al hacer click en el enlace anterior NO FUNCIONA, copie y pegue el siguiente enlace en una ventana del navegador: {url}
+                
                 Atentamente,
-                Equipo Global Redpyme
+                {empresaIfis.nombreEmpresa}
         """
         html_content = f"""
         <html>
             <body>
                 <h1>Registro de Contraseña</h1>
                 <br>
-                <p>Para completar su registro, haga click en el siguiente enlace: <a href='{url}'>Clic Aquí!</a></p>
+                <p>Para completar su registro en el portal de la Cooperativa {empresaIfis.nombreEmpresa}
+                a para acceder a su Crédito de Consumo y realizar compras en los mejores Locales 
+                Comerciales del país, haga Click en el siguiente enlace: <a href='{url}'>ENLACE</a></p>
                 <br>
                 <p>
-                Si al hacer click en el enlace anteriori no funciona, copie y pegue la siguiente URL en una ventana del navegador.
+                Si al hacer click en el enlace anterior NO FUNCIONA, copie y pegue el siguiente enlace en una ventana del navegador:
                  </p>
                 <br>
                 <p>{url}</p>
                 <br>
                 Atentamente,
                 <br>
-                <b>Equipo Global Redpyme</b>
+                <b>{empresaIfis.nombreEmpresa}</b>
                 <br>
             </body>
         </html>

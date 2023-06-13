@@ -203,6 +203,7 @@ def creditoPersonas_update(request, pk):
                         "password": request.data['claveFirma'],
                     }
             if 'solicitudCreditoFirmado' in request.data:
+                print('entro')
                 if request.data['solicitudCreditoFirmado'] is not None:
                     archivo_pdf_para_enviar_al_cliente = firmar(request, dct, 'solicitudCreditoFirmado')
                     request.data['solicitudCreditoFirmado'] = InMemoryUploadedFile(archivo_pdf_para_enviar_al_cliente,
@@ -1096,22 +1097,21 @@ def enviarCorreoPorcompletar(montoAprobado, email):
 
 
 def enviarCorreoAprobado(montoAprobado, email):
-    subject, from_email, to = 'Su Solicitud de Crédito de Consumo ha sido APROBADA', "08d77fe1da-d09822@inbox.mailtrap.io", email
+    subject, from_email, to = 'Su Solicitud de Línea de Crédito ha sido APROBADA', "08d77fe1da-d09822@inbox.mailtrap.io", email
     txt_content = f"""
-    CRÉDITO DE CONSUMO APROBADO
+    LÍNEA DE CRÉDITO PARA PAGO A PROVEEDORES Y/O EMPLEADOS APROBADA
     
     Felicidades!
-    Su Solicitud de Crédito para realizar compras en los mejores Locales Comerciales del país
-    ha sido APROBADA por un monto de {montoAprobado}.
+    Su Solicitud de Línea de Crédito para realizar pagos a sus proveedores y/o empleados ha sido APROBADA por un monto de {montoAprobado}.
     
-    Para acceder a su Crédito, realice los siguientes pasos:
+    Para acceder a su Línea de Crédito para realizar pagos a proveedores y/o empleados, realice lo siguiente: 
     
     Ingrese a www.credicompra.com y revise el catálogo de nuestros Locales Comerciales afiliados.
     Acérquese al Local Comercial de su preferencia y solicite realizar la compra con su crédito Aprobado.
     Confirme sus datos
     Escoja sus productos y listo. Pague con su Crédito Aprobado
     
-    Si requiere asistencia personalizada, contáctenos a través del siguiente <a href='https://wa.link/5aips'>LINK</a>
+    Si requiere asistencia personalizada, contáctenos a través del siguiente <a href='https://wa.link/6m3c3k'>LINK</a>
     
     Atentamente,
     
@@ -1120,19 +1120,20 @@ def enviarCorreoAprobado(montoAprobado, email):
     html_content = f"""
                 <html>
                     <body>
-                        <h1>CRÉDITO DE CONSUMO APROBADO</h1>
+                        <h1>LÍNEA DE CRÉDITO PARA PAGO A PROVEEDORES Y/O EMPLEADOS APROBADA</h1>
                         <br>
                         <h2>Felicidades!</h2>
                         <p>
-                        Su Solicitud de Crédito para realizar compras en los mejores Locales Comerciales del país
-                         ha sido <b>APROBADA</b> por un monto de {montoAprobado}.
+                        Su Solicitud de Línea de Crédito para realizar pagos a sus proveedores y/o empleados ha sido 
+                        <b>APROBADA</b> por un monto de  {montoAprobado}.
                         </p>
                         <br>
                         <p>
-                        <b>Para acceder a su Crédito, realice los siguientes pasos:</b>
+                        <b>Para acceder a su Línea de Crédito para realizar pagos a proveedores y/o empleados, realice lo siguiente:</b>
                         </p>
                         <br>
                         <ol>
+                            <li>Ingrese a <a href='https://credicompra.com/'>www.credicompra.com</a> y revise el catálogo de nuestros Locales Comerciales afiliados.</li>
                              <li>Ingrese a <a href='https://credicompra.com/'>www.credicompra.com</a> y revise el catálogo de nuestros Locales Comerciales afiliados.</li>
                              <li>Acérquese al Local Comercial de su preferencia y solicite realizar la compra con su crédito Aprobado.</li>
                              <li>Confirme sus datos</li>

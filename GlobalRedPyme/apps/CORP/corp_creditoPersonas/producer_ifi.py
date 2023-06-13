@@ -62,6 +62,8 @@ def publish(data):
     if 'external_id' in data:
         if data['external_id'] is None:
             data['external_id'] = data['_id']
+    if 'user_id' in data:
+        data.pop('user_id')
 
     response = snsClient.publish(
         TopicArn=topicArn,

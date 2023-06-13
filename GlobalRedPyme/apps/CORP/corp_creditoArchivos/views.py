@@ -445,7 +445,7 @@ def insertarDato_creditoPreaprobadoNegocio(dato, empresa_financiera):
         credito.save()
         creditoSerializer = CreditoPersonasSerializer(credito, data=data, partial=True)
         if creditoSerializer.is_valid():
-            enviarCodigoCorreo(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'])
+            enviarCodigoCorreo(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'], nombreCompleto=data['nombresCompleto'])
             if creditoSerializer.data['alcance'].upper() != 'LOCAL':
                 publish_credit(creditoSerializer.data)
         return 'Dato insertado correctamente'
@@ -539,7 +539,7 @@ def insertarDato_creditoPreaprobado_empleado(dato, empresa_financiera):
         credito.save()
         creditoSerializer = CreditoPersonasSerializer(credito, data=data, partial=True)
         if creditoSerializer.is_valid():
-            enviarCodigoCorreo(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'], empresa=dato[21])
+            enviarCodigoCorreo(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'], empresa=dato[21], nombreCompleto=data['nombresCompleto'])
             if creditoSerializer.data['alcance'].upper() != 'LOCAL':
                 publish_credit(creditoSerializer.data)
         return 'Dato insertado correctamente'
@@ -547,7 +547,7 @@ def insertarDato_creditoPreaprobado_empleado(dato, empresa_financiera):
         return str(e)
 
 
-def enviarCodigoCorreo(codigo, monto, email, alcance, empresa='COOP SANJOSE'):
+def enviarCodigoCorreo(codigo, monto, email, alcance, empresa='COOP SANJOSE', nombreCompleto=''):
     if alcance.upper() == 'LOCAL':
         url = config.API_FRONT_END_SANJOSE+"/pages/preApprovedCreditConsumer"
     else:
@@ -556,12 +556,14 @@ def enviarCodigoCorreo(codigo, monto, email, alcance, empresa='COOP SANJOSE'):
     txt_content = f"""
         FELICIDADES!
 
-        La Cooperativa {empresa} le acaba de preaprobar un 
-        crédito de $ {monto} para que realice compras en lo Locales Comerciales afiliados
+        {nombreCompleto}
         
-        Ingrese al siguiente  {url}
+        La {empresa} le acaba de preaprobar un crédito de $ {monto} para que realice compras en los
+        Locales Comerciales afiliados a la única Tienda de Comercio Electrónico del país en la que usted puede 
+        realizar compras con Créditos otorgados por la {empresa}
         
-        Su código para acceder a su crédito es: {codigo}
+        Para acceder a su Crédito y realizar compras en los mejores Locales Comerciales del país, 
+        COPIE Y PEGUE el siguiente código {codigo} en el siguiente {url}
 
         Saludos
 
@@ -572,18 +574,17 @@ def enviarCodigoCorreo(codigo, monto, email, alcance, empresa='COOP SANJOSE'):
                 <body>
                     <h1>FELICIDADES!</h1>
                     <br>
+                    <p>{nombreCompleto}</p>
+                    <br>
                     <p>
-                        La Cooperativa $$NOMBRE_DE_LA_COOP_QUE_CARGÓ_EL_CRÉDITO le acaba de preaprobar un 
-                        crédito de $ {monto} para que realice compras en lo Locales Comerciales afiliados 
-                        <a href='https://credicompra.com'>www.credicompra.com</a>
+                    La {empresa} le acaba de preaprobar un crédito de $ {monto} para que realice compras en los
+                    Locales Comerciales afiliados a la única Tienda de Comercio Electrónico del país en la que usted puede 
+                    realizar compras con Créditos otorgados por la {empresa}
                     </p>
                     <br>
                     <p>
-                    Ingrese al siguiente <a href='{url}'>ENLACE</a>
-                    </p
-                    <br>
-                    <p>
-                    Su código para acceder a su crédito es: {codigo}
+                    Para acceder a su Crédito y realizar compras en los mejores Locales Comerciales del país, 
+                    COPIE Y PEGUE el siguiente código {codigo} en el siguiente <a href='{url}'>ENLACE</a>
                     </p>
                     <br>
                     Saludos
@@ -837,10 +838,14 @@ def insertarDato_creditoPreaprobado_microCredito(dato, empresa_financiera, empre
         data['created_at'] = str(timezone_now)
         catalogo = Catalogo.objects.filter(tipo='ALCANCE_VISADO_DOCUMENTOS', state=1).order_by('-created_at').first()
         data['alcance'] = catalogo.valor
+        if catalogo.valor is 'OMNIGLOBAL':
+            url = config.API_FRONT_END_IFIS_PERSONAS
+        else:
+            url = config.API_FRONT_END_CENTRAL
         # inserto el dato con los campos requeridos
         creditoPreAprobado = CreditoPersonas.objects.create(**data)
         creditoSerializer = CreditoPersonasSerializer(creditoPreAprobado)
-        subject, from_email, to = 'Usted tiene una LÍNEA DE CRÉDITO PRE-APROBADA PARA PAGAR A SUS PROVEEDORES', "08d77fe1da-d09822@inbox.mailtrap.io", \
+        subject, from_email, to = 'Generación de codigo de credito pre-aprobado', "08d77fe1da-d09822@inbox.mailtrap.io", \
                                   dato[10]
         txt_content = f"""
             Estimad@ {data['nombresCompleto']}
@@ -849,7 +854,7 @@ def insertarDato_creditoPreaprobado_microCredito(dato, empresa_financiera, empre
             para que pueda realizar pagos a sus PROVEEDORES con un crédito otorgado por {dato[13]}
             
             Para acceder a su Línea de Crédito para pago a proveedores haga click en el siguiente enlace:
-            {config.API_FRONT_END_CENTRAL}/pages/preApprovedCreditLine
+            {url}/pages/preApprovedCreditLine
                 
             Su código de ingreso es: {codigo}
             
@@ -869,7 +874,7 @@ def insertarDato_creditoPreaprobado_microCredito(dato, empresa_financiera, empre
                         </p>
                         <br>
                         <p>Para acceder a su Línea de Crédito para pago a proveedores haga click en el siguiente enlace:
-                        <a href='{config.API_FRONT_END_CENTRAL}/pages/preApprovedCreditLine'>Link</a>
+                        <a href='{url}/pages/preApprovedCreditLine'>Link</a>
                         </p>
 
                         <p>Su código de ingreso es: {codigo}</p>
