@@ -257,7 +257,10 @@ def creditoPersonas_update(request, pk):
                     if serializer.data['alcance'] != 'LOCAL':
                         # Publicar en la cola
                         publish(serializer.data)
-                        enviarCorreoNegado(serializer.data['montoLiquidar'], email)
+                        if 'Pymes' in serializer.data['tipoCredito']:
+                            enviarCorreoNegado(serializer.data['montoLiquidar'], email)
+                        else:
+                            enviarCorreoNegado(serializer.data['montoLiquidar'], email)
                 if serializer.data['estado'] == 'Por Completar':
                     if serializer.data['alcance'] != 'LOCAL':
                         # Publicar en la cola
@@ -265,7 +268,10 @@ def creditoPersonas_update(request, pk):
                         enviarCorreoPorcompletar(serializer.data['montoLiquidar'], email)
                 if serializer.data['estado'] == 'Aprobado':
                     if serializer.data['montoLiquidar']:
-                        enviarCorreoAprobado(serializer.data['montoAprobado'], email)
+                        if 'Pymes' in serializer.data['tipoCredito']:
+                            enviarCorreoAprobado(serializer.data['montoAprobado'], email)
+                        else:
+                            enviarCorreoAprobadoCreditoConsumo(serializer.data['montoAprobado'], email)
                 if 'tipoCredito' in request.data:
                     if request.data['tipoCredito'] == '':
                         credito = serializer.data
@@ -842,42 +848,56 @@ def prueba(request):
         return Response(err, status=status.HTTP_400_BAD_REQUEST)
 
 
-def enviarCodigoCorreoMicroCredito(codigo, email):
-    subject, from_email, to = 'Generación de código para crédito aprobado', "08d77fe1da-d09822@inbox.mailtrap.io", \
+def enviarCodigoCorreoMicroCredito(codigo, email, nombreSolicitante):
+    subject, from_email, to = 'Código de seguridad para Consulta de Crédito', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
-        Su código de seguridad para consulta de créditos se ha generado
+        Se ha generado su código para consultar su crédito
                             
-        Hola!
+       Estimad@ {nombreSolicitante}
         
-        Su código de seguridad para consulta de créditos es: {codigo}
+        El código para realizar la consulta de su crédito es: {codigo}
+        
+        Por su seguridad, comparta esta información únicamente con el vendedor del local comercial en el que desea 
+        realizar su compra. Una vez ingresado, bloquearemos otras consultas para que su compra sea realizada de manera segura.
         
         Atentamente,
         
         CrediCompra-Big Puntos.
     """
     html_content = f"""
-                <html>
-                    <body>
-                        <h1>Su código de seguridad para consulta de créditos se ha generado</h1>
-                        <br>
-                        <p>Hola!</p>
-                        <br>
-                        <p>Su código de seguridad para consulta de créditos es: {codigo}</p>
-                        <br>
-                        Atentamente,
-                        <br>
-                        CrediCompra-Big Puntos.
-                        <br>
-                    </body>
-                </html>
-                """
+        <html>
+            <body>
+                <h1>
+                Se ha generado su código para consultar su crédito
+                </h1>
+                <br>
+                <p>
+                Estimad@ {nombreSolicitante}
+                </p>
+                <br>
+                <p>
+                El código para realizar la consulta de su crédito es: {codigo}
+                </p>
+                <br>
+                <p>
+                Por su seguridad, comparta esta información únicamente con el vendedor del local comercial en el que
+                 desea realizar su compra. Una vez ingresado, bloquearemos otras consultas para que su compra sea realizada de manera segura.
+                </p>
+                Atentamente,
+                <br>
+                CrediCompra-Big Puntos.
+                <br>
+            </body>
+        </html>
+    """
     sendEmail(subject, txt_content, from_email, to, html_content)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def creditoPersonas_codigo_creditoAprobado(request):
+    print('metodo')
     nowDate = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'generar/codigo/creditoAprobado/',
@@ -903,7 +923,8 @@ def creditoPersonas_codigo_creditoAprobado(request):
             longitud_codigo = Catalogo.objects.filter(tipo='CONFIG_TWILIO', nombre='LONGITUD_CODIGO',
                                                       state=1).first().valor
             codigo = (''.join(random.choice(string.digits) for _ in range(int(longitud_codigo))))
-            enviarCodigoCorreoMicroCredito(codigo, query.user['email'])
+            nombreSolicitante = query.user['nombres'] + ' ' + query.user['apellidos']
+            enviarCodigoCorreoMicroCredito(codigo, query.user['email'], nombreSolicitante)
             serializer = CodigoCreditoSerializer(data={'credito_id': str(query._id), 'codigo': codigo,
                                                        'numeroIdentificacion': request.data['numeroIdentificacion']})
             if serializer.is_valid():
@@ -1058,6 +1079,44 @@ def enviarCorreoNegado(montoAprobado, email):
     sendEmail(subject, txt_content, from_email, to, html_content)
 
 
+def enviarCorreoNegado(montoAprobado, email):
+    subject, from_email, to = 'Solicitud de Línea de Crédito NEGADA', "08d77fe1da-d09822@inbox.mailtrap.io", \
+                              email
+    txt_content = f"""
+        <h1>¡LO SENTIMOS!</h1>
+
+        Su solicitud de crédito para realizar compras en las mejores Casas Comerciales con un crédito otorgado 
+        por una Cooperativa de Ahorro y Crédito regulada ha sido NEGADA.
+
+        Contáctese con su asesor a través de nuestro link de WhatsApp: https://wa.link/e8b3sa
+
+        Atentamente,
+
+        Equipo Global Redpyme – Crédito Pagos
+    """
+    html_content = f"""
+                <html>
+                    <body>
+                        <h1>¡LO SENTIMOS!</h1>
+                        <br>
+                        <p>
+                        Su solicitud de crédito para realizar compras en las mejores Casas Comerciales con un crédito
+                         otorgado por una Cooperativa de Ahorro y Crédito regulada ha sido <b>NEGADA</b>.
+                        </p>
+                        <p>
+                        Contáctese con su asesor a través de nuestro link de WhatsApp: <a href='https://wa.link/e8b3sa'>LINK</a>
+                        </p>
+                        <br>
+                        Atentamente,
+                        <br>
+                        Equipo Global Redpyme – Crédito Pagos
+                        <br>
+                    </body>
+                </html>
+                """
+    sendEmail(subject, txt_content, from_email, to, html_content)
+
+
 def enviarCorreoPorcompletar(montoAprobado, email):
     subject, from_email, to = 'Solicitud de Crédito DEVUELTA para Completar información', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
@@ -1141,6 +1200,62 @@ def enviarCorreoAprobado(montoAprobado, email):
                         </ol>
                         <br>
                         <p>Si requiere asistencia personalizada, contáctenos a través del siguiente <a href='https://wa.link/5aips'>LINK</a></p>
+                        <br>
+                        Atentamente,
+                        <br>
+                        CrediCompra – Big Puntos
+                        <br>
+                    </body>
+                </html>
+                """
+    sendEmail(subject, txt_content, from_email, to, html_content)
+    print(email)
+
+
+def enviarCorreoAprobadoCreditoConsumo(montoAprobado, email):
+    subject, from_email, to = 'Su Solicitud de crédito de consumo ha sido APROBADA', "08d77fe1da-d09822@inbox.mailtrap.io", email
+    txt_content = f"""
+    CRÉDITO DE CONSUMO APROBADO
+
+    Felicidades!
+    Su Solicitud de Crédito para realizar compras en los mejores Locales Comerciales del país ha sido APROBADA por un monto de {montoAprobado}.
+
+    Para acceder a su Crédito, realice los siguientes pasos:
+
+    Ingrese a www.credicompra.com y revise el catálogo de nuestros Locales Comerciales afiliados.
+    Acérquese al Local Comercial de su preferencia y solicite realizar la compra con su crédito Aprobado.
+    Confirme sus datos
+    Escoja sus productos y listo. Pague con su Crédito Aprobado
+
+    Si requiere asistencia personalizada, contáctenos a través del siguiente <a href='https://wa.link/6m3c3k'>LINK</a>
+
+    Atentamente,
+
+    CrediCompra – Big Puntos
+    """
+    html_content = f"""
+                <html>
+                    <body>
+                        <h1>CRÉDITO DE CONSUMO APROBADO</h1>
+                        <br>
+                        <h2>Felicidades!</h2>
+                        <p>
+                        Su Solicitud de Crédito para realizar compras en los mejores Locales Comerciales del país ha 
+                        sido APROBADA por un monto de {montoAprobado}.
+                        </p>
+                        <br>
+                        <p>
+                        <b>Para acceder a su Crédito, realice los siguientes pasos:</b>
+                        </p>
+                        <br>
+                        <ol>
+                             <li>Ingrese a <a href='https://credicompra.com/'>www.credicompra.com</a> y revise el catálogo de nuestros Locales Comerciales afiliados.</li>
+                             <li>Acérquese al Local Comercial de su preferencia y solicite realizar la compra con su crédito Aprobado.</li>
+                             <li>Confirme sus datos</li>
+                             <li>Escoja sus productos y listo. Pague con su Crédito Aprobado</li>
+                        </ol>
+                        <br>
+                        <p>Si requiere asistencia personalizada, contáctenos a través del siguiente <a href='https://wa.link/ox0xha'>LINK</a></p>
                         <br>
                         Atentamente,
                         <br>

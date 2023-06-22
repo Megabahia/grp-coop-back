@@ -120,6 +120,13 @@ class CreditoPersonas(models.Model):
     enviado = models.SmallIntegerField(default=0)
     autorizacion = models.FileField(blank=True, null=True, upload_to=upload_path)
 
+    cedulaGarante = models.FileField(blank=True, null=True, upload_to=upload_path)
+    papeletaVotacionGarante = models.FileField(blank=True, null=True, upload_to=upload_path)
+    fotoGarante = models.FileField(blank=True, null=True, upload_to=upload_path)
+    impuestoPredialGarante = models.FileField(blank=True, null=True, upload_to=upload_path)
+    matriculaVehiculoGarante = models.FileField(blank=True, null=True, upload_to=upload_path)
+    planillaDomicilioGarante = models.FileField(blank=True, null=True, upload_to=upload_path)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)
     state = models.SmallIntegerField(default=1)

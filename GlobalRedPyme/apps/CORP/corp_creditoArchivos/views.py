@@ -838,7 +838,7 @@ def insertarDato_creditoPreaprobado_microCredito(dato, empresa_financiera, empre
         data['created_at'] = str(timezone_now)
         catalogo = Catalogo.objects.filter(tipo='ALCANCE_VISADO_DOCUMENTOS', state=1).order_by('-created_at').first()
         data['alcance'] = catalogo.valor
-        if catalogo.valor is 'OMNIGLOBAL':
+        if catalogo.valor == 'OMNIGLOBAL':
             url = config.API_FRONT_END_IFIS_PERSONAS
         else:
             url = config.API_FRONT_END_CENTRAL
@@ -851,17 +851,15 @@ def insertarDato_creditoPreaprobado_microCredito(dato, empresa_financiera, empre
             Estimad@ {data['nombresCompleto']}
             
             Nos complace comunicarle que usted tiene una LÍNEA DE CRÉDITO PRE-APROBADA por $ {data['monto']}
-            para que pueda realizar pagos a sus PROVEEDORES con un crédito otorgado por {dato[13]}
+            para que pueda realizar pagos a sus PROVEEDORES y/o EMPLEADOS con una línea de crédito otorgada por {dato[13]}
             
-            Para acceder a su Línea de Crédito para pago a proveedores haga click en el siguiente enlace:
-            {url}/pages/preApprovedCreditLine
-                
-            Su código de ingreso es: {codigo}
+            Para acceder a su Línea de Crédito para realizar pagos a sus proveedores y/o empleados, haga click en el siguiente enlace:
+            {url}/pages/preApprovedCreditLine Su código de ingreso es: {codigo}
             
             Crédito Pagos en la mejor opción de crecimiento para su negocio
             
             Saludos,
-            Crédito Pagos – Big Puntos
+            Crédito Pagos – {dato[13]}
         """
         html_content = f"""
                 <html>
@@ -870,20 +868,18 @@ def insertarDato_creditoPreaprobado_microCredito(dato, empresa_financiera, empre
                         <br>
                         <p>
                          Nos complace comunicarle que usted tiene una LÍNEA DE CRÉDITO PRE-APROBADA por $ {data['monto']}
-                         para que pueda realizar pagos a sus PROVEEDORES con un crédito otorgado por {dato[13]}
+                         para que pueda realizar pagos a sus PROVEEDORES y/o EMPLEADOS con una línea de crédito otorgada por {dato[13]}
                         </p>
                         <br>
-                        <p>Para acceder a su Línea de Crédito para pago a proveedores haga click en el siguiente enlace:
-                        <a href='{url}/pages/preApprovedCreditLine'>Link</a>
+                        <p>Para acceder a su Línea de Crédito para realizar pagos a sus proveedores y/o empleados, haga click en el siguiente enlace:
+                        <a href='{url}/pages/preApprovedCreditLine'>Link</a> Su código de ingreso es: {codigo}
                         </p>
-
-                        <p>Su código de ingreso es: {codigo}</p>
                         <br>
                         <br>
                         <b>Crédito Pagos en la mejor opción de crecimiento para su negocio</b>
                         <br>
                         Saludos,<br>
-                        Crédito Pagos – Big Puntos<br>
+                        Crédito Pagos – {dato[13]}<br>
                     </body>
                 </html>
                 """

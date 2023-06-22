@@ -6,6 +6,7 @@ from .views import (
     catalogo_filter_name, catalogo_filter_listOne_name_tipo,
     catalogo_filter_listOne_tipo,
     catalogo_list_parametrosTipo_sintoken,
+    catalogo_filter_listOne_tipo_todo,
 )
 
 from rest_framework.authtoken.views import obtain_auth_token
@@ -40,4 +41,5 @@ urlpatterns = [
     path('list/filtro/nombre', catalogo_filter_name, name="parametrizaciones_filter_name"),
     path('list/listOne', catalogo_filter_listOne_name_tipo, name="catalogo_filter_listOne_name_tipo"),
     path('listar/tipo/', catalogo_filter_listOne_tipo, name="catalogo_filter_listOne_tipo"),
+    path('listar/tipo/todos', catalogo_filter_listOne_tipo_todo, name="catalogo_filter_listOne_tipo_todo"),
 ]

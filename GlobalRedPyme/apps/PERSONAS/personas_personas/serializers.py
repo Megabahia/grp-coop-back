@@ -44,6 +44,18 @@ class PersonasSerializer(serializers.ModelSerializer):
 
         if representation['empresaInfo']:
             representation['empresaInfo'] = json.loads(desencriptar(eval(representation['empresaInfo'])))
+        if representation['referenciaDomicilio']:
+            representation['referenciaDomicilio'] = json.loads(desencriptar(eval(representation['referenciaDomicilio'])))
+        if representation['ocupacionSolicitante']:
+            representation['ocupacionSolicitante'] = json.loads(desencriptar(eval(representation['ocupacionSolicitante'])))
+        if representation['referenciasSolicitante']:
+            representation['referenciasSolicitante'] = json.loads(desencriptar(eval(representation['referenciasSolicitante'])))
+        if representation['ingresosSolicitante']:
+            representation['ingresosSolicitante'] = json.loads(desencriptar(eval(representation['ingresosSolicitante'])))
+        if representation['gastosSolicitante']:
+            representation['gastosSolicitante'] = json.loads(desencriptar(eval(representation['gastosSolicitante'])))
+        if representation['garante']:
+            representation['garante'] = json.loads(desencriptar(eval(representation['garante'])))
         if representation['datosPyme']:
             representation['datosPyme'] = json.loads(desencriptar(eval(representation['datosPyme'])))
         if representation['estadoCivil']:
@@ -58,6 +70,18 @@ class PersonasSerializer(serializers.ModelSerializer):
             representation['whatsappRepresentante'] = desencriptar(eval(representation['whatsappRepresentante']))
         if representation['correoRepresentante']:
             representation['correoRepresentante'] = desencriptar(eval(representation['correoRepresentante']))
+        if representation['celular']:
+            representation['celular'] = desencriptar(eval(representation['celular']))
+        if representation['direccionDomicilio']:
+            representation['direccionDomicilio'] = desencriptar(eval(representation['direccionDomicilio']))
+        if representation['nivelInstruccion']:
+            representation['nivelInstruccion'] = desencriptar(eval(representation['nivelInstruccion']))
+        if representation['tipoIdentificacion']:
+            representation['tipoIdentificacion'] = desencriptar(eval(representation['tipoIdentificacion']))
+        if representation['tipoPersona']:
+            representation['tipoPersona'] = desencriptar(eval(representation['tipoPersona']))
+        if representation['tipoVivienda']:
+            representation['tipoVivienda'] = desencriptar(eval(representation['tipoVivienda']))
         return representation
 
     def to_internal_value(self, data):
@@ -91,6 +115,18 @@ class PersonasSerializer(serializers.ModelSerializer):
 
         if 'empresaInfo' in data and data.get('empresaInfo'):
             data['empresaInfo'] = encriptar(json.dumps(data.get('empresaInfo')))
+        if 'referenciaDomicilio' in data and data.get('referenciaDomicilio'):
+            data['referenciaDomicilio'] = encriptar(json.dumps(data.get('referenciaDomicilio')))
+        if 'ocupacionSolicitante' in data and data.get('ocupacionSolicitante'):
+            data['ocupacionSolicitante'] = encriptar(json.dumps(data.get('ocupacionSolicitante')))
+        if 'referenciasSolicitante' in data and data.get('referenciasSolicitante'):
+            data['referenciasSolicitante'] = encriptar(json.dumps(data.get('referenciasSolicitante')))
+        if 'ingresosSolicitante' in data and data.get('ingresosSolicitante'):
+            data['ingresosSolicitante'] = encriptar(json.dumps(data.get('ingresosSolicitante')))
+        if 'gastosSolicitante' in data and data.get('gastosSolicitante'):
+            data['gastosSolicitante'] = encriptar(json.dumps(data.get('gastosSolicitante')))
+        if 'garante' in data and data.get('garante'):
+            data['garante'] = encriptar(json.dumps(data.get('garante')))
         if 'datosPyme' in data and data.get('datosPyme'):
             data['datosPyme'] = encriptar(json.dumps(data.get('datosPyme')))
         if 'estadoCivil' in data and data.get('estadoCivil'):
@@ -105,6 +141,18 @@ class PersonasSerializer(serializers.ModelSerializer):
             data['whatsappRepresentante'] = encriptar(data.get('whatsappRepresentante'))
         if 'correoRepresentante' in data and data.get('correoRepresentante'):
             data['correoRepresentante'] = encriptar(data.get('correoRepresentante'))
+        if 'celular' in data and data.get('celular'):
+            data['celular'] = encriptar(data.get('celular'))
+        if 'direccionDomicilio' in data and data.get('direccionDomicilio'):
+            data['direccionDomicilio'] = encriptar(data.get('direccionDomicilio'))
+        if 'nivelInstruccion' in data and data.get('nivelInstruccion'):
+            data['nivelInstruccion'] = encriptar(data.get('nivelInstruccion'))
+        if 'tipoIdentificacion' in data and data.get('tipoIdentificacion'):
+            data['tipoIdentificacion'] = encriptar(data.get('tipoIdentificacion'))
+        if 'tipoPersona' in data and data.get('tipoPersona'):
+            data['tipoPersona'] = encriptar(data.get('tipoPersona'))
+        if 'tipoVivienda' in data and data.get('tipoVivienda'):
+            data['tipoVivienda'] = encriptar(data.get('tipoVivienda'))
         return data
 
 
@@ -146,6 +194,18 @@ class PersonasUpdateSerializer(serializers.ModelSerializer):
 
         if representation['empresaInfo']:
             representation['empresaInfo'] = json.loads(desencriptar(eval(representation['empresaInfo'])))
+        if representation['referenciaDomicilio']:
+            representation['referenciaDomicilio'] = json.loads(desencriptar(eval(representation['referenciaDomicilio'])))
+        if representation['ocupacionSolicitante']:
+            representation['ocupacionSolicitante'] = json.loads(desencriptar(eval(representation['ocupacionSolicitante'])))
+        if representation['referenciasSolicitante']:
+            representation['referenciasSolicitante'] = json.loads(desencriptar(eval(representation['referenciasSolicitante'])))
+        if representation['ingresosSolicitante']:
+            representation['ingresosSolicitante'] = json.loads(desencriptar(eval(representation['ingresosSolicitante'])))
+        if representation['gastosSolicitante']:
+            representation['gastosSolicitante'] = json.loads(desencriptar(eval(representation['gastosSolicitante'])))
+        if representation['garante']:
+            representation['garante'] = json.loads(desencriptar(eval(representation['garante'])))
         if representation['datosPyme']:
             representation['datosPyme'] = json.loads(desencriptar(eval(representation['datosPyme'])))
         if representation['estadoCivil']:
@@ -160,6 +220,18 @@ class PersonasUpdateSerializer(serializers.ModelSerializer):
             representation['whatsappRepresentante'] = desencriptar(eval(representation['whatsappRepresentante']))
         if representation['correoRepresentante']:
             representation['correoRepresentante'] = desencriptar(eval(representation['correoRepresentante']))
+        if representation['celular']:
+            representation['celular'] = desencriptar(eval(representation['celular']))
+        if representation['direccionDomicilio']:
+            representation['direccionDomicilio'] = desencriptar(eval(representation['direccionDomicilio']))
+        if representation['nivelInstruccion']:
+            representation['nivelInstruccion'] = desencriptar(eval(representation['nivelInstruccion']))
+        if representation['tipoIdentificacion']:
+            representation['tipoIdentificacion'] = desencriptar(eval(representation['tipoIdentificacion']))
+        if representation['tipoPersona']:
+            representation['tipoPersona'] = desencriptar(eval(representation['tipoPersona']))
+        if representation['tipoVivienda']:
+            representation['tipoVivienda'] = desencriptar(eval(representation['tipoVivienda']))
         return representation
 
     def to_internal_value(self, data):
@@ -193,6 +265,18 @@ class PersonasUpdateSerializer(serializers.ModelSerializer):
 
         if 'empresaInfo' in data and data.get('empresaInfo'):
             data['empresaInfo'] = encriptar(json.dumps(data.get('empresaInfo')))
+        if 'referenciaDomicilio' in data and data.get('referenciaDomicilio'):
+            data['referenciaDomicilio'] = encriptar(json.dumps(data.get('referenciaDomicilio')))
+        if 'ocupacionSolicitante' in data and data.get('ocupacionSolicitante'):
+            data['ocupacionSolicitante'] = encriptar(json.dumps(data.get('ocupacionSolicitante')))
+        if 'referenciasSolicitante' in data and data.get('referenciasSolicitante'):
+            data['referenciasSolicitante'] = encriptar(json.dumps(data.get('referenciasSolicitante')))
+        if 'ingresosSolicitante' in data and data.get('ingresosSolicitante'):
+            data['ingresosSolicitante'] = encriptar(json.dumps(data.get('ingresosSolicitante')))
+        if 'gastosSolicitante' in data and data.get('gastosSolicitante'):
+            data['gastosSolicitante'] = encriptar(json.dumps(data.get('gastosSolicitante')))
+        if 'garante' in data and data.get('garante'):
+            data['garante'] = encriptar(json.dumps(data.get('garante')))
         if 'datosPyme' in data and data.get('datosPyme'):
             data['datosPyme'] = encriptar(json.dumps(data.get('datosPyme')))
         if 'estadoCivil' in data and data.get('estadoCivil'):
@@ -207,6 +291,18 @@ class PersonasUpdateSerializer(serializers.ModelSerializer):
             data['whatsappRepresentante'] = encriptar(data.get('whatsappRepresentante'))
         if 'correoRepresentante' in data and data.get('correoRepresentante'):
             data['correoRepresentante'] = encriptar(data.get('correoRepresentante'))
+        if 'celular' in data and data.get('celular'):
+            data['celular'] = encriptar(data.get('celular'))
+        if 'direccionDomicilio' in data and data.get('direccionDomicilio'):
+            data['direccionDomicilio'] = encriptar(data.get('direccionDomicilio'))
+        if 'nivelInstruccion' in data and data.get('nivelInstruccion'):
+            data['nivelInstruccion'] = encriptar(data.get('nivelInstruccion'))
+        if 'tipoIdentificacion' in data and data.get('tipoIdentificacion'):
+            data['tipoIdentificacion'] = encriptar(data.get('tipoIdentificacion'))
+        if 'tipoPersona' in data and data.get('tipoPersona'):
+            data['tipoPersona'] = encriptar(data.get('tipoPersona'))
+        if 'tipoVivienda' in data and data.get('tipoVivienda'):
+            data['tipoVivienda'] = encriptar(data.get('tipoVivienda'))
         return data
 
 
@@ -247,6 +343,18 @@ class PersonasUpdateSinImagenSerializer(serializers.ModelSerializer):
 
         if representation['empresaInfo']:
             representation['empresaInfo'] = json.loads(desencriptar(eval(representation['empresaInfo'])))
+        if representation['referenciaDomicilio']:
+            representation['referenciaDomicilio'] = json.loads(desencriptar(eval(representation['referenciaDomicilio'])))
+        if representation['ocupacionSolicitante']:
+            representation['ocupacionSolicitante'] = json.loads(desencriptar(eval(representation['ocupacionSolicitante'])))
+        if representation['referenciasSolicitante']:
+            representation['referenciasSolicitante'] = json.loads(desencriptar(eval(representation['referenciasSolicitante'])))
+        if representation['ingresosSolicitante']:
+            representation['ingresosSolicitante'] = json.loads(desencriptar(eval(representation['ingresosSolicitante'])))
+        if representation['gastosSolicitante']:
+            representation['gastosSolicitante'] = json.loads(desencriptar(eval(representation['gastosSolicitante'])))
+        if representation['garante']:
+            representation['garante'] = json.loads(desencriptar(eval(representation['garante'])))
         if representation['datosPyme']:
             representation['datosPyme'] = json.loads(desencriptar(eval(representation['datosPyme'])))
         if representation['estadoCivil']:
@@ -261,6 +369,18 @@ class PersonasUpdateSinImagenSerializer(serializers.ModelSerializer):
             representation['whatsappRepresentante'] = desencriptar(eval(representation['whatsappRepresentante']))
         if representation['correoRepresentante']:
             representation['correoRepresentante'] = desencriptar(eval(representation['correoRepresentante']))
+        if representation['celular']:
+            representation['celular'] = desencriptar(eval(representation['celular']))
+        if representation['direccionDomicilio']:
+            representation['direccionDomicilio'] = desencriptar(eval(representation['direccionDomicilio']))
+        if representation['nivelInstruccion']:
+            representation['nivelInstruccion'] = desencriptar(eval(representation['nivelInstruccion']))
+        if representation['tipoIdentificacion']:
+            representation['tipoIdentificacion'] = desencriptar(eval(representation['tipoIdentificacion']))
+        if representation['tipoPersona']:
+            representation['tipoPersona'] = desencriptar(eval(representation['tipoPersona']))
+        if representation['tipoVivienda']:
+            representation['tipoVivienda'] = desencriptar(eval(representation['tipoVivienda']))
         return representation
 
     def to_internal_value(self, data):
@@ -294,6 +414,18 @@ class PersonasUpdateSinImagenSerializer(serializers.ModelSerializer):
 
         if 'empresaInfo' in data and data.get('empresaInfo'):
             data['empresaInfo'] = encriptar(json.dumps(data.get('empresaInfo')))
+        if 'referenciaDomicilio' in data and data.get('referenciaDomicilio'):
+            data['referenciaDomicilio'] = encriptar(json.dumps(data.get('referenciaDomicilio')))
+        if 'ocupacionSolicitante' in data and data.get('ocupacionSolicitante'):
+            data['ocupacionSolicitante'] = encriptar(json.dumps(data.get('ocupacionSolicitante')))
+        if 'referenciasSolicitante' in data and data.get('referenciasSolicitante'):
+            data['referenciasSolicitante'] = encriptar(json.dumps(data.get('referenciasSolicitante')))
+        if 'ingresosSolicitante' in data and data.get('ingresosSolicitante'):
+            data['ingresosSolicitante'] = encriptar(json.dumps(data.get('ingresosSolicitante')))
+        if 'gastosSolicitante' in data and data.get('gastosSolicitante'):
+            data['gastosSolicitante'] = encriptar(json.dumps(data.get('gastosSolicitante')))
+        if 'garante' in data and data.get('garante'):
+            data['garante'] = encriptar(json.dumps(data.get('garante')))
         if 'datosPyme' in data and data.get('datosPyme'):
             data['datosPyme'] = encriptar(json.dumps(data.get('datosPyme')))
         if 'estadoCivil' in data and data.get('estadoCivil'):
@@ -308,6 +440,18 @@ class PersonasUpdateSinImagenSerializer(serializers.ModelSerializer):
             data['whatsappRepresentante'] = encriptar(data.get('whatsappRepresentante'))
         if 'correoRepresentante' in data and data.get('correoRepresentante'):
             data['correoRepresentante'] = encriptar(data.get('correoRepresentante'))
+        if 'celular' in data and data.get('celular'):
+            data['celular'] = encriptar(data.get('celular'))
+        if 'direccionDomicilio' in data and data.get('direccionDomicilio'):
+            data['direccionDomicilio'] = encriptar(data.get('direccionDomicilio'))
+        if 'nivelInstruccion' in data and data.get('nivelInstruccion'):
+            data['nivelInstruccion'] = encriptar(data.get('nivelInstruccion'))
+        if 'tipoIdentificacion' in data and data.get('tipoIdentificacion'):
+            data['tipoIdentificacion'] = encriptar(data.get('tipoIdentificacion'))
+        if 'tipoPersona' in data and data.get('tipoPersona'):
+            data['tipoPersona'] = encriptar(data.get('tipoPersona'))
+        if 'tipoVivienda' in data and data.get('tipoVivienda'):
+            data['tipoVivienda'] = encriptar(data.get('tipoVivienda'))
         return data
 
 
@@ -361,6 +505,18 @@ class PersonasSearchSerializer(serializers.ModelSerializer):
 
         if representation['empresaInfo']:
             representation['empresaInfo'] = json.loads(desencriptar(eval(representation['empresaInfo'])))
+        if representation['referenciaDomicilio']:
+            representation['referenciaDomicilio'] = json.loads(desencriptar(eval(representation['referenciaDomicilio'])))
+        if representation['ocupacionSolicitante']:
+            representation['ocupacionSolicitante'] = json.loads(desencriptar(eval(representation['ocupacionSolicitante'])))
+        if representation['referenciasSolicitante']:
+            representation['referenciasSolicitante'] = json.loads(desencriptar(eval(representation['referenciasSolicitante'])))
+        if representation['ingresosSolicitante']:
+            representation['ingresosSolicitante'] = json.loads(desencriptar(eval(representation['ingresosSolicitante'])))
+        if representation['gastosSolicitante']:
+            representation['gastosSolicitante'] = json.loads(desencriptar(eval(representation['gastosSolicitante'])))
+        if representation['garante']:
+            representation['garante'] = json.loads(desencriptar(eval(representation['garante'])))
         if representation['datosPyme']:
             representation['datosPyme'] = json.loads(desencriptar(eval(representation['datosPyme'])))
         if representation['estadoCivil']:
@@ -375,6 +531,18 @@ class PersonasSearchSerializer(serializers.ModelSerializer):
             representation['whatsappRepresentante'] = desencriptar(eval(representation['whatsappRepresentante']))
         if representation['correoRepresentante']:
             representation['correoRepresentante'] = desencriptar(eval(representation['correoRepresentante']))
+        if representation['celular']:
+            representation['celular'] = desencriptar(eval(representation['celular']))
+        if representation['direccionDomicilio']:
+            representation['direccionDomicilio'] = desencriptar(eval(representation['direccionDomicilio']))
+        if representation['nivelInstruccion']:
+            representation['nivelInstruccion'] = desencriptar(eval(representation['nivelInstruccion']))
+        if representation['tipoIdentificacion']:
+            representation['tipoIdentificacion'] = desencriptar(eval(representation['tipoIdentificacion']))
+        if representation['tipoPersona']:
+            representation['tipoPersona'] = desencriptar(eval(representation['tipoPersona']))
+        if representation['tipoVivienda']:
+            representation['tipoVivienda'] = desencriptar(eval(representation['tipoVivienda']))
         return representation
 
     def to_internal_value(self, data):
@@ -408,6 +576,18 @@ class PersonasSearchSerializer(serializers.ModelSerializer):
 
         if 'empresaInfo' in data and data.get('empresaInfo'):
             data['empresaInfo'] = encriptar(json.dumps(data.get('empresaInfo')))
+        if 'referenciaDomicilio' in data and data.get('referenciaDomicilio'):
+            data['referenciaDomicilio'] = encriptar(json.dumps(data.get('referenciaDomicilio')))
+        if 'ocupacionSolicitante' in data and data.get('ocupacionSolicitante'):
+            data['ocupacionSolicitante'] = encriptar(json.dumps(data.get('ocupacionSolicitante')))
+        if 'referenciasSolicitante' in data and data.get('referenciasSolicitante'):
+            data['referenciasSolicitante'] = encriptar(json.dumps(data.get('referenciasSolicitante')))
+        if 'ingresosSolicitante' in data and data.get('ingresosSolicitante'):
+            data['ingresosSolicitante'] = encriptar(json.dumps(data.get('ingresosSolicitante')))
+        if 'gastosSolicitante' in data and data.get('gastosSolicitante'):
+            data['gastosSolicitante'] = encriptar(json.dumps(data.get('gastosSolicitante')))
+        if 'garante' in data and data.get('garante'):
+            data['garante'] = encriptar(json.dumps(data.get('garante')))
         if 'datosPyme' in data and data.get('datosPyme'):
             data['datosPyme'] = encriptar(json.dumps(data.get('datosPyme')))
         if 'estadoCivil' in data and data.get('estadoCivil'):
@@ -422,4 +602,16 @@ class PersonasSearchSerializer(serializers.ModelSerializer):
             data['whatsappRepresentante'] = encriptar(data.get('whatsappRepresentante'))
         if 'correoRepresentante' in data and data.get('correoRepresentante'):
             data['correoRepresentante'] = encriptar(data.get('correoRepresentante'))
+        if 'celular' in data and data.get('celular'):
+            data['celular'] = encriptar(data.get('celular'))
+        if 'direccionDomicilio' in data and data.get('direccionDomicilio'):
+            data['direccionDomicilio'] = encriptar(data.get('direccionDomicilio'))
+        if 'nivelInstruccion' in data and data.get('nivelInstruccion'):
+            data['nivelInstruccion'] = encriptar(data.get('nivelInstruccion'))
+        if 'tipoIdentificacion' in data and data.get('tipoIdentificacion'):
+            data['tipoIdentificacion'] = encriptar(data.get('tipoIdentificacion'))
+        if 'tipoPersona' in data and data.get('tipoPersona'):
+            data['tipoPersona'] = encriptar(data.get('tipoPersona'))
+        if 'tipoVivienda' in data and data.get('tipoVivienda'):
+            data['tipoVivienda'] = encriptar(data.get('tipoVivienda'))
         return data
