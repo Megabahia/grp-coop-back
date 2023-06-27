@@ -49,10 +49,13 @@ def catalogo_list(request):
             filters = {"state": "1"}
             if 'nombre' in request.data:
                 if request.data['nombre'] != '':
-                    filters['nombre__startswith'] = str(request.data['nombre'])
+                    filters['nombre__icontains'] = str(request.data['nombre'])
             if 'tipo' in request.data:
                 if request.data['tipo'] != '':
                     filters['tipo'] = str(request.data['tipo'])
+            if 'descripcion' in request.data:
+                if request.data['descripcion'] != '':
+                    filters['descripcion__icontains'] = str(request.data['descripcion'])
 
             # Serializar los datos
             query = Catalogo.objects.filter(**filters).order_by('-created_at')
