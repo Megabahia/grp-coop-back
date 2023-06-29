@@ -269,7 +269,11 @@ def creditoPersonas_update(request, pk):
                 if serializer.data['estado'] == 'Aprobado':
                     if serializer.data['montoLiquidar']:
                         if 'Pymes' in serializer.data['tipoCredito']:
-                            enviarCorreoAprobado(serializer.data['montoAprobado'], email, serializer.data['nombresCompletos'])
+                            if serializer.data['nombresCompleto']:
+                                nombresCompleto = serializer.data['nombresCompleto']
+                            else:
+                                nombresCompleto = serializer.data['empresaInfo']['reprsentante']
+                            enviarCorreoAprobado(serializer.data['montoAprobado'], email, nombresCompleto)
                         else:
                             enviarCorreoAprobadoCreditoConsumo(serializer.data['montoAprobado'], email)
                 if 'tipoCredito' in request.data:
@@ -1165,7 +1169,7 @@ def enviarCorreoAprobado(montoAprobado, email, nombreCompleto):
     
     Para acceder a su Línea de Crédito para realizar pagos a proveedores y/o empleados, realice lo siguiente: 
     
-    Ingrese a: https://grp-clientes.financieradevittoria.com?email={email}&nombre={nombreCompleto}  y cargue su firma electrónica en 
+    Ingrese a: https://grp-clientes.financieradevittoria.com/#/grp/registro?email={email}&nombre={nombreCompleto}  y cargue su firma electrónica en 
     nuestra plataforma. Recuerde que al hacerlo, autoriza a la Plataforma y Cooperativa de Ahorro 
     y Crédito a realizar movimientos desde su cuenta con el único fin de completar el proceso del PAGO A SUS PROVEEDORES Y/O EMPLEADOS.
     

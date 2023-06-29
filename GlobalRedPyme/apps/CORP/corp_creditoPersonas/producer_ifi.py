@@ -64,6 +64,11 @@ def publish(data):
             data['external_id'] = data['_id']
     if 'user_id' in data:
         data.pop('user_id')
+    if 'autorizacion' in data:
+        autorizacion = data.pop('autorizacion')
+        data['autorizacion'] = str(autorizacion).replace('https://globalredpymes.s3.amazonaws.com/', '')
+        if data['autorizacion'] == 'None':
+            data.pop('autorizacion')
 
     response = snsClient.publish(
         TopicArn=topicArn,

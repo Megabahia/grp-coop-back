@@ -10,6 +10,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
+# Enviar Correo
+from apps.config.util import sendEmail
+# Importar config
+from apps.config import config
 # excel
 import openpyxl
 # Utils
@@ -672,6 +676,44 @@ def insertarDato_empleado(dato, empresaRuc):
         data['state'] = 1
         # inserto el dato con los campos requeridos
         Empleados.objects.update_or_create(**data)
+        subject, from_email, to = 'OBTENER MIS DESCUENTOS', "credicompra.bigpuntos@corporacionomniglobal.com", dato[6]
+        txt_content = f"""
+            REGISTRO DE CUENTA
+
+            Su cuenta para acceder al portal Corp ha sido registrada.
+
+            Para completar su registro haga click en el siguiente {config.API_FRONT_END_CORP_BP}/grp/registro?email={dato[6]}&nombre={dato[4] + ' ' + dato[5]}
+
+            Si el enlace no funciona, copie el siguiente link en una ventana del navegador:
+            {config.API_FRONT_END_CORP_BP}/grp/registro?email={dato[6]}&nombre={dato[4] + ' ' + dato[5]}
+
+            Atentamente,
+            Equipo Global Redpyme
+        """
+        html_content = f"""
+        <html>
+            <body>
+                <h1>REGISTRO DE CUENTA</h1>
+                <br>
+                <p>Su cuenta para acceder al portal Corp ha sido registrada.</p>
+                <br>
+                <p>
+                Para completar su registro haga click en el siguiente 
+                <a href='{config.API_FRONT_END_CORP_BP}/grp/registro?email={dato[6]}&nombre={dato[4] + ' ' + dato[5]}'>ENLACE</a>
+                </p>
+                <br>
+                <p>
+                Si el enlace no funciona, copie el siguiente link en una ventana del navegador:
+                {config.API_FRONT_END_CORP_BP}/grp/registro?email={dato[6]}&nombre={dato[4] + ' ' + dato[5]}
+                </p>
+                <br>
+                Atentamente,
+                <br>
+                Equipo Global Redpyme
+            </body>
+        </html>
+        """
+        sendEmail(subject, txt_content, from_email, to, html_content)
         return 'Dato insertado correctamente'
     except Exception as e:
         return str(e)

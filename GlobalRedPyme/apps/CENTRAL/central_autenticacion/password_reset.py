@@ -77,6 +77,8 @@ def enviarEmailAsignacionPassword(reset_password_token):
             url = config.API_FRONT_END_CENTRAL + config.endpointEmailReseteoPassword + "?token=" + reset_password_token.key + "&email=" + reset_password_token.user.email
         elif reset_password_token.user.tipoUsuario.nombre == 'credit':
             url = config.API_FRONT_END_CREDIT + config.endpointEmailReseteoPassword + "?token=" + reset_password_token.key + "&email=" + reset_password_token.user.email
+        elif reset_password_token.user.tipoUsuario.nombre == 'corp':
+            url = config.API_FRONT_END_CORP_COOP + config.endpointEmailReseteoPassword + "?token=" + reset_password_token.key + "&email=" + reset_password_token.user.email
         else:
             url = config.API_FRONT_END + config.endpointEmailAsignacionPassword + "?token=" + reset_password_token.key + "&email=" + reset_password_token.user.email
         # url=config.API_FRONT_END+config.endpointEmailAsignacionPassword+"?token="+reset_password_token.key+"&email="+reset_password_token.user.email

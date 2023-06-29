@@ -517,9 +517,9 @@ def insertarDato_creditoPreaprobado_empleado(dato, empresa_financiera):
         data['cargarOrigen'] = 'IFIS'
         # persona = Personas.objects.filter(identificacion=dato[5],state=1).first()
         # data['user_id'] = persona.user_id
-        empleado = Empleados.objects.filter(identificacion=dato[8]).first()
-        if empleado is None:
-            return f"Empleado {dato[9]} {dato[10]} {dato[8]} no existe"
+        # empleado = Empleados.objects.filter(identificacion=dato[8]).first()
+        # if empleado is None:
+        #     return f"Empleado {dato[9]} {dato[10]} {dato[8]} no existe"
         data['numeroIdentificacion'] = dato[8]
         data['nombres'] = dato[9].replace('"', "") if dato[9] != "NULL" else None
         data['apellidos'] = dato[10].replace('"', "") if dato[10] != "NULL" else None
