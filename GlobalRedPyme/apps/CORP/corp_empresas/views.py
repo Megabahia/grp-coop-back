@@ -5,6 +5,7 @@ from .serializers import (
     EmpresasLogosSerializer,
     EmpleadosSerializer,
 )
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -134,7 +135,7 @@ def empresas_list_filtro(request):
                     filters['ruc__icontains'] = str(request.data["ruc"])
 
             # Serializar los datos
-            query = Empresas.objects.filter(**filters).order_by('-created_at')
+            query = Empresas.objects.filter(Q(ruc__icontains=str(request.data["ruc"]), state=1) | Q(nombreEmpresa__icontains=str(request.data["ruc"]), state=1)).order_by('-created_at')
             serializer = EmpresasFiltroSerializer(query[offset:limit], many=True)
             new_serializer_data = {'cont': query.count(),
                                    'info': serializer.data}

@@ -5,7 +5,7 @@ from ...config import config
 
 
 def publish(data):
-    topicArn = config.AWS_TOPIC_ARN_CODIGOS
+    topicArn = config.AWS_TOPIC_ARN
     snsClient = boto3.client(
         'sns',
         aws_access_key_id=config.AWS_ACCESS_KEY_ID_COLAS,

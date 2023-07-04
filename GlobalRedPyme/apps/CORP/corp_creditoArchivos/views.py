@@ -885,7 +885,8 @@ def insertarDato_creditoPreaprobado_microCredito(dato, empresa_financiera, empre
                 """
         # CodigoCreditoPreaprobado.objects.create(codigo=codigo, cedula=data['numeroIdentificacion'], monto=data['monto'])
         sendEmail(subject, txt_content, from_email, to, html_content)
-        # publish(creditoSerializer.data)
+        if catalogo.valor == 'OMNIGLOBAL':
+            publish(creditoSerializer.data)
         return "Dato insertado correctamente"
     except Exception as e:
         return str(e)

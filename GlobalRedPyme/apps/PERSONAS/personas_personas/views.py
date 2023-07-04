@@ -422,7 +422,7 @@ def personas_update_empresa(request, pk):
             serializer = PersonasUpdateSinImagenSerializer(query, data=request.data,partial=True)
             if serializer.is_valid():
                 serializer.save()
-                creditos = CreditoPersonas.objects.filter(email=serializer.data['empresaInfo']['correo'], numeroIdentificacion=serializer.data['empresaInfo']['rucEmpresa'], state=1)
+                creditos = CreditoPersonas.objects.filter(email=serializer.data['empresaInfo']['correo'], rucEmpresa=serializer.data['empresaInfo']['rucEmpresa'], state=1)
                 for credito in creditos:
                     credito.user_id = str(serializer.data['user_id'])
                     credito.save()
