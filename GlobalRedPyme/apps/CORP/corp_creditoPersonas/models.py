@@ -126,6 +126,7 @@ class CreditoPersonas(models.Model):
     impuestoPredialGarante = models.FileField(blank=True, null=True, upload_to=upload_path)
     matriculaVehiculoGarante = models.FileField(blank=True, null=True, upload_to=upload_path)
     planillaDomicilioGarante = models.FileField(blank=True, null=True, upload_to=upload_path)
+    empresaEmpleado = jsonfield.JSONField()
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)

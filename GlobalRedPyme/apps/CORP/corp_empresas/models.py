@@ -22,6 +22,10 @@ class Empresas(models.Model):
     correo = models.EmailField(max_length=255, null=True, blank=True)
     estado = models.CharField(default="Activo", max_length=200, null=True, blank=True)
     imagen = models.FileField(blank=True, null=True, upload_to=upload_path)
+    numeroCuenta = models.TextField(max_length=255, null=True, blank=True)
+    titularCuenta = models.TextField(max_length=255, null=True, blank=True)
+    correoTitular = models.EmailField(max_length=255, null=True, blank=True)
+    bancoDestino = models.TextField(max_length=255, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)
