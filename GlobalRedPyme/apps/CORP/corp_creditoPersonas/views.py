@@ -1,4 +1,9 @@
 import io
+import datetime
+## Libreria para agregar imagenes a pdf
+import fitz
+from PIL import Image, ImageDraw, ImageFont
+
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from apps.CENTRAL.central_catalogo.models import Catalogo
@@ -195,6 +200,7 @@ def creditoPersonas_update(request, pk):
                         "sigandcertify": True,
                         "signaturebox": (470, 840, 570, 640),
                         "signature": usuario['reprsentante'],
+                        "signature_manual": [],
                         # "signature_img": "signature_test.png",
                         "contact": usuario['correo'],
                         "location": "Ubicación",
@@ -1032,11 +1038,18 @@ def firmar(request, dct, nombreArchivo):
         ruta = d + 'SOLICITUD_REMATRICULA_DE_.pdf'
         s3 = boto3.resource('s3')
         archivo = s3.meta.client.download_file('globalredpymes', str(request.data[nombreArchivo]), ruta)
+    date = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    datosFirmante = f"""FIRMADO POR:\n {dct['signature']} \n FECHA:\n {date}"""
+    generarQR(datosFirmante)
+    output_file = "example-with-barcode.pdf"
+    agregarQRDatosFirmante(datosFirmante,output_file, ruta)
+
     contrasenia = request.data['claveFirma']
     p12 = pkcs12.load_key_and_certificates(
         certificado.read(), contrasenia.encode("ascii"), backends.default_backend()
     )
-    datau = open(ruta, "rb").read()
+    datau = open(output_file, "rb").read()
+    dct.pop('signature')
     datas = cms.sign(datau, dct, p12[0], p12[1], p12[2], "sha256")
     archivo_pdf_para_enviar_al_cliente = io.BytesIO()
     archivo_pdf_para_enviar_al_cliente.write(datau)
@@ -1267,3 +1280,101 @@ def enviarCorreoAprobadoCreditoConsumo(montoAprobado, email):
                 """
     sendEmail(subject, txt_content, from_email, to, html_content)
     print(email)
+
+
+def generarQR(datos):
+    import qrcode
+    img = qrcode.make(datos)
+    f = open("output.png", "wb")
+    img.save(f)
+    f.close()
+
+
+def agregarQRDatosFirmante(datosFirmante,output_file, ruta):
+    # Define the position and size of the image rectangle
+    image_rectangle = fitz.Rect(1450, 0, 1850, 420)  # Adjust the coordinates and size as needed
+
+    # Retrieve the first page of the PDF
+    file_handle = fitz.open(ruta)
+    first_page = file_handle[0]
+
+    # Open and flip the image vertically
+    image_path = 'output.png'
+    image = Image.open(image_path).transpose(Image.FLIP_TOP_BOTTOM)
+    image.save('flipped_image.png')
+
+    # Insert the flipped image into the PDF
+    img = open('flipped_image.png', "rb").read()  # an image file
+    img_xref = 0
+    first_page.insert_image(image_rectangle, stream=img, xref=img_xref)
+    ##############
+
+
+    # Crear una nueva imagen con fondo blanco
+    width = 400
+    height = 400
+    image = Image.new('RGB', (width, height), 'white')
+
+    # Crear un objeto ImageDraw para dibujar en la imagen
+    draw = ImageDraw.Draw(image)
+
+    # Especificar la fuente a utilizar
+    font = ImageFont.truetype('/System/Library/Fonts/Supplemental/Arial Unicode.ttf', size=40)
+
+    # Especificar el texto y su posición en la imagen
+    text_position = (10, 50)
+
+    # Dibujar el texto en la imagen
+    draw.text(text_position, datosFirmante, font=font, fill='black')
+
+    # Guardar la imagen resultante
+    image.save('imagen_con_texto.png')
+    ##############
+    # Open and flip the text image vertically
+    text_image_path = 'imagen_con_texto.png'
+    text_image = Image.open(text_image_path).transpose(Image.FLIP_TOP_BOTTOM)
+    text_image.save('flipped_text_image.png')
+
+    img1 = open('flipped_text_image.png', "rb").read()  # an image file
+    first_page.insert_image(fitz.Rect(1850, 0, 2250, 420), stream=img1, xref=img_xref)
+
+    # Save the modified PDF
+    file_handle.save(output_file)
+
+@api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+def prueba_verificar(request):
+    env = environ.Env()
+    environ.Env.read_env()  # LEE ARCHIVO .ENV
+    client_s3 = boto3.client(
+        's3',
+        aws_access_key_id=env.str('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=env.str('AWS_SECRET_ACCESS_KEY')
+    )
+    with tempfile.TemporaryDirectory() as d:
+        ruta = d + 'creditosPreAprobados.xlsx'
+        s3 = boto3.resource('s3')
+        s3.meta.client.download_file('globalredpymes', str('CORP/documentosCreditosPersonas/64906cb5b5913ced050fb5b2_solicitudCreditoFirmado.pdf'), ruta)
+
+    import fitz
+
+    input_file = "/Users/papamacone/Documents/Edgar/grp-back-coop/GlobalRedPyme/apps/CORP/corp_creditoPersonas/comandancia.pdf"
+    output_file = "example-with-barcode.pdf"
+    barcode_file = "/Users/papamacone/Documents/Edgar/grp-back-coop/GlobalRedPyme/output.png"
+
+    # define the position (upper-right corner)
+    image_rectangle = fitz.Rect(450, 20, 550, 120)
+
+    # retrieve the first page of the PDF
+    file_handle = fitz.open(input_file)
+    first_page = file_handle[0]
+
+    img = open(barcode_file, "rb").read()  # an image file
+    img_xref = 0
+
+    first_page.insert_image(image_rectangle, stream=img, xref=img_xref)
+
+    file_handle.save(output_file)
+
+    return Response({'verificada': 'hashok'}, status=status.HTTP_400_BAD_REQUEST)
+
