@@ -1,8 +1,13 @@
+import json
+
 from rest_framework import serializers
 
 from .models import (
     PagoProveedores
 )
+from ..corp_creditoArchivos.models import ArchivosFirmados
+from ..corp_creditoArchivos.serializers import ArchivosFirmadosSerializer
+
 
 class PagoProveedorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,8 +23,13 @@ class PagoProveedorSerializer(serializers.ModelSerializer):
         else:
             data['documentoVerificado'] = False
 
-        return data
+        if data['usuario']:
+            usuario_json = json.loads(data['usuario'])
+            if usuario_json:
+                archivosFirmados = ArchivosFirmados.objects.filter(numeroIdentificacion=json.loads(data['usuario'])['identificacion'],state=1).first()
+                data['archivosFirmados'] = ArchivosFirmadosSerializer(archivosFirmados).data
 
+        return data
 
 
 # Importar boto3
@@ -27,6 +37,8 @@ import boto3
 import tempfile
 import environ
 from endesive import pdf
+
+
 def prueba_verificar(url):
     env = environ.Env()
     environ.Env.read_env()  # LEE ARCHIVO .ENV
@@ -48,9 +60,9 @@ def prueba_verificar(url):
     for (hashok, signatureok, certok) in pdf.verify(
             data
     ):
-        print("*" * 10, "signature no:", no)
-        print("signature ok?", signatureok)
+        # print("*" * 10, "signature no:", no)
+        # print("signature ok?", signatureok)
         print("hash ok?", hashok)
-        print("cert ok?", certok)
+        # print("cert ok?", certok)
 
     return hashok

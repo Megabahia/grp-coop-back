@@ -74,6 +74,7 @@ class FacturasFisicas(models.Model):
     facturaFisica = models.FileField(blank=True, null=True, upload_to=upload_path)
     cooperativa = models.CharField(max_length=150, null=True, blank=True)
     estado = models.CharField(max_length=255, null=True, blank=True)
+    casaComercial = jsonfield.JSONField()
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)
