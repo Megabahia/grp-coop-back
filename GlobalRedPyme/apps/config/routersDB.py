@@ -97,7 +97,7 @@ class GRPCORPRouter:
     route_app_labels = {'corp_cobrarSupermonedas', 'corp_autorizaciones', 'corp_empresas', 'corp_movimientoCobros',
                         'corp_pagos', 'corp_creditoPersonas', 'corp_creditoPreaprobados', 'corp_notasPedidos',
                         'corp_monedasEmpresa', 'corp_creditoArchivos', 'corp_envios', 'corp_firmaElectronica',
-                        'corp_pagoProveedores'}
+                        'corp_pagoProveedores', 'corp_pagoEmpleados'}
 
     def db_for_read(self, model, **hints):
         """

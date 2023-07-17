@@ -54,6 +54,7 @@ urlpatterns = [
     path('corp/envios/', include(('apps.CORP.corp_envios.urls', 'corp_envios'), namespace='corp_envios')),
     path('corp/firmaElectronica/', include(('apps.CORP.corp_firmaElectronica.urls', 'corp_firmaElectronica'), namespace='corp_firmaElectronica')),
     path('corp/pagoProveedores/', include(('apps.CORP.corp_pagoProveedores.urls', 'corp_pagoProveedores'), namespace='corp_pagoProveedores')),
+    path('corp/pagoEmpleados/', include(('apps.CORP.corp_pagoEmpleados.urls', 'corp_pagoEmpleados'), namespace='corp_pagoEmpleados')),
     #Modulo MDM
     path('mdm/prospectosClientes/', include(('apps.MDM.mdm_prospectosClientes.urls', 'prospectos_clientes'), namespace='prospectos_clientes')),
     path('mdm/clientes/', include(('apps.MDM.mdm_clientes.urls', 'clientes'), namespace='clientes')),

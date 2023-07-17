@@ -57,6 +57,8 @@ GlobalRedPyme/apps/CORP/corp_firmaElectronica/__pycache__/
 GlobalRedPyme/apps/CORP/corp_firmaElectronica/migrations/__pycache__/
 GlobalRedPyme/apps/CORP/corp_pagoProveedores/__pycache__/
 GlobalRedPyme/apps/CORP/corp_pagoProveedores/migrations/__pycache__/
+GlobalRedPyme/apps/CORP/corp_pagoEmpleados/__pycache__/
+GlobalRedPyme/apps/CORP/corp_pagoEmpleados/migrations/__pycache__/
 GlobalRedPyme/apps/MDM/mdm_clientes/__pycache__/
 GlobalRedPyme/apps/MDM/mdm_clientes/migrations/__pycache__/
 GlobalRedPyme/apps/MDM/mdm_clientes/views/__pycache__/
