@@ -1,7 +1,11 @@
 import io
 import datetime
-## Libreria para agregar imagenes a pdf
+import qrcode
 import fitz
+from cryptography.hazmat import backends
+from cryptography.hazmat.primitives.serialization import pkcs12
+from endesive.pdf import cms
+## Libreria para agregar imagenes a pdf
 from PIL import Image, ImageDraw, ImageFont
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -1019,11 +1023,6 @@ def enviarCorreoSolicitud(email):
     sendEmail(subject, txt_content, from_email, to, html_content)
 
 
-from cryptography.hazmat import backends
-from cryptography.hazmat.primitives.serialization import pkcs12
-from endesive.pdf import cms
-
-
 def firmar(request, dct, nombreArchivo):
     certificado = request.data['certificado']
     # environ init
@@ -1283,7 +1282,6 @@ def enviarCorreoAprobadoCreditoConsumo(montoAprobado, email):
 
 
 def generarQR(datos):
-    import qrcode
     img = qrcode.make(datos)
     f = open("output.png", "wb")
     img.save(f)
@@ -1292,7 +1290,7 @@ def generarQR(datos):
 
 def agregarQRDatosFirmante(datosFirmante,output_file, ruta):
     # Define the position and size of the image rectangle
-    image_rectangle = fitz.Rect(1450, 0, 1850, 420)  # Adjust the coordinates and size as needed
+    image_rectangle = fitz.Rect(0, 0, 250, 220)  # Adjust the coordinates and size as needed
 
     # Retrieve the first page of the PDF
     file_handle = fitz.open(ruta)
@@ -1304,7 +1302,7 @@ def agregarQRDatosFirmante(datosFirmante,output_file, ruta):
     image.save('flipped_image.png')
 
     # Insert the flipped image into the PDF
-    img = open('flipped_image.png', "rb").read()  # an image file
+    img = open('output.png', "rb").read()  # an image file
     img_xref = 0
     first_page.insert_image(image_rectangle, stream=img, xref=img_xref)
     ##############
@@ -1319,7 +1317,7 @@ def agregarQRDatosFirmante(datosFirmante,output_file, ruta):
     draw = ImageDraw.Draw(image)
 
     # Especificar la fuente a utilizar
-    font = ImageFont.truetype('/System/Library/Fonts/Supplemental/Arial Unicode.ttf', size=40)
+    font = ImageFont.truetype('Arial Unicode.ttf', size=40)
 
     # Especificar el texto y su posición en la imagen
     text_position = (10, 50)
@@ -1335,8 +1333,8 @@ def agregarQRDatosFirmante(datosFirmante,output_file, ruta):
     text_image = Image.open(text_image_path).transpose(Image.FLIP_TOP_BOTTOM)
     text_image.save('flipped_text_image.png')
 
-    img1 = open('flipped_text_image.png', "rb").read()  # an image file
-    first_page.insert_image(fitz.Rect(1850, 0, 2250, 420), stream=img1, xref=img_xref)
+    img1 = open('imagen_con_texto.png', "rb").read()  # an image file
+    first_page.insert_image(fitz.Rect(250, 0, 450, 220), stream=img1, xref=img_xref)
 
     # Save the modified PDF
     file_handle.save(output_file)
@@ -1356,7 +1354,7 @@ def prueba_verificar(request):
         s3 = boto3.resource('s3')
         s3.meta.client.download_file('globalredpymes', str('CORP/documentosCreditosPersonas/64906cb5b5913ced050fb5b2_solicitudCreditoFirmado.pdf'), ruta)
 
-    import fitz
+
 
     input_file = "/Users/papamacone/Documents/Edgar/grp-back-coop/GlobalRedPyme/apps/CORP/corp_creditoPersonas/comandancia.pdf"
     output_file = "example-with-barcode.pdf"

@@ -1,5 +1,15 @@
 import io
-
+import os
+# Establecer el directorio base del proyecto
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+import datetime
+import qrcode
+import fitz
+from cryptography.hazmat import backends
+from cryptography.hazmat.primitives.serialization import pkcs12
+from endesive.pdf import cms
+## Libreria para agregar imagenes a pdf
+from PIL import Image, ImageDraw, ImageFont
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from .models import PagoProveedores
 from .serializers import (
@@ -188,7 +198,7 @@ from endesive.pdf import cms
 def firmar(request, query):
     usuario = json.loads(query.usuario)
     certificado = request.data['certificado']
-    pdf = request.data['pdf']
+    pdf = request.FILES['pdf']
     contrasenia = request.data['claveFirma']
     date = timezone_now = timezone.localtime(timezone.now())
     date = date.strftime("D:%Y%m%d%H%M%S+00'00'")
@@ -203,6 +213,7 @@ def firmar(request, query):
         "sigandcertify": True,
         "signaturebox": (470, 840, 570, 640),
         "signature": usuario['nombresCompleto'],
+        "signature_manual": [],
         # "signature_img": "signature_test.png",
         "contact": usuario['email'],
         "location": "Ubicación",
@@ -216,11 +227,83 @@ def firmar(request, query):
     )
 
     #datau = open(fname, "rb").read()
-    datau = pdf.read()
+    # Ruta de destino para guardar el archivo
+    # ruta = '/Users/papamacone/Documents/Edgar/grp-back-coop/GlobalRedPyme/' + pdf.name
+    ruta = os.path.join(BASE_DIR, '../' + pdf.name)
+
+    # Leer los datos del archivo
+    with open(ruta, 'wb') as archivo_destino:
+        for chunk in pdf.chunks():
+            archivo_destino.write(chunk)
+
+    date = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    datosFirmante = f"""FIRMADO POR:\n {dct['signature']} \n FECHA:\n {date}"""
+    generarQR(datosFirmante)
+    output_file = "example-with-barcode.pdf"
+    agregarQRDatosFirmante(datosFirmante, output_file, ruta)
+    datau = open(output_file, "rb").read()
+    dct.pop('signature')
     datas = cms.sign(datau, dct, p12[0], p12[1], p12[2], "sha256")
     return datau, datas
     # return Response('new_serializer_data', status=status.HTTP_200_OK)
 
+
+def agregarQRDatosFirmante(datosFirmante,output_file, ruta):
+    # Define the position and size of the image rectangle
+    image_rectangle = fitz.Rect(0, 0, 250, 220)  # Adjust the coordinates and size as needed
+
+    # Retrieve the first page of the PDF
+    file_handle = fitz.open(ruta)
+    first_page = file_handle[0]
+
+    # Open and flip the image vertically
+    image_path = 'output.png'
+    image = Image.open(image_path).transpose(Image.FLIP_TOP_BOTTOM)
+    image.save('flipped_image.png')
+
+    # Insert the flipped image into the PDF
+    img = open('output.png', "rb").read()  # an image file
+    img_xref = 0
+    first_page.insert_image(image_rectangle, stream=img, xref=img_xref)
+    ##############
+
+
+    # Crear una nueva imagen con fondo blanco
+    width = 400
+    height = 400
+    image = Image.new('RGB', (width, height), 'white')
+
+    # Crear un objeto ImageDraw para dibujar en la imagen
+    draw = ImageDraw.Draw(image)
+
+    # Especificar la fuente a utilizar
+    font = ImageFont.truetype('Arial Unicode.ttf', size=40)
+
+    # Especificar el texto y su posición en la imagen
+    text_position = (10, 50)
+
+    # Dibujar el texto en la imagen
+    draw.text(text_position, datosFirmante, font=font, fill='black')
+
+    # Guardar la imagen resultante
+    image.save('imagen_con_texto.png')
+    ##############
+    # Open and flip the text image vertically
+    text_image_path = 'imagen_con_texto.png'
+    text_image = Image.open(text_image_path).transpose(Image.FLIP_TOP_BOTTOM)
+    text_image.save('flipped_text_image.png')
+
+    img1 = open('imagen_con_texto.png', "rb").read()  # an image file
+    first_page.insert_image(fitz.Rect(250, 0, 450, 220), stream=img1, xref=img_xref)
+
+    # Save the modified PDF
+    file_handle.save(output_file)
+
+def generarQR(datos):
+    img = qrcode.make(datos)
+    f = open("output.png", "wb")
+    img.save(f)
+    f.close()
 
 def enviarNegadoPago(email, monto):
     subject, from_email, to = 'RAZÓN POR LA QUE SE NIEGA EL PAGO A PROVEEDORES', "08d77fe1da-d09822@inbox.mailtrap.io", \
