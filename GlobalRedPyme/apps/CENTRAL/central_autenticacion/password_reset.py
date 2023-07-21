@@ -87,8 +87,8 @@ def enviarEmailAsignacionPassword(reset_password_token):
                 Registro de Contraseña
                 
                 Para completar su registro en el portal de la Cooperativa {empresaIfis.nombreEmpresa}
-                a para acceder a su Crédito de Consumo y realizar compras en los mejores Locales 
-                Comerciales del país, haga Click en el siguiente enlace: {url}
+                para acceder a su Línea de Crédito y realizar pagos a sus proveedores y/o empleados,
+                haga click en el siguiente enlace: {url}
 
                 Si al hacer click en el enlace anterior NO FUNCIONA, copie y pegue el siguiente enlace en una ventana del navegador: {url}
                 
@@ -101,8 +101,9 @@ def enviarEmailAsignacionPassword(reset_password_token):
                 <h1>Registro de Contraseña</h1>
                 <br>
                 <p>Para completar su registro en el portal de la Cooperativa {empresaIfis.nombreEmpresa}
-                a para acceder a su Crédito de Consumo y realizar compras en los mejores Locales 
-                Comerciales del país, haga Click en el siguiente enlace: <a href='{url}'>ENLACE</a></p>
+                para acceder a su Línea de Crédito y realizar pagos a sus proveedores y/o empleados, 
+                haga click en el siguiente enlace:  <a href='{url}'>ENLACE</a>
+                </p>
                 <br>
                 <p>
                 Si al hacer click en el enlace anterior NO FUNCIONA, copie y pegue el siguiente enlace en una ventana del navegador:

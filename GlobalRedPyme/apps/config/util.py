@@ -21,7 +21,8 @@ def sendEmail(subject, txt_content, from_email,to,html_content):
         msg.attach_alternative(html_content, "text/html")
         msg.send()
         return True
-    except Exception as e: 
+    except Exception as e:
+        print('errrrrrr', e)
         err={"error":'Un error ha ocurrido: {}'.format(e)}
         return Response(err, status=status.HTTP_400_BAD_REQUEST)
 

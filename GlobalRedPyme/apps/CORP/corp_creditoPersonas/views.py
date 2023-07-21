@@ -53,6 +53,8 @@ from bson import ObjectId
 # logs
 from apps.CENTRAL.central_logs.methods import createLog, datosTipoLog, datosProductosMDP
 
+from ...utils.extraerDatosFirmaElectronica import usuarioPropietarioFirma
+
 # declaracion variables log
 datosAux = datosProductosMDP()
 datosTipoLogAux = datosTipoLog()
@@ -275,7 +277,10 @@ def creditoPersonas_update(request, pk):
                     if serializer.data['alcance'] != 'LOCAL':
                         # Publicar en la cola
                         publish(serializer.data)
-                        enviarCorreoPorcompletar(serializer.data['montoLiquidar'], email)
+                        if 'Pymes' in serializer.data['tipoCredito']:
+                            enviarCorreoPorcompletarLineaCredito(serializer.data['montoLiquidar'], email)
+                        else:
+                            enviarCorreoPorcompletar(serializer.data['montoLiquidar'], email)
                 if serializer.data['estado'] == 'Aprobado':
                     if serializer.data['montoLiquidar']:
                         if 'Pymes' in serializer.data['tipoCredito']:
@@ -1171,6 +1176,43 @@ def enviarCorreoPorcompletar(montoAprobado, email):
     sendEmail(subject, txt_content, from_email, to, html_content)
 
 
+def enviarCorreoPorcompletarLineaCredito(montoAprobado, email):
+    subject, from_email, to = 'Solicitud de Línea de Crédito DEVUELTA para completar información', "08d77fe1da-d09822@inbox.mailtrap.io", \
+                              email
+    txt_content = f"""
+        ¡LO SENTIMOS!
+
+        Su Solicitud de Línea de Crédito para realizar pagos a sus proveedores y/o empleados con una Línea de Crédito
+        otorgada por una Cooperativa de Ahorro y Crédito regulada ha sido DEVUELTA PARA COMPLETAR INFORMACIÓN.
+
+        Contáctese con su asesor a través de nuestro link de WhatsApp https://wa.link/s3vift
+
+        Atentamente,
+
+        Equipo Global Redpyme – Crédito Pagos
+    """
+    html_content = f"""
+        <html>
+            <body>
+                <h1>¡LO SENTIMOS!</h1>
+                <br>
+                <p>
+                Su Solicitud de Línea de Crédito para realizar pagos a sus proveedores y/o empleados con una Línea
+                de Crédito otorgada por una Cooperativa de Ahorro y Crédito regulada ha sido DEVUELTA PARA COMPLETAR INFORMACIÓN.
+                </p>
+                <br>
+                <p>Contáctese con su asesor a través de nuestro link de WhatsApp <a href='https://wa.link/s3vift'>LINK</a></p>
+                <br>
+                Atentamente,
+                <br>
+                Equipo Global Redpyme – Crédito Pagos
+                <br>
+            </body>
+        </html>
+    """
+    sendEmail(subject, txt_content, from_email, to, html_content)
+
+
 def enviarCorreoAprobado(montoAprobado, email, nombreCompleto):
     subject, from_email, to = 'Su Solicitud de Línea de Crédito ha sido APROBADA', "08d77fe1da-d09822@inbox.mailtrap.io", email
     txt_content = f"""
@@ -1207,8 +1249,8 @@ def enviarCorreoAprobado(montoAprobado, email, nombreCompleto):
                         </p>
                         <br>
                         <p>
-                        Ingrese a: https://grp-clientes.financieradevittoria.com/#/grp/registro?email={email}&nombre={nombreCompleto}  y cargue su firma electrónica en 
-                        nuestra plataforma. Recuerde que al hacerlo, autoriza a la Plataforma y Cooperativa de Ahorro 
+                        Ingrese a: <a href="https://grp-clientes.financieradevittoria.com/#/grp/registro?email={email}&nombre={nombreCompleto}">https://grp-clientes.financieradevittoria.com/#/grp/registro?email={email}&nombre={nombreCompleto}</a> 
+                         y cargue su firma electrónica en nuestra plataforma. Recuerde que al hacerlo, autoriza a la Plataforma y Cooperativa de Ahorro 
                         y Crédito a realizar movimientos desde su cuenta con el único fin de completar el proceso del PAGO A SUS PROVEEDORES Y/O EMPLEADOS.
                         </p>
                         <br>
@@ -1340,7 +1382,7 @@ def agregarQRDatosFirmante(datosFirmante,output_file, ruta):
     file_handle.save(output_file)
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def prueba_verificar(request):
     env = environ.Env()
     environ.Env.read_env()  # LEE ARCHIVO .ENV
@@ -1375,4 +1417,14 @@ def prueba_verificar(request):
     file_handle.save(output_file)
 
     return Response({'verificada': 'hashok'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def verificarPropietarioFirma(request):
+    firmaCorresponde = usuarioPropietarioFirma(request.data['certificado'], request.data['claveFirma'], request.data['rucEmpresa'])
+    if firmaCorresponde is False:
+        return Response({"message": "No es dueño de la firma"}, status=status.HTTP_200_OK)
+
+    return Response(status=status.HTTP_200_OK)
 

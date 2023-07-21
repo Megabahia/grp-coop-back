@@ -138,7 +138,9 @@ def pagoProveedores_update(request, pk):
                     enviarNegadoPago(usuario['email'], query.valorPagar)
 
                 if 'Procesar' in query.estado:
+                    print('corrreeeeeeeeeo', usuario['email'])
                     enviarProcesandoPago(usuario['email'], query.valorPagar)
+                    print('se envio el correo')
 
                 createLog(logModel, serializer.data, logTransaccion)
                 return Response(serializer.data)

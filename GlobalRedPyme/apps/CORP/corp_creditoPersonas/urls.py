@@ -15,6 +15,7 @@ from .views import (
     creditoPersonas_validar_codigo_creditoAprobado,
     prueba,
     prueba_verificar,
+    verificarPropietarioFirma,
 )
 
 app_name = 'corp_creditoPersonas'
@@ -39,4 +40,5 @@ urlpatterns = [
          name="creditoPersonas_validar_codigo_creditoAprobado"),
     path('pruebaConsumer', prueba, name="prueba"),
     path('verificarDocumento', prueba_verificar, name="prueba_verificar"),
+    path('verificarPropietarioFirma', verificarPropietarioFirma, name="verificarPropietarioFirma"),
 ]
