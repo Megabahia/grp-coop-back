@@ -16,6 +16,8 @@ class PagoEmpleados(models.Model):
     correo = models.EmailField(max_length=255, null=True, blank=True)
     montoPagar = models.CharField(max_length=255, null=True, blank=True)
     codigoEmpleado = models.CharField(max_length=255, null=True, blank=True)
+    numeroCuentaEmpleado = models.CharField(max_length=255, null=True, blank=True)
+    bancoDestino = models.CharField(max_length=255, null=True, blank=True)
     mesPago = models.CharField(max_length=255, null=True, blank=True)
     anio = models.CharField(max_length=255, null=True, blank=True)
     estado = models.CharField(max_length=255, null=True, blank=True)
@@ -23,6 +25,8 @@ class PagoEmpleados(models.Model):
     fechaFirma = models.DateTimeField(null=True, blank=True)
     user_id = models.CharField(max_length=255, null=True, blank=True)
     observacion = models.TextField()
+    numeroComprobante = models.CharField(max_length=255, null=True, blank=True)
+    fechaProceso = models.DateTimeField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)

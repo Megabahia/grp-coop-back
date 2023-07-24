@@ -23,6 +23,8 @@ class PagoProveedores(models.Model):
     observacion = models.CharField(max_length=255, null=True, blank=True)
     fechaFirma = models.DateTimeField(null=True, blank=True)
     user_id = models.CharField(max_length=255, null=True, blank=True)
+    numeroComprobante = models.CharField(max_length=255, null=True, blank=True)
+    fechaProceso = models.DateTimeField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)

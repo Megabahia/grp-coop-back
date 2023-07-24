@@ -1,4 +1,11 @@
 import io
+import qrcode
+import fitz
+from cryptography.hazmat import backends
+from cryptography.hazmat.primitives.serialization import pkcs12
+from endesive.pdf import cms
+## Libreria para agregar imagenes a pdf
+from PIL import Image, ImageDraw, ImageFont
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from .models import PagoEmpleados
@@ -63,7 +70,7 @@ def uploadEXCEL_pagosEmpleados(request):
                 first = False
                 continue
             else:
-                if len(dato) == 10:
+                if len(dato) == 12:
                     resultadoInsertar = insertarDato_PagoEmpleado(dato, request.data['user_id'])
                     if resultadoInsertar != 'Dato insertado correctamente':
                         contInvalidos += 1
@@ -118,7 +125,6 @@ def pagoEmpleados_update(request, pk):
 
             if 'claveFirma' in request.data:
                 if request.data != '':
-                    print('llega')
                     datau, datas = firmar(request)
                     archivo_pdf_para_enviar_al_cliente = io.BytesIO()
                     archivo_pdf_para_enviar_al_cliente.write(datau)
@@ -141,11 +147,11 @@ def pagoEmpleados_update(request, pk):
 
                 if serializer.data['estado'] == 'Negado':
                     registro = serializer.data
-                    envioCorreoNegado(registro['correo'], registro['nombresCompletos'], registro['observacion'])
+                    envioCorreoNegado(registro['correo'], registro['nombresCompletos'], registro['observacion'], registro['montoPagar'])
                 if serializer.data['estado'] == 'Aprobado':
                     registro = serializer.data
                     envioCorreoAprobado(registro['empresa']['correo'], registro['nombresCompletos'],
-                                        registro['montoPagar'], registro['montoDisponible'])
+                                        registro['montoPagar'], registro['montoDisponible'], registro)
                     nombrePyme = registro['empresa']['comercial']
                     nombreReresentanteLegal = registro['empresa']['reprsentante']
                     envioCorreoTranserencia(registro['correo'], registro['montoPagar'], registro['nombresCompletos'],
@@ -189,6 +195,9 @@ def pagoEmpleados_list(request):
             if "user_id" in request.data and request.data["user_id"]:
                 filters['user_id'] = str(request.data["user_id"])
 
+            if "estado" in request.data and request.data["estado"]:
+                filters['estado__in'] = request.data["estado"]
+
             # Serializar los datos
             query = PagoEmpleados.objects.filter(**filters).order_by('-created_at')
             serializer = PagoEmpleadosSerializer(query[offset:limit], many=True)
@@ -225,6 +234,7 @@ def firmar(request):
         "sigandcertify": True,
         "signaturebox": (470, 840, 570, 640),
         "signature": usuario['nombresCompleto'],
+        "signature_manual": [],
         # "signature_img": "signature_test.png",
         "contact": usuario['email'],
         "location": "Ubicación",
@@ -236,9 +246,14 @@ def firmar(request):
     p12 = pkcs12.load_key_and_certificates(
         certificado.read(), contrasenia.encode("ascii"), backends.default_backend()
     )
+    datosFirmante = f"""FIRMADO POR:\n {dct['signature']} \n FECHA:\n {date}"""
+    generarQR(datosFirmante)
+    output_file = "example-with-barcode.pdf"
+    agregarQRDatosFirmante(datosFirmante, output_file, pdf)
 
     # datau = open(fname, "rb").read()
-    datau = pdf.read()
+    datau = open(output_file, "rb").read()
+    dct.pop('signature')
     datas = cms.sign(datau, dct, p12[0], p12[1], p12[2], "sha256")
     return datau, datas
     # return Response('new_serializer_data', status=status.HTTP_200_OK)
@@ -366,6 +381,8 @@ def insertarDato_PagoEmpleado(dato, user_id):
         data['codigoEmpleado'] = dato[4]
         data['mesPago'] = dato[1]
         data['anio'] = dato[2]
+        data['numeroCuentaEmpleado'] = dato[10]
+        data['bancoDestino'] = dato[11]
         data['estado'] = ''
         data['user_id'] = user_id
         data['state'] = 1
@@ -376,17 +393,17 @@ def insertarDato_PagoEmpleado(dato, user_id):
         return str(e)
 
 
-def envioCorreoNegado(email, nombresCompletosEmpleado, observacion):
-    subject, from_email, to = 'Solicitud de Pago a Empleado NEGADA', "08d77fe1da-d09822@inbox.mailtrap.io", \
+def envioCorreoNegado(email, nombresCompletosEmpleado, observacion, montoPagar):
+    subject, from_email, to = 'PAGO FALLIDO', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
-            Solicitud de Pago a Empleado NEGADA
+            Pago a empleados – Crédito Pagos
 
-            Lo sentimos!!
+            Lo sentimos
 
-            El pago a {nombresCompletosEmpleado} ha sido NEGADO debido a {observacion}
+            Su pago a empleados por ${montoPagar} ha sido NEGADO debido a {observacion}
 
-            Si requiere ayuda, contáctese con un asesor a través del siguiente enlace: https://wa.link/nczlei
+            Si necesita ayuda personalizada, contáctese con un asesor a través del siguiente enlace: https://wa.link/koof8g 
 
             Atentamente,
 
@@ -395,18 +412,18 @@ def envioCorreoNegado(email, nombresCompletosEmpleado, observacion):
     html_content = f"""
         <html>
             <body>
-                <h1>Solicitud de Pago a Empleado NEGADA</h1>
+                <h1>Pago a empleados – Crédito Pagos</h1>
                 <br>
-                <h3><b>Lo sentimos!!</b></h3>
+                <h3><b>Lo sentimos</b></h3>
                 <br>
-                <p>El pago a {nombresCompletosEmpleado} ha sido NEGADO debido a {observacion}</p>
+                <p>Su pago a empleados por ${montoPagar} ha sido NEGADO debido a {observacion}</p>
                 <br>
                 <br>
-                <p>Si requiere ayuda, contáctese con un asesor a través del siguiente enlace: https://wa.link/nczlei</p>
+                <p>Si necesita ayuda personalizada, contáctese con un asesor a través del siguiente enlace: https://wa.link/koof8g </p>
                 <br>
                 Atentamente,
                 <br>
-                Equipo Global Redpyme – Crédito Pagos
+                Cooperativa San José de Vittoria – Crédito Pagos
                 <br>
             </body>
         </html>
@@ -414,34 +431,50 @@ def envioCorreoNegado(email, nombresCompletosEmpleado, observacion):
     sendEmail(subject, txt_content, from_email, to, html_content)
 
 
-def envioCorreoAprobado(email, nombresCompletosEmpleado, monto, montoDisponible):
-    subject, from_email, to = 'Solicitud de Pago a Empleado APROBADA', "08d77fe1da-d09822@inbox.mailtrap.io", \
+def envioCorreoAprobado(email, nombresCompletosEmpleado, monto, montoDisponible, registro):
+    subject, from_email, to = 'Transferencia existosa', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
-            Solicitud de Pago a Empleado APROBADA
+            Pago a empleados – Crédito Pagos
 
-            LISTO,
+            FELICIDADES!!
 
-            El pago a {nombresCompletosEmpleado} un monto de {monto} a sido APROBADO. Su Monto Disponible de Línea de Crédito es: {montoDisponible}
+            Usted acaba de realizar un pago a su empleado por ${monto}. A continuación le mostramos un resumen de su pago:
+
+            Número de comprobante de transferencia: {registro['numeroComprobante']}
+            Fecha de transferencia: {registro['fechaProceso']}
+            Nombre del empleado: {registro['nombresCompletos']}
+            Numero de cédula del empleado: {registro['cedula']}
+            Monto pagado: {monto}
+            Número de cuenta del empleado: {registro['numeroCuentaEmpleado']}
+            Banco destino: {registro['bancoDestino']}
+            Estado: APROBADO
 
             Atentamente,
 
-            Equipo Global Redpyme – Crédito Pagos
+            Cooperativa San José de Vittoria – Crédito Pagos
         """
     html_content = f"""
         <html>
             <body>
-                <h1>Solicitud de Pago a Empleado APROBADA</h1>
+                <h1>Pago a empleados – Crédito Pagos</h1>
                 <br>
-                <h3><b>LISTO,</b></h3>
+                <h3><b>FELICIDADES!!</b></h3>
                 <br>
-                <p>El pago a {nombresCompletosEmpleado} un monto de {monto} a sido APROBADO. 
-                Su Monto Disponible de Línea de Crédito es: {montoDisponible}</p>
+                <p>Usted acaba de realizar un pago a su empleado por ${monto}. A continuación le mostramos un resumen de su pago:</p>
                 <br>
+                Número de comprobante de transferencia: {registro['numeroComprobante']}
+                Fecha de transferencia: {registro['fechaProceso']}
+                Nombre del empleado: {registro['nombresCompletos']}
+                Numero de cédula del empleado: {registro['cedula']}
+                Monto pagado: {monto}
+                Número de cuenta del empleado: {registro['numeroCuentaEmpleado']}
+                Banco destino: {registro['bancoDestino']}
+                Estado: APROBADO
                 <br>
                 Atentamente,
                 <br>
-                Equipo Global Redpyme – Crédito Pagos
+                Cooperativa San José de Vittoria – Crédito Pagos
                 <br>
             </body>
         </html>
@@ -484,3 +517,66 @@ def envioCorreoTranserencia(email, monto, nombresCompletosEmpleado, nombreRepres
         </html>
     """
     sendEmail(subject, txt_content, from_email, to, html_content)
+
+
+def generarQR(datos):
+    img = qrcode.make(datos)
+    f = open("output.png", "wb")
+    img.save(f)
+    f.close()
+
+
+def agregarQRDatosFirmante(datosFirmante,output_file, ruta):
+    # Define the position and size of the image rectangle
+    image_rectangle = fitz.Rect(0, 420, 150, 520)  # Adjust the coordinates and size as needed
+
+    # Retrieve the first page of the PDF
+    with open('temp_file.pdf', 'wb') as temp_file:
+        temp_file.write(ruta.read())
+
+    # 2. Abrir el archivo temporal con fitz.open()
+    file_handle = fitz.open('temp_file.pdf')
+    first_page = file_handle[0]
+
+    # Open and flip the image vertically
+    image_path = 'output.png'
+    image = Image.open(image_path).transpose(Image.FLIP_TOP_BOTTOM)
+    image.save('flipped_image.png')
+
+    # Insert the flipped image into the PDF
+    img = open('output.png', "rb").read()  # an image file
+    img_xref = 0
+    first_page.insert_image(image_rectangle, stream=img, xref=img_xref)
+    ##############
+
+
+    # Crear una nueva imagen con fondo blanco
+    width = 400
+    height = 400
+    image = Image.new('RGB', (width, height), 'white')
+
+    # Crear un objeto ImageDraw para dibujar en la imagen
+    draw = ImageDraw.Draw(image)
+
+    # Especificar la fuente a utilizar
+    font = ImageFont.truetype('Arial Unicode.ttf', size=40)
+
+    # Especificar el texto y su posición en la imagen
+    text_position = (10, 50)
+
+    # Dibujar el texto en la imagen
+    draw.text(text_position, datosFirmante, font=font, fill='black')
+
+    # Guardar la imagen resultante
+    image.save('imagen_con_texto.png')
+    ##############
+    # Open and flip the text image vertically
+    text_image_path = 'imagen_con_texto.png'
+    text_image = Image.open(text_image_path).transpose(Image.FLIP_TOP_BOTTOM)
+    text_image.save('flipped_text_image.png')
+
+    img1 = open('imagen_con_texto.png', "rb").read()  # an image file
+    first_page.insert_image(fitz.Rect(150, 420, 300, 520), stream=img1, xref=img_xref)
+
+    # Save the modified PDF
+    file_handle.save(output_file)

@@ -135,11 +135,11 @@ def pagoProveedores_update(request, pk):
                 serializer.save()
                 usuario = json.loads(query.usuario)
                 if 'Negado' in query.estado:
-                    enviarNegadoPago(usuario['email'], query.valorPagar)
+                    enviarNegadoPago(usuario['email'], query.valorPagar, query)
 
                 if 'Procesar' in query.estado:
                     print('corrreeeeeeeeeo', usuario['email'])
-                    enviarProcesandoPago(usuario['email'], query.valorPagar)
+                    enviarProcesandoPago(usuario['email'], query.valorPagar, query)
                     print('se envio el correo')
 
                 createLog(logModel, serializer.data, logTransaccion)
@@ -307,35 +307,35 @@ def generarQR(datos):
     img.save(f)
     f.close()
 
-def enviarNegadoPago(email, monto):
+def enviarNegadoPago(email, monto, registro):
     subject, from_email, to = 'RAZÓN POR LA QUE SE NIEGA EL PAGO A PROVEEDORES', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
-        PAGO A PROVEEDORES - CRÉDITO PAGOS
+        Pago a proveedores – Crédito Pagos
         
-        Lo sentimos!!
+        Lo sentimos
         
-        La transferencia por ${monto} DE LA FACTURA A PAGAR ha sido rechazada. 
-        Por favor revise sus fondos e intente de nuevo.
+        Su pago a proveedores por ${monto} ha sido NEGADO debido a {registro.observacion}
         
-        Si cree que es un error, contáctese con su agente a través de https://walink.co/b5e9c0
+        Si necesita ayuda personalizada, contáctese con un asesor a través del siguiente enlace: https://wa.link/7v6pcn
         
         Atentamente,
         
-        Global RedPyme – Crédito Pagos
+        Cooperativa San José de Vittoria – Crédito Pagos
     """
     html_content = f"""
                 <html>
                     <body>
-                        <h1>PAGO A PROVEEDORES - CRÉDITO PAGOS</h1>
+                        <h1>Pago a proveedores – Crédito Pagos</h1>
                         <br>
-                        <h3><b>Lo sentimos!!</b></h3>
+                        <h3><b>Lo sentimos</b></h3>
                         <br>
-                        <p>La transferencia por ${monto} DE LA FACTURA A PAGAR ha sido rechazada. 
-                        Por favor revise sus fondos e intente de nuevo.</p>
+                        <p>Su pago a proveedores por ${monto} ha sido NEGADO debido a {registro.observacion}</p>
                         <br>
                         <br>
-                        <p>Si cree que es un error, contáctese con su agente a través de https://walink.co/b5e9c0</p>
+                        <p>
+                        Si necesita ayuda personalizada, contáctese con un asesor a través del siguiente enlace: https://wa.link/7v6pcn
+                        </p>
                         <br>
                         Atentamente,
                         <br>
@@ -347,37 +347,50 @@ def enviarNegadoPago(email, monto):
     sendEmail(subject, txt_content, from_email, to, html_content)
 
 
-def enviarProcesandoPago(email, monto):
+def enviarProcesandoPago(email, monto, registro):
     subject, from_email, to = 'Transferencia exitosa', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
-        PAGO A PROVEEDORES - CRÉDITO PAGOS
+        Pago a proveedores – Crédito Pagos
         
         FELICIDADES!!
         
-        La transferencia por ${monto} ha sido realizada con éxito, 
-        adjuntamos el comprobante del pago realizado. 
-        En 24 horas será acreditado a la cuenta destino.
+        Usted acaba de realizar un pago a su proveedor por ${monto}. A continuación le mostramos un resumen de su pago:
+
+        Número de comprobante de transferencia: {registro.numeroComprobante}
+        Fecha de transferencia: {registro.fechaProceso}
+        Nombre del proveedor: {registro.nombreProveedor}
+        Numero de RUC del proveedor: {registro.rucProveedor}
+        Monto pagado: ${monto}
+        Número de cuenta del proveedor: {registro.numeroCuenta}
+        Banco destino: {registro.banco}
+        Estado: APROBADO
                             
         Atentamente,
         
-        Global RedPyme – Crédito Pagos
+        Cooperativa San José de Vittoria – Crédito Pagos 
     """
     html_content = f"""
                 <html>
                     <body>
-                        <h1>PAGO A PROVEEDORES - CRÉDITO PAGOS</h1>
+                        <h1>Pago a proveedores – Crédito Pagos</h1>
                         <br>
                         <h3><b>FELICIDADES!!</b></h3>
                         <br>
-                        <p>La transferencia por ${monto} ha sido realizada con éxito, 
-                        adjuntamos el comprobante del pago realizado. 
-                        En 24 horas será acreditado a la cuenta destino.</p>
+                        <p>Usted acaba de realizar un pago a su proveedor por ${monto}. A continuación le mostramos un resumen de su pago:</p>
                         <br>
+                        Número de comprobante de transferencia: {registro.numeroComprobante}
+                        Fecha de transferencia: {registro.fechaProceso}
+                        Nombre del proveedor: {registro.nombreProveedor}
+                        Numero de RUC del proveedor: {registro.rucProveedor}
+                        Monto pagado: ${monto}
+                        Número de cuenta del proveedor: {registro.numeroCuenta}
+                        Banco destino: {registro.banco}
+                        Estado: APROBADO
                         <br>
                         Atentamente,
                         <br>
-                        Global RedPyme – Crédito Pagos
+                        Cooperativa San José de Vittoria – Crédito Pagos
                         <br>
                     </body>
                 </html>

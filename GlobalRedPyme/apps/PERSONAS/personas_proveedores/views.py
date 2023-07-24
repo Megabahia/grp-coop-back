@@ -202,6 +202,10 @@ def proveedores_list(request):
                 if request.data["empresa_id"] != '':
                     filters['empresa_id'] = str(request.data["empresa_id"])
 
+            if "user_id" in request.data:
+                if request.data["user_id"] != '':
+                    filters['user_id'] = str(request.data["user_id"])
+
             # Serializar los datos
             query = Proveedores.objects.filter(**filters).order_by('-created_at')
             serializer = ProveedoresSerializer(query[offset:limit], many=True)

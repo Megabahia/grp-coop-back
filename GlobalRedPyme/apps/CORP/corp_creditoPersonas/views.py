@@ -1422,9 +1422,24 @@ def prueba_verificar(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def verificarPropietarioFirma(request):
-    firmaCorresponde = usuarioPropietarioFirma(request.data['certificado'], request.data['claveFirma'], request.data['rucEmpresa'])
-    if firmaCorresponde is False:
-        return Response({"message": "No es dueño de la firma"}, status=status.HTTP_200_OK)
+    timezone_now = timezone.localtime(timezone.now())
+    logModel = {
+        'endPoint': logApi + 'verificarPropietarioFirma',
+        'modulo': logModulo,
+        'tipo': logExcepcion,
+        'accion': 'CREAR',
+        'fechaInicio': str(timezone_now),
+        'dataEnviada': '{}',
+        'fechaFin': str(timezone_now),
+        'dataRecibida': '{}'
+    }
+    try:
+        firmaCorresponde = usuarioPropietarioFirma(request.data['certificado'], request.data['claveFirma'], request.data['rucEmpresa'])
+        if firmaCorresponde is False:
+            return Response({"message": "No es dueño de la firma"}, status=status.HTTP_200_OK)
 
-    return Response(status=status.HTTP_200_OK)
-
+        return Response(status=status.HTTP_200_OK)
+    except Exception as e:
+        err = {"error": 'Un error ha ocurrido: {}'.format(e)}
+        createLog(logModel, err, logExcepcion)
+        return Response(err, status=status.HTTP_400_BAD_REQUEST)
