@@ -100,3 +100,8 @@ GlobalRedPyme/apps/config/__pycache__/
 .idea
 /GlobalRedPyme/apps/blob
 /GlobalRedPyme/temp_file.pdf
+/GlobalRedPyme/example-with-barcode.pdf
+/GlobalRedPyme/flipped_image.png
+/GlobalRedPyme/flipped_text_image.png
+/GlobalRedPyme/imagen_con_texto.png
+/GlobalRedPyme/output.png
