@@ -19,5 +19,5 @@ def usuarioPropietarioFirma(p12_file, password, rucEmpresa):
     print('Propietario:', propietario)
     print('rucEmpresa:', rucEmpresa)
 
-    return True if rucEmpresa == propietario+'001' else False
+    return True if rucEmpresa == propietario else False
 

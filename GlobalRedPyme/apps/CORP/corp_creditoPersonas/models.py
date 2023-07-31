@@ -127,6 +127,7 @@ class CreditoPersonas(models.Model):
     matriculaVehiculoGarante = models.FileField(blank=True, null=True, upload_to=upload_path)
     planillaDomicilioGarante = models.FileField(blank=True, null=True, upload_to=upload_path)
     empresaEmpleado = jsonfield.JSONField()
+    activarMenu = models.SmallIntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)
@@ -161,6 +162,21 @@ class CodigoCredito(models.Model):
     credito_id = models.CharField(max_length=200, blank=False, null=False)
     codigo = models.CharField(max_length=250, blank=False, null=False)
     numeroIdentificacion = models.CharField(max_length=250, blank=False, null=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(null=True)
+    state = models.SmallIntegerField(default=1)
+
+
+class RegarcarCreditos(models.Model):
+    _id = models.ObjectIdField()
+    fechaRecarga = models.DateField(null=True, blank=True)
+    info = jsonfield.JSONField()
+    monto = models.FloatField(blank=True, null=True)
+    estado = models.CharField(max_length=250, blank=False, null=False)
+    tipoCredito = models.CharField(max_length=250, blank=False, null=False)
+    observaciones = models.TextField()
+    empresaIfis_id = models.CharField(max_length=255, blank=False, null=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)

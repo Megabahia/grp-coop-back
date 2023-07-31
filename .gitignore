@@ -98,3 +98,5 @@ GlobalRedPyme/apps/config/__pycache__/
 /GlobalRedPyme/GlobalRedPyme/.env.example
 .env
 .idea
+/GlobalRedPyme/apps/blob
+/GlobalRedPyme/temp_file.pdf

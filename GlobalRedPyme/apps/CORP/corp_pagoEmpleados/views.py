@@ -20,6 +20,9 @@ from django.utils import timezone
 import json
 # excel
 import openpyxl
+
+from ..corp_creditoPersonas.models import CreditoPersonas
+from ..corp_movimientoCobros.models import Transacciones
 # Utils
 from ...utils import utils
 # Import PDF
@@ -143,7 +146,6 @@ def pagoEmpleados_update(request, pk):
             serializer = PagoEmpleadosSerializer(query, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
-                print(serializer.data['empresa'])
 
                 if serializer.data['estado'] == 'Negado':
                     registro = serializer.data
@@ -156,6 +158,20 @@ def pagoEmpleados_update(request, pk):
                     nombreReresentanteLegal = registro['empresa']['reprsentante']
                     envioCorreoTranserencia(registro['correo'], registro['montoPagar'], registro['nombresCompletos'],
                                             nombreReresentanteLegal, nombrePyme, registro['mesPago'])
+                    # Vamos a registrar la transacction del credito
+                    credito = CreditoPersonas.objects.filter(user_id=serializer.data['user_id'], estado='Aprobado',
+                                                             state=1).order_by('-created_at').first()
+                    Transacciones.objects.create(**{
+                        'fechaTransaccion': timezone_now,
+                        'tipo': 'Pago empleado',
+                        'estado': 'Aprobado',
+                        'informacion': json.dumps(serializer.data),
+                        'egreso': float(serializer.data['montoPagar']),
+                        'total': (credito.montoDisponible - float(serializer.data['montoPagar'])),
+                        'user_id': serializer.data['user_id'],
+                        'creditoPersona_id': credito._id,
+                        'pagoEmpleados': query,
+                    })
 
                 createLog(logModel, serializer.data, logTransaccion)
                 return Response(serializer.data)

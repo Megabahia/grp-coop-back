@@ -1,10 +1,10 @@
-from .models import MovimientoCobros
+from .models import MovimientoCobros, Transacciones
 from ...CORP.corp_autorizaciones.models import Autorizaciones
 from ...CORE.core_monedas.models import Monedas
 from ...CORP.corp_pagos.models import Pagos
 from ...CORP.corp_monedasEmpresa.models import MonedasEmpresa
 from .serializers import (
-    MovimientoCobrosSerializer
+    MovimientoCobrosSerializer, TransaccionesSerializer
 )
 from .producer import publish_monedas
 from rest_framework import status
@@ -306,3 +306,44 @@ def movimientoCobros_delete(request, pk):
         err = {"error": 'Un error ha ocurrido: {}'.format(e)}
         createLog(logModel, err, logExcepcion)
         return Response(err, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def list_transacciones(request):
+    timezone_now = timezone.localtime(timezone.now())
+    logModel = {
+        'endPoint': logApi + 'list/transacciones/',
+        'modulo': logModulo,
+        'tipo': logExcepcion,
+        'accion': 'LEER',
+        'fechaInicio': str(timezone_now),
+        'dataEnviada': '{}',
+        'fechaFin': str(timezone_now),
+        'dataRecibida': '{}'
+    }
+    if request.method == 'POST':
+        try:
+            logModel['dataEnviada'] = str(request.data)
+            # paginacion
+            page_size = int(request.data['page_size'])
+            page = int(request.data['page'])
+            offset = page_size * page
+            limit = offset + page_size
+            # Filtros
+            filters = {"state": "1"}
+
+            if 'creditoPersonas_id' in request.data and request.data['creditoPersonas_id'] != '':
+                    filters['creditoPersonas_id'] = str(request.data['creditoPersonas_id'])
+
+            # Serializar los datos
+            query = Transacciones.objects.filter(**filters).order_by('estado')
+            serializer = TransaccionesSerializer(query[offset:limit], many=True)
+            new_serializer_data = {'cont': query.count(),
+                                   'info': serializer.data}
+            # envio de datos
+            return Response(new_serializer_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            err = {"error": 'Un error ha ocurrido: {}'.format(e)}
+            createLog(logModel, err, logExcepcion)
+            return Response(err, status=status.HTTP_400_BAD_REQUEST)

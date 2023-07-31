@@ -5,6 +5,22 @@ from ...config import config
 
 
 def publish(data):
+
+    if 'solicitudCredito' in data:
+        data.pop('solicitudCredito')
+    if 'cedulaGarante' in data:
+        data.pop('cedulaGarante')
+    if 'papeletaVotacionGarante' in data:
+        data.pop('papeletaVotacionGarante')
+    if 'fotoGarante' in data:
+        data.pop('fotoGarante')
+    if 'impuestoPredialGarante' in data:
+        data.pop('impuestoPredialGarante')
+    if 'matriculaVehiculoGarante' in data:
+        data.pop('matriculaVehiculoGarante')
+    if 'planillaDomicilioGarante' in data:
+        data.pop('planillaDomicilioGarante')
+
     topicArn = config.AWS_TOPIC_ARN
     snsClient = boto3.client(
         'sns',

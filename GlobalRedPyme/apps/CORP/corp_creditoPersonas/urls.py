@@ -16,6 +16,9 @@ from .views import (
     prueba,
     prueba_verificar,
     verificarPropietarioFirma,
+    recargar_lineas_creditos,
+    listar_recargar_lineas_creditos,
+    actualizar_recargar_lineas_creditos,
 )
 
 app_name = 'corp_creditoPersonas'
@@ -41,4 +44,7 @@ urlpatterns = [
     path('pruebaConsumer', prueba, name="prueba"),
     path('verificarDocumento', prueba_verificar, name="prueba_verificar"),
     path('verificarPropietarioFirma', verificarPropietarioFirma, name="verificarPropietarioFirma"),
+    path('recargar/lineasCreditos', recargar_lineas_creditos, name="recargar_lineas_creditos"),
+    path('listar/recargar/lineasCreditos', listar_recargar_lineas_creditos, name="listar_recargar_lineas_creditos"),
+    path('actualizar/recargar/lineasCreditos/<str:pk>', actualizar_recargar_lineas_creditos, name="actualizar_recargar_lineas_creditos"),
 ]

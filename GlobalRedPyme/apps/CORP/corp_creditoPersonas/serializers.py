@@ -5,6 +5,7 @@ from bson import ObjectId
 from .models import (
     CreditoPersonas,
     CodigoCredito,
+    RegarcarCreditos,
 )
 
 from ..corp_empresas.models import Empresas
@@ -80,5 +81,12 @@ class CreditoPersonasPersonaSerializer(serializers.ModelSerializer):
 class CodigoCreditoSerializer(serializers.ModelSerializer):
     class Meta:
         model = CodigoCredito
+        fields = '__all__'
+        read_only_fields = ['_id']
+
+
+class RegarcarCreditosSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RegarcarCreditos
         fields = '__all__'
         read_only_fields = ['_id']

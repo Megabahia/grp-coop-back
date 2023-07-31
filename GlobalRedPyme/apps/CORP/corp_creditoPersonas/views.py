@@ -1,5 +1,7 @@
 import io
 import datetime
+import json
+
 import qrcode
 import fitz
 from cryptography.hazmat import backends
@@ -8,15 +10,21 @@ from endesive.pdf import cms
 ## Libreria para agregar imagenes a pdf
 from PIL import Image, ImageDraw, ImageFont
 
+import os
+
+from ..corp_movimientoCobros.models import Transacciones
+
+# Establecer el directorio base del proyecto
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from apps.CENTRAL.central_catalogo.models import Catalogo
-from .models import CreditoPersonas, CodigoCredito
+from .models import CreditoPersonas, CodigoCredito, RegarcarCreditos
 from apps.PERSONAS.personas_personas.models import Personas
 from apps.CORP.corp_empresas.models import Empresas
-from apps.PERSONAS.personas_personas.serializers import PersonasSearchSerializer
 from .serializers import (
-    CreditoPersonasSerializer, CreditoPersonasPersonaSerializer, CodigoCreditoSerializer
+    CreditoPersonasSerializer, CreditoPersonasPersonaSerializer, CodigoCreditoSerializer,
+    RegarcarCreditosSerializer,
 )
 # Enviar Correo
 from ...config.util import sendEmail
@@ -35,7 +43,6 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from django.conf import settings
 # Swagger
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 # Lectura de AWS s3
 import boto3
@@ -281,7 +288,7 @@ def creditoPersonas_update(request, pk):
                             enviarCorreoPorcompletarLineaCredito(serializer.data['montoLiquidar'], email)
                         else:
                             enviarCorreoPorcompletar(serializer.data['montoLiquidar'], email)
-                if serializer.data['estado'] == 'Aprobado':
+                if serializer.data['estado'] == 'Aprobado' and request.data['motivoNegarLinea'] == '' and request.data['activarMenu']:
                     if serializer.data['montoLiquidar']:
                         if 'Pymes' in serializer.data['tipoCredito']:
                             if serializer.data['nombresCompleto']:
@@ -298,10 +305,18 @@ def creditoPersonas_update(request, pk):
                         if serializer.data['alcance'] != 'LOCAL':
                             # Publicar en la cola
                             publish(credito)
+                        else:
+                            query.tipoCredito = credito['canal']
+                            query.save()
                 if "estado" in request.data:
                     if request.data["estado"] == 'Enviado':
                         query.enviado = 1
                         query.save()
+                if "motivoNegarLinea" in request.data and request.data['motivoNegarLinea'] != '':
+                    enviarCorreoNegarLineaCredito(email, request.data['motivoNegarLinea'])
+                if "activarMenu" in request.data and request.data['activarMenu']:
+                    query.activarMenu = 1
+                    query.save()
 
                 return Response(serializer.data)
             createLog(logModel, serializer.errors, logExcepcion)
@@ -1046,7 +1061,7 @@ def firmar(request, dct, nombreArchivo):
     datosFirmante = f"""FIRMADO POR:\n {dct['signature']} \n FECHA:\n {date}"""
     generarQR(datosFirmante)
     output_file = "example-with-barcode.pdf"
-    agregarQRDatosFirmante(datosFirmante,output_file, ruta)
+    agregarQRDatosFirmante(datosFirmante, output_file, ruta)
 
     contrasenia = request.data['claveFirma']
     p12 = pkcs12.load_key_and_certificates(
@@ -1330,7 +1345,7 @@ def generarQR(datos):
     f.close()
 
 
-def agregarQRDatosFirmante(datosFirmante,output_file, ruta):
+def agregarQRDatosFirmante(datosFirmante, output_file, ruta):
     # Define the position and size of the image rectangle
     image_rectangle = fitz.Rect(0, 0, 250, 220)  # Adjust the coordinates and size as needed
 
@@ -1348,7 +1363,6 @@ def agregarQRDatosFirmante(datosFirmante,output_file, ruta):
     img_xref = 0
     first_page.insert_image(image_rectangle, stream=img, xref=img_xref)
     ##############
-
 
     # Crear una nueva imagen con fondo blanco
     width = 400
@@ -1381,6 +1395,7 @@ def agregarQRDatosFirmante(datosFirmante,output_file, ruta):
     # Save the modified PDF
     file_handle.save(output_file)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def prueba_verificar(request):
@@ -1394,9 +1409,9 @@ def prueba_verificar(request):
     with tempfile.TemporaryDirectory() as d:
         ruta = d + 'creditosPreAprobados.xlsx'
         s3 = boto3.resource('s3')
-        s3.meta.client.download_file('globalredpymes', str('CORP/documentosCreditosPersonas/64906cb5b5913ced050fb5b2_solicitudCreditoFirmado.pdf'), ruta)
-
-
+        s3.meta.client.download_file('globalredpymes',
+                                     str('CORP/documentosCreditosPersonas/64906cb5b5913ced050fb5b2_solicitudCreditoFirmado.pdf'),
+                                     ruta)
 
     input_file = "/Users/papamacone/Documents/Edgar/grp-back-coop/GlobalRedPyme/apps/CORP/corp_creditoPersonas/comandancia.pdf"
     output_file = "example-with-barcode.pdf"
@@ -1434,12 +1449,293 @@ def verificarPropietarioFirma(request):
         'dataRecibida': '{}'
     }
     try:
-        firmaCorresponde = usuarioPropietarioFirma(request.data['certificado'], request.data['claveFirma'], request.data['rucEmpresa'])
+        firmaCorresponde = usuarioPropietarioFirma(request.data['certificado'], request.data['claveFirma'],
+                                                   request.data['rucEmpresa'])
         if firmaCorresponde is False:
-            return Response({"message": "No es dueño de la firma"}, status=status.HTTP_200_OK)
+            return Response({"message": "Lo sentimos, parece que la firma registrada no corresponde a "
+                                        "la del representante legal o el dueño de la empresa o negocio. "
+                                        "Por favor verifica la información y vuelve a intentarlo."}, status=status.HTTP_200_OK)
 
         return Response(status=status.HTTP_200_OK)
     except Exception as e:
         err = {"error": 'Un error ha ocurrido: {}'.format(e)}
         createLog(logModel, err, logExcepcion)
         return Response(err, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def recargar_lineas_creditos(request):
+    timezone_now = timezone.localtime(timezone.now())
+    logModel = {
+        'endPoint': logApi + 'recargar/lineasCreditos',
+        'modulo': logModulo,
+        'tipo': logExcepcion,
+        'accion': 'CREAR',
+        'fechaInicio': str(timezone_now),
+        'dataEnviada': '{}',
+        'fechaFin': str(timezone_now),
+        'dataRecibida': '{}'
+    }
+    try:
+        contValidos = 0
+        contInvalidos = 0
+        contTotal = 0
+        errores = []
+        try:
+            if request.method == 'POST':
+                print('llegA')
+                excel = request.FILES['documento']
+                ruta = os.path.join(BASE_DIR, excel.name)
+                # Leer los datos del archivo
+                with open(ruta, 'wb') as archivo_destino:
+                    for chunk in excel.chunks():
+                        archivo_destino.write(chunk)
+                print('paso')
+                first = True  # si tiene encabezado
+                #             uploaded_file = request.FILES['documento']
+                # you may put validations here to check extension or file size
+                wb = openpyxl.load_workbook(ruta)
+                # getting a particular sheet by name out of many sheets
+                worksheet = wb["Recargas"]
+                lines = list()
+            for row in worksheet.iter_rows():
+                row_data = list()
+                for cell in row:
+                    row_data.append(str(cell.value))
+                lines.append(row_data)
+
+            for dato in lines:
+                contTotal += 1
+                if first:
+                    first = False
+                    continue
+                else:
+                    if len(dato) == 7:
+                        resultadoInsertar = insertarDato_creditoPreaprobadoNegocio(dato,
+                                                                                   request.data['empresa_financiera'])
+                        if resultadoInsertar != 'Dato insertado correctamente':
+                            contInvalidos += 1
+                            errores.append(
+                                {"error": "Error en la línea " + str(contTotal) + ": " + str(resultadoInsertar)})
+                        else:
+                            contValidos += 1
+                    else:
+                        contInvalidos += 1
+                        errores.append({"error": "Error en la línea " + str(
+                            contTotal) + ": la fila tiene un tamaño incorrecto (" + str(len(dato)) + ")"})
+
+            result = {"mensaje": "La Importación se Realizo Correctamente",
+                      "correctos": contValidos,
+                      "incorrectos": contInvalidos,
+                      "errores": errores
+                      }
+            os.remove(ruta)
+            return Response(result, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            err = {"error": 'Error verifique el archivo, un error ha ocurrido: {}'.format(e)}
+            return Response(err, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        err = {"error": 'Un error ha ocurrido: {}'.format(e)}
+        createLog(logModel, err, logExcepcion)
+        return Response(err, status=status.HTTP_400_BAD_REQUEST)
+
+
+def insertarDato_creditoPreaprobadoNegocio(dato, empresa_financiera):
+    try:
+        info = {
+            "nombreNegocio": dato[1],
+            "rucNegocio": dato[2],
+            "nombresRepresentante": dato[3],
+            "rucRepresentante": dato[4],
+            "correoRepresentante": dato[5],
+        }
+        timezone_now = timezone.localtime(timezone.now())
+        data = {}
+        data['fechaRecarga'] = dato[0].replace('"', "")[0:10] if dato[0] != "NULL" else None
+        data['info'] = info
+        data['monto'] = dato[6].replace('"', "") if dato[6] != "NULL" else None
+        data['estado'] = 'Nuevo'
+        data['tipoCredito'] = 'LineaCredito'
+        data['observaciones'] = ''
+
+        data['empresaIfis_id'] = empresa_financiera
+        data['created_at'] = str(timezone_now)
+        # inserto el dato con los campos requeridos
+        RegarcarCreditos.objects.create(**data)
+        return 'Dato insertado correctamente'
+    except Exception as e:
+        return str(e)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def listar_recargar_lineas_creditos(request):
+    timezone_now = timezone.localtime(timezone.now())
+    logModel = {
+        'endPoint': logApi + 'listar/recargar/lineasCreditos',
+        'modulo': logModulo,
+        'tipo': logExcepcion,
+        'accion': 'LEER',
+        'fechaInicio': str(timezone_now),
+        'dataEnviada': '{}',
+        'fechaFin': str(timezone_now),
+        'dataRecibida': '{}'
+    }
+    if request.method == 'POST':
+        try:
+            logModel['dataEnviada'] = str(request.data)
+            # paginacion
+            page_size = int(request.data['page_size'])
+            page = int(request.data['page'])
+            offset = page_size * page
+            limit = offset + page_size
+            # Filtros
+            filters = {"state": "1"}
+
+            if "empresaIfis_id" in request.data:
+                if request.data["empresaIfis_id"] != '':
+                    filters['empresaIfis_id'] = ObjectId(request.data["empresaIfis_id"])
+
+            if "estado" in request.data:
+                if request.data["estado"] != '':
+                    filters['estado__icontains'] = request.data["estado"]
+
+            if "tipoCredito" in request.data:
+                if request.data["tipoCredito"] != '':
+                    filters['tipoCredito'] = str(request.data["tipoCredito"])
+
+            # Serializar los datos
+            query = RegarcarCreditos.objects.filter(**filters).order_by('-created_at')
+            serializer = RegarcarCreditosSerializer(query[offset:limit], many=True)
+            new_serializer_data = {'cont': query.count(),
+                                   'info': serializer.data}
+            # envio de datos
+            return Response(new_serializer_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            err = {"error": 'Un error ha ocurrido: {}'.format(e)}
+            createLog(logModel, err, logExcepcion)
+            return Response(err, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def actualizar_recargar_lineas_creditos(request, pk):
+    request.POST._mutable = True
+    timezone_now = timezone.localtime(timezone.now())
+    logModel = {
+        'endPoint': logApi + 'actualizar/recargar/lineasCreditos/',
+        'modulo': logModulo,
+        'tipo': logExcepcion,
+        'accion': 'ESCRIBIR',
+        'fechaInicio': str(timezone_now),
+        'dataEnviada': '{}',
+        'fechaFin': str(timezone_now),
+        'dataRecibida': '{}'
+    }
+    try:
+        try:
+            logModel['dataEnviada'] = str(request.data)
+            query = RegarcarCreditos.objects.filter(pk=ObjectId(pk), state=1).order_by('-created_at').first()
+        except RegarcarCreditos.DoesNotExist:
+            errorNoExiste = {'error': 'No existe'}
+            createLog(logModel, errorNoExiste, logExcepcion)
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if request.method == 'POST':
+            now = timezone.localtime(timezone.now())
+            request.data['updated_at'] = str(now)
+            if 'created_at' in request.data:
+                request.data.pop('created_at')
+
+            serializer = RegarcarCreditosSerializer(query, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                if 'estado' in request.data and 'Aprobado' == request.data['estado']:
+                    enviarCorreoRecarga(serializer.data)
+                    # Vamos a registrar la transacction del credito
+                    credito = CreditoPersonas.objects.filter(rucEmpresa=serializer.data['info']['rucRepresentante'], estado='Aprobado',
+                                                             state=1).order_by('-created_at').first()
+                    Transacciones.objects.create(**{
+                        'fechaTransaccion': timezone_now,
+                        'tipo': 'Recarga de cupo de línea de crédito',
+                        'estado': 'Aprobado',
+                        'informacion': json.dumps(serializer.data),
+                        'egreso': float(serializer.data['monto']),
+                        'total': (credito.montoDisponible + float(serializer.data['monto'])),
+                        'user_id': credito.user_id,
+                        'creditoPersona_id': credito._id,
+                        'regarcarCreditos': query,
+                    })
+                return Response(serializer.data)
+            createLog(logModel, serializer.errors, logExcepcion)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        err = {"error": 'Un error ha ocurrido: {}'.format(e)}
+        createLog(logModel, err, logExcepcion)
+        return Response(err, status=status.HTTP_400_BAD_REQUEST)
+
+
+def enviarCorreoRecarga(data):
+    empresaIfis = Empresas.objects.filter(tipoEmpresa='ifis', state=1).order_by('-created_at').first()
+    subject, from_email, to = 'RECARGA DE CUPO EN LÍNEA DE CRÉDITO', "08d77fe1da-d09822@inbox.mailtrap.io", \
+                              data['info']['correoRepresentante']
+    txt_content = f"""
+        Estimad@ {data['info']['nombresRepresentante']}
+
+        La Cooperativa {empresaIfis.nombreEmpresa} ha recargado el Monto de su línea de crédito con {data['monto']}
+
+        Atentamente,
+
+        {empresaIfis.nombreEmpresa}
+    """
+    html_content = f"""
+        <html>
+            <body>
+                <h1>
+                Estimad@ {data['info']['nombresRepresentante']}
+                </h1>
+                <br>
+                <p>
+                La Cooperativa {empresaIfis.nombreEmpresa} ha recargado el Monto de su línea de crédito con {data['monto']}
+                </p>
+                <br>
+                Atentamente,
+                <br>
+                {empresaIfis.nombreEmpresa}
+            </body>
+        </html>
+    """
+    sendEmail(subject, txt_content, from_email, to, html_content)
+
+
+def enviarCorreoNegarLineaCredito(email, motivo):
+    empresaIfis = Empresas.objects.filter(tipoEmpresa='ifis', state=1).order_by('-created_at').first()
+    subject, from_email, to = 'NEGAR LÍNEA DE CRÉDITO', "08d77fe1da-d09822@inbox.mailtrap.io", email
+    txt_content = f"""
+        Estimad@
+
+        La Cooperativa {empresaIfis.nombreEmpresa} ha negado la activación por el motivo {motivo}
+
+        Atentamente,
+
+        {empresaIfis.nombreEmpresa}
+    """
+    html_content = f"""
+        <html>
+            <body>
+                <h1>
+                Estimad@
+                </h1>
+                <br>
+                <p>
+                La Cooperativa {empresaIfis.nombreEmpresa} ha negado la activación por el motivo {motivo}
+                </p>
+                <br>
+                Atentamente,
+                <br>
+                {empresaIfis.nombreEmpresa}
+            </body>
+        </html>
+    """
+    sendEmail(subject, txt_content, from_email, to, html_content)

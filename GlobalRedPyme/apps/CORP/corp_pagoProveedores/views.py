@@ -1,5 +1,9 @@
 import io
 import os
+
+from ..corp_creditoPersonas.models import CreditoPersonas
+from ..corp_movimientoCobros.models import Transacciones
+
 # Establecer el directorio base del proyecto
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 import datetime
@@ -138,9 +142,19 @@ def pagoProveedores_update(request, pk):
                     enviarNegadoPago(usuario['email'], query.valorPagar, query)
 
                 if 'Procesar' in query.estado:
-                    print('corrreeeeeeeeeo', usuario['email'])
                     enviarProcesandoPago(usuario['email'], query.valorPagar, query)
-                    print('se envio el correo')
+                    credito = CreditoPersonas.objects.filter(user_id=serializer.data['user_id'], estado='Aprobado', state=1).order_by('-created_at').first()
+                    Transacciones.objects.create(**{
+                        'fechaTransaccion': timezone_now,
+                        'tipo': 'Pago proveedor',
+                        'estado': 'Aprobado',
+                        'informacion': json.dumps(serializer.data),
+                        'egreso': float(serializer.data['valorPagar']),
+                        'total': (credito.montoDisponible - float(serializer.data['valorPagar'])),
+                        'user_id': serializer.data['user_id'],
+                        'creditoPersona_id': credito._id,
+                        'pagoProveedores': query,
+                    })
 
                 createLog(logModel, serializer.data, logTransaccion)
                 return Response(serializer.data)
