@@ -856,6 +856,8 @@ def insertarDato_creditoPreaprobado_microCredito(dato, empresa_financiera, empre
             Para acceder a su Línea de Crédito para realizar pagos a sus proveedores y/o empleados, haga click en el siguiente enlace:
             {url}/pages/preApprovedCreditLine Su código de ingreso es: {codigo}
             
+            Si su enlace no funciona, copia el siguiente link en una ventana del navegador: {url}/pages/preApprovedCreditLine
+            
             Crédito Pagos en la mejor opción de crecimiento para su negocio
             
             Saludos,
@@ -875,6 +877,9 @@ def insertarDato_creditoPreaprobado_microCredito(dato, empresa_financiera, empre
                         <a href='{url}/pages/preApprovedCreditLine'>Link</a> Su código de ingreso es: {codigo}
                         </p>
                         <br>
+                        <p>
+                        Si su enlace no funciona, copia el siguiente link en una ventana del navegador: {url}/pages/preApprovedCreditLine
+                        </p>
                         <br>
                         <b>Crédito Pagos en la mejor opción de crecimiento para su negocio</b>
                         <br>

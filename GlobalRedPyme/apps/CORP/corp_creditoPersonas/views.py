@@ -9,6 +9,7 @@ from cryptography.hazmat.primitives.serialization import pkcs12
 from endesive.pdf import cms
 ## Libreria para agregar imagenes a pdf
 from PIL import Image, ImageDraw, ImageFont
+import urllib.parse
 
 import os
 
@@ -288,7 +289,7 @@ def creditoPersonas_update(request, pk):
                             enviarCorreoPorcompletarLineaCredito(serializer.data['montoLiquidar'], email)
                         else:
                             enviarCorreoPorcompletar(serializer.data['montoLiquidar'], email)
-                if serializer.data['estado'] == 'Aprobado' and request.data['motivoNegarLinea'] == '' and request.data['activarMenu']:
+                if serializer.data['estado'] == 'Aprobado' and 'motivoNegarLinea':
                     if serializer.data['montoLiquidar']:
                         if 'Pymes' in serializer.data['tipoCredito']:
                             if serializer.data['nombresCompleto']:
@@ -1056,7 +1057,7 @@ def firmar(request, dct, nombreArchivo):
     with tempfile.TemporaryDirectory() as d:
         ruta = d + 'SOLICITUD_REMATRICULA_DE_.pdf'
         s3 = boto3.resource('s3')
-        archivo = s3.meta.client.download_file('globalredpymes', str(request.data[nombreArchivo]), ruta)
+        archivo = s3.meta.client.download_file('globalredpymes', urllib.parse.unquote(str(request.data[nombreArchivo])), ruta)
     date = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     datosFirmante = f"""FIRMADO POR:\n {dct['signature']} \n FECHA:\n {date}"""
     generarQR(datosFirmante)
@@ -1435,7 +1436,7 @@ def prueba_verificar(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def verificarPropietarioFirma(request):
     timezone_now = timezone.localtime(timezone.now())
     logModel = {

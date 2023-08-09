@@ -25,7 +25,9 @@ class PagoEmpleadosSerializer(serializers.ModelSerializer):
             data['documentoVerificado'] = False
 
         if data['user_id']:
-            archivosFirmados = CreditoPersonas.objects.filter(user_id=data['user_id'], estado='Aprobado', tipoCredito='Pymes-Normales',state=1).first()
+            archivosFirmados = CreditoPersonas.objects.filter(user_id=str(data['user_id']), estado='Aprobado', tipoCredito='Pymes-Normales',state=1).order_by('-created_at').first()
+            if archivosFirmados is None:
+                archivosFirmados = CreditoPersonas.objects.filter(user_id=str(data['user_id']), estado='Aprobado', tipoCredito='Pymes-PreAprobado',state=1).order_by('-created_at').first()
             data['empresa'] = CreditoPersonasSerializer(archivosFirmados).data['empresaInfo']
             data['montoDisponible'] = CreditoPersonasSerializer(archivosFirmados).data['montoDisponible']
 
