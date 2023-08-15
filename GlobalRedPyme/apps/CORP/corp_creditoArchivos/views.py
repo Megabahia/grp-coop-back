@@ -445,7 +445,8 @@ def insertarDato_creditoPreaprobadoNegocio(dato, empresa_financiera):
         credito.save()
         creditoSerializer = CreditoPersonasSerializer(credito, data=data, partial=True)
         if creditoSerializer.is_valid():
-            enviarCodigoCorreo(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'], nombreCompleto=data['nombresCompleto'])
+            enviarCodigoCorreo(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'],
+                               nombreCompleto=data['nombresCompleto'])
             if creditoSerializer.data['alcance'].upper() != 'LOCAL':
                 publish_credit(creditoSerializer.data)
         return 'Dato insertado correctamente'
@@ -533,13 +534,20 @@ def insertarDato_creditoPreaprobado_empleado(dato, empresa_financiera):
         # Genera el codigo
         codigo = (''.join(random.choice(string.digits) for _ in range(int(6))))
         data['codigoPreaprobado'] = codigo
+        data['empresaInfo'] = {
+            'correo': dato[16].replace('"', '') if dato[16] != 'NULL' else None,
+            'representante': dato[10].replace('"', '') if dato[10] != 'NULL' else None,
+            'monto': dato[2].replace('"', '') if dato[2] != 'NULL' else None
+        }
+
         # inserto el dato con los campos requeridos
         credito = CreditoPersonas.objects.create(**data)
         credito.external_id = credito._id
         credito.save()
         creditoSerializer = CreditoPersonasSerializer(credito, data=data, partial=True)
         if creditoSerializer.is_valid():
-            enviarCodigoCorreo(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'], empresa=dato[21], nombreCompleto=data['nombresCompleto'])
+            enviarCodigoCorreo(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'],
+                               empresa=dato[21], nombreCompleto=data['nombresCompleto'])
             if creditoSerializer.data['alcance'].upper() != 'LOCAL':
                 publish_credit(creditoSerializer.data)
         return 'Dato insertado correctamente'
@@ -549,9 +557,9 @@ def insertarDato_creditoPreaprobado_empleado(dato, empresa_financiera):
 
 def enviarCodigoCorreo(codigo, monto, email, alcance, empresa='COOP SANJOSE', nombreCompleto=''):
     if alcance.upper() == 'LOCAL':
-        url = config.API_FRONT_END_SANJOSE+"/pages/preApprovedCreditConsumer"
+        url = config.API_FRONT_END_SANJOSE + "/pages/preApprovedCreditConsumer"
     else:
-        url = config.API_FRONT_END_BIGPUNTOS+"/pages/preApprovedCreditConsumer"
+        url = config.API_FRONT_END_BIGPUNTOS + "/pages/preApprovedCreditConsumer"
     subject, from_email, to = 'Generacion de codigo de credito pre-aprobado', "08d77fe1da-d09822@inbox.mailtrap.io", email
     txt_content = f"""
         FELICIDADES!
