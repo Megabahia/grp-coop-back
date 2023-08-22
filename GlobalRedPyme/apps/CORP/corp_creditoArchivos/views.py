@@ -12,6 +12,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from django.conf import settings
+# Constantes
+from .constants import empresaInfo
 
 from ...CENTRAL.central_catalogo.models import Catalogo
 from ...config import config
@@ -217,7 +219,7 @@ def uploadEXCEL_creditosPreaprobados(request, pk):
             with tempfile.TemporaryDirectory() as d:
                 ruta = d + 'creditosPreAprobados.xlsx'
                 s3 = boto3.resource('s3')
-                s3.meta.client.download_file('globalredpymes', str(archivo.linkArchivo), ruta)
+                s3.meta.client.download_file(env.str('AWS_STORAGE_BUCKET_NAME'), str(archivo.linkArchivo), ruta)
 
             first = True  # si tiene encabezado
             #             uploaded_file = request.FILES['documento']
@@ -287,7 +289,7 @@ def uploadEXCEL_microCreditosPreaprobados(request, pk):
             with tempfile.TemporaryDirectory() as d:
                 ruta = d + 'creditosPreAprobados.xlsx'
                 s3 = boto3.resource('s3')
-                s3.meta.client.download_file('globalredpymes', str(archivo.linkArchivo), ruta)
+                s3.meta.client.download_file(env.str('AWS_STORAGE_BUCKET_NAME'), str(archivo.linkArchivo), ruta)
 
             first = True  # si tiene encabezado
             #             uploaded_file = request.FILES['documento']
@@ -358,7 +360,7 @@ def uploadEXCEL_creditosPreaprobados_empleados(request, pk):
             with tempfile.TemporaryDirectory() as d:
                 ruta = d + 'creditosPreAprobados.xlsx'
                 s3 = boto3.resource('s3')
-                s3.meta.client.download_file('globalredpymes', str(archivo.linkArchivo), ruta)
+                s3.meta.client.download_file(env.str('AWS_STORAGE_BUCKET_NAME'), str(archivo.linkArchivo), ruta)
 
             first = True  # si tiene encabezado
             #             uploaded_file = request.FILES['documento']
@@ -758,7 +760,7 @@ def uploadEXCEL_creditosPreaprobados_negocios(request, pk):
             with tempfile.TemporaryDirectory() as d:
                 ruta = d + 'creditosPreAprobados.xlsx'
                 s3 = boto3.resource('s3')
-                s3.meta.client.download_file('globalredpymes', str(archivo.linkArchivo), ruta)
+                s3.meta.client.download_file(env.str('AWS_STORAGE_BUCKET_NAME'), str(archivo.linkArchivo), ruta)
 
             first = True  # si tiene encabezado
             #             uploaded_file = request.FILES['documento']
@@ -846,6 +848,14 @@ def insertarDato_creditoPreaprobado_microCredito(dato, empresa_financiera, empre
         data['created_at'] = str(timezone_now)
         catalogo = Catalogo.objects.filter(tipo='ALCANCE_VISADO_DOCUMENTOS', state=1).order_by('-created_at').first()
         data['alcance'] = catalogo.valor
+        empresaInfo['reprsentante'] = data['nombresCompleto']
+        empresaInfo['rucEmpresa'] = dato[4]
+        empresaInfo['comercial'] = dato[3]
+        empresaInfo['correo'] = data['email']
+        empresaInfo['esatdo_civil'] = dato[9]
+        empresaInfo['celular'] = dato[11]
+        empresaInfo['nombreIfi'] = dato[11]
+        data['empresaInfo'] = empresaInfo
         if catalogo.valor == 'OMNIGLOBAL':
             url = config.API_FRONT_END_IFIS_PERSONAS
         else:
@@ -897,9 +907,11 @@ def insertarDato_creditoPreaprobado_microCredito(dato, empresa_financiera, empre
                 </html>
                 """
         # CodigoCreditoPreaprobado.objects.create(codigo=codigo, cedula=data['numeroIdentificacion'], monto=data['monto'])
-        sendEmail(subject, txt_content, from_email, to, html_content)
         if catalogo.valor == 'OMNIGLOBAL':
             publish(creditoSerializer.data)
+            print('entro al piblicar')
+        else:
+            sendEmail(subject, txt_content, from_email, to, html_content)
         return "Dato insertado correctamente"
     except Exception as e:
         return str(e)
@@ -926,7 +938,7 @@ def viewEXCEL_creditosPreaprobados_negocios(request, pk):
             with tempfile.TemporaryDirectory() as d:
                 ruta = d + 'creditosPreAprobados.xlsx'
                 s3 = boto3.resource('s3')
-                s3.meta.client.download_file('globalredpymes', str(archivo.linkArchivo), ruta)
+                s3.meta.client.download_file(env.str('AWS_STORAGE_BUCKET_NAME'), str(archivo.linkArchivo), ruta)
 
             first = True  # si tiene encabezado
             #             uploaded_file = request.FILES['documento']

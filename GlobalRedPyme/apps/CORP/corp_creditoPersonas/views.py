@@ -767,8 +767,11 @@ def creditoPersonas_lecturaArchivos(request, pk):
 
 
 def obtenerDatosArchivos(nombreArchivo):
+    # environ init
+    env = environ.Env()
+    environ.Env.read_env()  # LEE ARCHIVO .ENV
     # Function invokes
-    jobId = InvokeTextDetectJob('globalredpymes', nombreArchivo)
+    jobId = InvokeTextDetectJob(env.str('AWS_STORAGE_BUCKET_NAME'), nombreArchivo)
     print("Started job with id: {}".format(jobId))
     respuesta = {}
     if (CheckJobComplete(jobId)):
@@ -1057,7 +1060,7 @@ def firmar(request, dct, nombreArchivo):
     with tempfile.TemporaryDirectory() as d:
         ruta = d + 'SOLICITUD_REMATRICULA_DE_.pdf'
         s3 = boto3.resource('s3')
-        archivo = s3.meta.client.download_file('globalredpymes', urllib.parse.unquote(str(request.data[nombreArchivo])), ruta)
+        archivo = s3.meta.client.download_file(env.str('AWS_STORAGE_BUCKET_NAME'), urllib.parse.unquote(str(request.data[nombreArchivo])), ruta)
     date = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     datosFirmante = f"""FIRMADO POR:\n {dct['signature']} \n FECHA:\n {date}"""
     generarQR(datosFirmante)
@@ -1410,7 +1413,7 @@ def prueba_verificar(request):
     with tempfile.TemporaryDirectory() as d:
         ruta = d + 'creditosPreAprobados.xlsx'
         s3 = boto3.resource('s3')
-        s3.meta.client.download_file('globalredpymes',
+        s3.meta.client.download_file(env.str('AWS_STORAGE_BUCKET_NAME'),
                                      str('CORP/documentosCreditosPersonas/64906cb5b5913ced050fb5b2_solicitudCreditoFirmado.pdf'),
                                      ruta)
 

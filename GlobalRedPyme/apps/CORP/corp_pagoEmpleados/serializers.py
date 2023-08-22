@@ -52,7 +52,7 @@ def prueba_verificar(url):
     with tempfile.TemporaryDirectory() as d:
         ruta = d + 'creditosPreAprobados.xlsx'
         s3 = boto3.resource('s3')
-        s3.meta.client.download_file('globalredpymes', str(url), ruta)
+        s3.meta.client.download_file(env.str('AWS_STORAGE_BUCKET_NAME'), str(url), ruta)
 
     try:
         data = open(ruta, "rb").read()
