@@ -23,6 +23,7 @@ import openpyxl
 # logs
 from apps.CENTRAL.central_logs.methods import createLog, datosTipoLog, datosProductosMDP
 
+import environ
 # declaracion variables log
 datosAux = datosProductosMDP()
 datosTipoLogAux = datosTipoLog()
@@ -429,6 +430,8 @@ def insertarDato_monedas(dato):
         data['created_at'] = str(timezone_now)
         # inserto el dato con los campos requeridos
         Monedas.objects.create(**data)
+        env = environ.Env()
+        environ.Env.read_env()  # LEE ARCHIVO .ENV
         subject, from_email, to = f'Por su buen desempeño como empleado de {empresa.nombreComercial}, le premiamos', "08d77fe1da-d09822@inbox.mailtrap.io", \
                                   dato[5]
         txt_content = f"""
@@ -436,7 +439,7 @@ def insertarDato_monedas(dato):
                         USTED ACABA DE RECIBIR
                         {dato[4]} para que realice compras en los establecimientos afiliados pagando menos dinero en efectivo.
                         
-                        Regístrese a través del portal https://portal.bigpuntos.com y reciba sus Big Puntos de recompensa en su cuenta
+                        Regístrese a través del portal {env.str('API_FRONT_END_BIGPUNTOS')} y reciba sus Big Puntos de recompensa en su cuenta
                         
                         Atentamente,
                         CrediCompra - Big Puntos
@@ -452,7 +455,7 @@ def insertarDato_monedas(dato):
                         {dato[4]} para que realice compras en los establecimientos afiliados pagando menos dinero en efectivo.
                         </p>
                         <br>
-                        <p>Regístrese a través del portal https://portal.bigpuntos.com y reciba sus Big Puntos de recompensa en su cuenta</p>
+                        <p>Regístrese a través del portal {env.str('API_FRONT_END_BIGPUNTOS')} y reciba sus Big Puntos de recompensa en su cuenta</p>
                         <br>
                         Atentamente,
                         <br>
@@ -555,6 +558,8 @@ def insertarDato_monedasClientes(dato):
         data['created_at'] = str(timezone_now)
         # inserto el dato con los campos requeridos
         Monedas.objects.create(**data)
+        env = environ.Env()
+        environ.Env.read_env()  # LEE ARCHIVO .ENV
         subject, from_email, to = f'Por ser cliente de {empresa.nombreComercial}, le premiamos', "08d77fe1da-d09822@inbox.mailtrap.io", \
                                   dato[5]
         txt_content = f"""
@@ -562,9 +567,9 @@ def insertarDato_monedasClientes(dato):
                         Por ser cliente de {empresa.nombreComercial} le regalamos {dato[4]} para que realice compras de 
                         productos de varias categorías en establecimientos afiliados PAGANDO MENOS DINERO EN EFECTIVO.
 
-                        Para acceder a sus Big Puntos, ingrese a: https://portal.bigpuntos.com/#/grp/login 
+                        Para acceder a sus Big Puntos, ingrese a: {env.str('API_FRONT_END_BIGPUNTOS')}/#/grp/login 
 
-                        Si aún no tiene cuenta en Big Puntos, regístrese a través de: https://portal.bigpuntos.com/#/grp/registro y acceda a fabulosos premios.
+                        Si aún no tiene cuenta en Big Puntos, regístrese a través de: {env.str('API_FRONT_END_BIGPUNTOS')}/#/grp/registro y acceda a fabulosos premios.
 
                         Atentamente,
                         CrediCompra - Big Puntos
@@ -579,9 +584,9 @@ def insertarDato_monedasClientes(dato):
                         productos de varias categorías en establecimientos afiliados <b>PAGANDO MENOS DINERO EN EFECTIVO.</b>
                         </p>
                         <br>
-                        <p>Para acceder a sus Big Puntos, ingrese a: https://portal.bigpuntos.com/#/grp/login</p>
+                        <p>Para acceder a sus Big Puntos, ingrese a: {env.str('API_FRONT_END_BIGPUNTOS')}/#/grp/login</p>
                         <br>
-                        <p>Si aún no tiene cuenta en Big Puntos, regístrese a través de: https://portal.bigpuntos.com/#/grp/registro y acceda a fabulosos premios.</p>
+                        <p>Si aún no tiene cuenta en Big Puntos, regístrese a través de: {env.str('API_FRONT_END_BIGPUNTOS')}/#/grp/registro y acceda a fabulosos premios.</p>
                         <br>
                         Atentamente,
                         <br>
