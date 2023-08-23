@@ -19,7 +19,9 @@ class PagoProveedorSerializer(serializers.ModelSerializer):
         data = super(PagoProveedorSerializer, self).to_representation(instance)
         # tomo el campo persona y convierto de OBJECTID a string
         if data['archivoFirmado']:
-            data['documentoVerificado'] = prueba_verificar(data['archivoFirmado'].replace('https://globalredpymes.s3.amazonaws.com/', ''))
+            env = environ.Env()
+            environ.Env.read_env()  # LEE ARCHIVO .ENV
+            data['documentoVerificado'] = prueba_verificar(data['archivoFirmado'].replace(env.str('URL_BUCKET'), ''))
         else:
             data['documentoVerificado'] = False
 

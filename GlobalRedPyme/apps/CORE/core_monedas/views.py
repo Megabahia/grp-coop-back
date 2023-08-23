@@ -567,9 +567,9 @@ def insertarDato_monedasClientes(dato):
                         Por ser cliente de {empresa.nombreComercial} le regalamos {dato[4]} para que realice compras de 
                         productos de varias categorías en establecimientos afiliados PAGANDO MENOS DINERO EN EFECTIVO.
 
-                        Para acceder a sus Big Puntos, ingrese a: {env.str('API_FRONT_END_BIGPUNTOS')}/#/grp/login 
+                        Para acceder a sus Big Puntos, ingrese a: {env.str('API_FRONT_END_BIGPUNTOS')}/grp/login 
 
-                        Si aún no tiene cuenta en Big Puntos, regístrese a través de: {env.str('API_FRONT_END_BIGPUNTOS')}/#/grp/registro y acceda a fabulosos premios.
+                        Si aún no tiene cuenta en Big Puntos, regístrese a través de: {env.str('API_FRONT_END_BIGPUNTOS')}/grp/registro y acceda a fabulosos premios.
 
                         Atentamente,
                         CrediCompra - Big Puntos
@@ -584,9 +584,9 @@ def insertarDato_monedasClientes(dato):
                         productos de varias categorías en establecimientos afiliados <b>PAGANDO MENOS DINERO EN EFECTIVO.</b>
                         </p>
                         <br>
-                        <p>Para acceder a sus Big Puntos, ingrese a: {env.str('API_FRONT_END_BIGPUNTOS')}/#/grp/login</p>
+                        <p>Para acceder a sus Big Puntos, ingrese a: {env.str('API_FRONT_END_BIGPUNTOS')}/grp/login</p>
                         <br>
-                        <p>Si aún no tiene cuenta en Big Puntos, regístrese a través de: {env.str('API_FRONT_END_BIGPUNTOS')}/#/grp/registro y acceda a fabulosos premios.</p>
+                        <p>Si aún no tiene cuenta en Big Puntos, regístrese a través de: {env.str('API_FRONT_END_BIGPUNTOS')}/grp/registro y acceda a fabulosos premios.</p>
                         <br>
                         Atentamente,
                         <br>

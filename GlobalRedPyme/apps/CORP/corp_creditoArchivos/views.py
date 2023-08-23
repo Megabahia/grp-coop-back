@@ -570,14 +570,14 @@ def enviarCodigoCorreo(codigo, monto, email, alcance, empresa='COOP SANJOSE', no
         
         La {empresa} le acaba de preaprobar un crédito de $ {monto} para que realice compras en los
         Locales Comerciales afiliados a la única Tienda de Comercio Electrónico del país en la que usted puede 
-        realizar compras con Créditos otorgados por la {empresa}
+        realizar compras con su Crédito de consumo otorgado por {empresa}
         
         Para acceder a su Crédito y realizar compras en los mejores Locales Comerciales del país, 
         COPIE Y PEGUE el siguiente código {codigo} en el siguiente {url}
 
         Saludos
 
-        Equipo CrediCompra - Big Puntos
+        {empresa}
     """
     html_content = f"""
             <html>
@@ -589,7 +589,7 @@ def enviarCodigoCorreo(codigo, monto, email, alcance, empresa='COOP SANJOSE', no
                     <p>
                     La {empresa} le acaba de preaprobar un crédito de $ {monto} para que realice compras en los
                     Locales Comerciales afiliados a la única Tienda de Comercio Electrónico del país en la que usted puede 
-                    realizar compras con Créditos otorgados por la {empresa}
+                    realizar compras con su Crédito de consumo otorgado por {empresa}
                     </p>
                     <br>
                     <p>
@@ -599,7 +599,7 @@ def enviarCodigoCorreo(codigo, monto, email, alcance, empresa='COOP SANJOSE', no
                     <br>
                     Saludos
                     <br>
-                    Equipo CrediCompra - Big Puntos
+                    {empresa}
                 </body>
             </html>
             """

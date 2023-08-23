@@ -1242,7 +1242,7 @@ def enviarCorreoAprobado(montoAprobado, email, nombreCompleto):
     
     Para acceder a su Línea de Crédito para realizar pagos a proveedores y/o empleados, realice lo siguiente: 
     
-    Ingrese a: https://grp-clientes.financieradevittoria.com/#/grp/registro?email={email}&nombre={nombreCompleto}  y cargue su firma electrónica en 
+    Ingrese a: {config.API_FRONT_END_CENTRAL}/grp/registro?email={email}&nombre={nombreCompleto}  y cargue su firma electrónica en 
     nuestra plataforma. Recuerde que al hacerlo, autoriza a la Plataforma y Cooperativa de Ahorro 
     y Crédito a realizar movimientos desde su cuenta con el único fin de completar el proceso del PAGO A SUS PROVEEDORES Y/O EMPLEADOS.
     
@@ -1268,7 +1268,7 @@ def enviarCorreoAprobado(montoAprobado, email, nombreCompleto):
                         </p>
                         <br>
                         <p>
-                        Ingrese a: <a href="https://grp-clientes.financieradevittoria.com/#/grp/registro?email={email}&nombre={nombreCompleto}">https://grp-clientes.financieradevittoria.com/#/grp/registro?email={email}&nombre={nombreCompleto}</a> 
+                        Ingrese a: <a href="{config.API_FRONT_END_CENTRAL}/grp/registro?email={email}&nombre={nombreCompleto}">{config.API_FRONT_END_CENTRAL}/grp/registro?email={email}&nombre={nombreCompleto}</a> 
                          y cargue su firma electrónica en nuestra plataforma. Recuerde que al hacerlo, autoriza a la Plataforma y Cooperativa de Ahorro 
                         y Crédito a realizar movimientos desde su cuenta con el único fin de completar el proceso del PAGO A SUS PROVEEDORES Y/O EMPLEADOS.
                         </p>
