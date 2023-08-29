@@ -31,5 +31,6 @@ def publish(data):
 
     response = snsClient.publish(
         TopicArn=topicArn,
-        Message=json.dumps(data)
+        Message=json.dumps(data),
+        Subject='IFIS',
     )

@@ -1,6 +1,8 @@
 from .models import Monedas
 from apps.PERSONAS.personas_personas.models import Personas
 from apps.CORP.corp_empresas.models import Empresas
+
+from .producer_monedas import publish_monedas_otrogadas
 from .serializers import (
     MonedasSerializer, MonedasUsuarioSerializer, ListMonedasSerializer, ListMonedasRegaladasSerializer
 )
@@ -535,6 +537,8 @@ def insertarDato_monedasClientes(dato):
         if persona is not None:
             data['user_id'] = persona.user_id
         empresa = Empresas.objects.filter(ruc=dato[6], state=1).first()
+        if empresa is None:
+            return 'El ruc de la empresa no esta registrada'
         data['identificacion'] = dato[1]
         data['nombres'] = dato[2]
         data['apellidos'] = dato[3]
@@ -596,6 +600,7 @@ def insertarDato_monedasClientes(dato):
                 </html>
                 """
         sendEmail(subject, txt_content, from_email, to, html_content)
+        publish_monedas_otrogadas(dato)
         return 'Dato insertado correctamente'
     except Exception as e:
         return str(e)

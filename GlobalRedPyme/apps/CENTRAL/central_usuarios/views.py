@@ -29,7 +29,7 @@ from django.utils.crypto import get_random_string
 from apps.CENTRAL.central_logs.methods import createLog,datosUsuarios,datosTipoLog
 from django_rest_passwordreset.views import ResetPasswordRequestToken
 #enviar email usuario creado
-from apps.CENTRAL.central_autenticacion.password_reset import resetPasswordNewUser, enviarEmailCreacionPersona
+from ..central_autenticacion.password_reset import resetPasswordNewUser, enviarEmailCreacionPersona
 
 from ...CORP.corp_creditoPersonas.models import CreditoPersonas
 
@@ -334,6 +334,7 @@ def usuario_delete(request, pk):
             serializer = UsuarioSerializer(usuario, data={'state': '0','updated_at':str(now)},partial=True)
             if serializer.is_valid():
                 serializer.save()
+                usuario.delete()
                 createLog(logModel,serializer.data,logTransaccion)
                 return Response(serializer.data)
             createLog(logModel,serializer.errors,logExcepcion)

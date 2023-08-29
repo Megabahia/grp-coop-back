@@ -687,7 +687,7 @@ def creditoArchivos_ver_documentosFirmados_list(request):
     }
     try:
         try:
-            query = ArchivosFirmados.objects.get(numeroIdentificacion=request.data['numeroIdentificacion'], state=1)
+            query = ArchivosFirmados.objects.filter(numeroIdentificacion=request.data['numeroIdentificacion'], state=1).first()
         except ArchivosFirmados.DoesNotExist:
             err = {"error": "No existe"}
             createLog(logModel, err, logExcepcion)

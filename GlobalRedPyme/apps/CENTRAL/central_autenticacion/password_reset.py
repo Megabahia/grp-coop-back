@@ -1,4 +1,9 @@
 # lib token
+from bson import ObjectId
+
+from .emails import emailCreacionUsuarioGeneral, emailCreacionUsuarioCorp
+from ..central_infoUsuarios.models import InfoUsuarios
+from ..central_usuarios.models import UsuariosEmpresas
 from ...CORP.corp_empresas.models import Empresas
 from django_rest_passwordreset.serializers import EmailSerializer
 from django_rest_passwordreset.models import ResetPasswordToken, clear_expired, get_password_reset_token_expiry_time, \
@@ -75,49 +80,22 @@ def enviarEmailAsignacionPassword(reset_password_token):
         # enviar por email
         if reset_password_token.user.tipoUsuario.nombre == 'core':
             url = config.API_FRONT_END_CENTRAL + config.endpointEmailReseteoPassword + "?token=" + reset_password_token.key + "&email=" + reset_password_token.user.email
+            txt_content, html_content = emailCreacionUsuarioGeneral(empresaIfis, url)
         elif reset_password_token.user.tipoUsuario.nombre == 'credit':
             url = config.API_FRONT_END_CREDIT + config.endpointEmailReseteoPassword + "?token=" + reset_password_token.key + "&email=" + reset_password_token.user.email
+            txt_content, html_content = emailCreacionUsuarioGeneral(empresaIfis, url)
         elif reset_password_token.user.tipoUsuario.nombre == 'corp':
             url = config.API_FRONT_END_CORP_COOP + config.endpointEmailReseteoPassword + "?token=" + reset_password_token.key + "&email=" + reset_password_token.user.email
+            usuarioEmpresa = UsuariosEmpresas.objects.filter(usuario_id=reset_password_token.user, state=1).first()
+            empresaCorp = Empresas.objects.filter(_id=ObjectId(usuarioEmpresa.empresa_id), state=1).first()
+            infoUsuario = InfoUsuarios.objects.filter(usuario=reset_password_token.user).first()
+            txt_content, html_content = emailCreacionUsuarioCorp(empresaIfis, url, infoUsuario, empresaCorp)
         else:
             url = config.API_FRONT_END + config.endpointEmailAsignacionPassword + "?token=" + reset_password_token.key + "&email=" + reset_password_token.user.email
+            txt_content, html_content = emailCreacionUsuarioGeneral(empresaIfis, url)
         # url=config.API_FRONT_END+config.endpointEmailAsignacionPassword+"?token="+reset_password_token.key+"&email="+reset_password_token.user.email
         subject, from_email, to = 'Registro de Cuenta', "08d77fe1da-d09822@inbox.mailtrap.io", reset_password_token.user.email
-        txt_content = f"""
-                Registro de Contraseña
-                
-                Para completar su registro en el portal de la Cooperativa {empresaIfis.nombreEmpresa}
-                para acceder a su Línea de Crédito y realizar pagos a sus proveedores y/o empleados,
-                haga click en el siguiente enlace: {url}
 
-                Si al hacer click en el enlace anterior NO FUNCIONA, copie y pegue el siguiente enlace en una ventana del navegador: {url}
-                
-                Atentamente,
-                {empresaIfis.nombreEmpresa}
-        """
-        html_content = f"""
-        <html>
-            <body>
-                <h1>Registro de Contraseña</h1>
-                <br>
-                <p>Para completar su registro en el portal de la Cooperativa {empresaIfis.nombreEmpresa}
-                para acceder a su Línea de Crédito y realizar pagos a sus proveedores y/o empleados, 
-                haga click en el siguiente enlace:  <a href='{url}'>ENLACE</a>
-                </p>
-                <br>
-                <p>
-                Si al hacer click en el enlace anterior NO FUNCIONA, copie y pegue el siguiente enlace en una ventana del navegador:
-                 </p>
-                <br>
-                <p>{url}</p>
-                <br>
-                Atentamente,
-                <br>
-                <b>{empresaIfis.nombreEmpresa}</b>
-                <br>
-            </body>
-        </html>
-        """
         if sendEmail(subject, txt_content, from_email, to, html_content):
             return True
         return False

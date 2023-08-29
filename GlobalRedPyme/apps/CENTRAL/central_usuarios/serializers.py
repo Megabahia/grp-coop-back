@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.CENTRAL.central_usuarios.models import Usuarios, UsuariosEmpresas
 from apps.CENTRAL.central_roles.models import RolesUsuarios
-from apps.CENTRAL.central_infoUsuarios.models import InfoUsuarios
+from ..central_infoUsuarios.models import InfoUsuarios
 from apps.CENTRAL.central_infoUsuarios.serializers import InfoUsuarioSerializer
 from apps.CENTRAL.central_roles.serializers import RolFiltroSerializer, ListRolSerializer
 from apps.CORP.corp_empresas.models import Empresas
