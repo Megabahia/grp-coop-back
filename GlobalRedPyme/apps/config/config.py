@@ -11,7 +11,7 @@ env = environ.Env()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Tomar variables de entorno del archivo .env
-environ.Env.read_env(os.path.join(BASE_DIR, '../GlobalRedPyme/.env.prod'))
+environ.Env.read_env(os.path.join(BASE_DIR, '../GlobalRedPyme/.env.test'))
 
 PRODUCTION=True
 
