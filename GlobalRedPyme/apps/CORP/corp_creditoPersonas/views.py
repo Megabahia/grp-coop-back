@@ -133,6 +133,40 @@ def creditoPersonas_create(request):
             createLog(logModel, err, logExcepcion)
             return Response(err, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def creditoPersonas_listOne_sinAutenticar(request, pk):
+    timezone_now = timezone.localtime(timezone.now())
+    logModel = {
+        'endPoint': logApi + 'listOne/',
+        'modulo': logModulo,
+        'tipo': logExcepcion,
+        'accion': 'LEER',
+        'fechaInicio': str(timezone_now),
+        'dataEnviada': '{}',
+        'fechaFin': str(timezone_now),
+        'dataRecibida': '{}'
+    }
+    try:
+        if request.method == 'POST':
+            query = CreditoPersonas.objects.filter(pk=ObjectId(pk), tipoCredito=request.data['tipoCredito'],
+                                                   state=1).first()
+            if query is None:
+                err = {"error": "No existe"}
+                createLog(logModel, err, logExcepcion)
+                return Response(err, status=status.HTTP_404_NOT_FOUND)
+            # tomar el dato
+            serializer = CreditoPersonasSerializer(query)
+            createLog(logModel, serializer.data, logTransaccion)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            err = {"error": "No existe"}
+            createLog(logModel, err, logExcepcion)
+            return Response(err, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        err = {"error": 'Un error ha ocurrido: {}'.format(e)}
+        createLog(logModel, err, logExcepcion)
+        return Response(err, status=status.HTTP_400_BAD_REQUEST)
+
 
 # ENCONTRAR UNO
 @api_view(['GET'])
@@ -1743,3 +1777,127 @@ def enviarCorreoNegarLineaCredito(email, motivo):
         </html>
     """
     sendEmail(subject, txt_content, from_email, to, html_content)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def creditoPersonas_create_local(request):
+    timezone_now = timezone.localtime(timezone.now())
+    logModel = {
+        'endPoint': logApi + 'create/',
+        'modulo': logModulo,
+        'tipo': logExcepcion,
+        'accion': 'CREAR',
+        'fechaInicio': str(timezone_now),
+        'dataEnviada': '{}',
+        'fechaFin': str(timezone_now),
+        'dataRecibida': '{}'
+    }
+    if request.method == 'POST':
+        try:
+            logModel['dataEnviada'] = str(request.data)
+            request.data['created_at'] = str(timezone_now)
+            if 'updated_at' in request.data:
+                request.data.pop('updated_at')
+
+            if 'nombres' in request.data:
+                if request.data['nombres'] != "":
+                    request.data['nombresCompleto'] = request.data['nombres'] + ' ' + request.data['apellidos']
+
+            serializer = CreditoPersonasSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                if 'tipoCredito' in serializer.data and serializer.data['tipoCredito'] == 'null':
+                    usuario = serializer.data['user']
+                    nombreGarante = usuario['garante']['nombres'] + ' ' + usuario['garante']['apellidos']
+                    nombreSolicitante = usuario['nombres'] + ' ' + usuario['apellidos']
+                    enviarCorreoSolicitudGarante(usuario['garante']['correoGarante'], serializer.data['_id'], nombreGarante, nombreSolicitante)
+                createLog(logModel, serializer.data, logTransaccion)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            createLog(logModel, serializer.errors, logExcepcion)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            err = {"error": 'Un error ha ocurrido: {}'.format(e)}
+            createLog(logModel, err, logExcepcion)
+            return Response(err, status=status.HTTP_400_BAD_REQUEST)
+
+
+def enviarCorreoSolicitudGarante(email, id, garante, solicitante):
+    subject, from_email, to = 'Autorización de la Madrina/Padrino', "credicompra.bigpuntos@corporacionomniglobal.com", \
+                              email
+    txt_content = f"""
+        Autorización de Crédito de Consumo
+
+        Estimad@ {garante}, {solicitante} desea que usted le apadrine para poder acceder a un Crédito de Consumo para realizar compras.
+
+        Para confirmar su aprobación como Garantía para acceder al Crédito, haga click en el siguiente enlace y confirme sus datos: 
+        {config.API_FRONT_END_CENTRAL}/pages/confirmacion-garante/{id}
+
+        Atentamente,
+        CrediCompra – Big Puntos
+    """
+    html_content = f"""
+        <html>
+            <body>
+                <h1>
+                Autorización de Crédito de Consumo
+                </h1>
+                <p>
+                Estimad@ {garante}, {solicitante} desea que usted le apadrine para poder acceder a un Crédito
+                 de Consumo para realizar compras.
+                </p>
+                <br>
+                <p>
+                Para confirmar su aprobación como Garantía para acceder al Crédito, haga click en el siguiente enlace
+                 y confirme sus datos: <a href='{config.API_FRONT_END_CENTRAL}/pages/confirmacion-garante/{id}'>ENLACE</a>
+                </p>
+                <br>
+                Atentamente,
+                <br>
+                CrediCompra – Big Puntos
+                <br>
+            </body>
+        </html>
+    """
+    sendEmail(subject, txt_content, from_email, to, html_content)
+
+
+# ACTUALIZAR SIN AUTENTICAR
+@api_view(['POST'])
+def creditoPersonas_update_sinAutenticar(request, pk):
+    request.POST._mutable = True
+    timezone_now = timezone.localtime(timezone.now())
+    logModel = {
+        'endPoint': logApi + 'update/',
+        'modulo': logModulo,
+        'tipo': logExcepcion,
+        'accion': 'ESCRIBIR',
+        'fechaInicio': str(timezone_now),
+        'dataEnviada': '{}',
+        'fechaFin': str(timezone_now),
+        'dataRecibida': '{}'
+    }
+    try:
+        try:
+            logModel['dataEnviada'] = str(request.data)
+            query = CreditoPersonas.objects.filter(pk=ObjectId(pk), state=1).first()
+        except CreditoPersonas.DoesNotExist:
+            errorNoExiste = {'error': 'No existe'}
+            createLog(logModel, errorNoExiste, logExcepcion)
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if request.method == 'POST':
+            now = timezone.localtime(timezone.now())
+            request.data['updated_at'] = str(now)
+            if 'created_at' in request.data:
+                request.data.pop('created_at')
+            serializer = CreditoPersonasSerializer(query, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                createLog(logModel, serializer.data, logTransaccion)
+                return Response(serializer.data)
+            createLog(logModel, serializer.errors, logExcepcion)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        err = {"error": 'Un error ha ocurrido: {}'.format(e)}
+        createLog(logModel, err, logExcepcion)
+        return Response(err, status=status.HTTP_400_BAD_REQUEST)

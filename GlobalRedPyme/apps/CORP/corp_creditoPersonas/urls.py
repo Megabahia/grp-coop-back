@@ -19,15 +19,23 @@ from .views import (
     recargar_lineas_creditos,
     listar_recargar_lineas_creditos,
     actualizar_recargar_lineas_creditos,
+    creditoPersonas_create_local,
+    creditoPersonas_listOne_sinAutenticar,
+    creditoPersonas_update_sinAutenticar,
 )
 
 app_name = 'corp_creditoPersonas'
 
 urlpatterns = [
     path('create/', creditoPersonas_create, name="creditoPersonas_create"),
+    path('create/local/', creditoPersonas_create_local, name="creditoPersonas_create_local"),
     path('list/', creditoPersonas_list, name="creditoPersonas_list"),
+    path('listOneSinAutenticar/<str:pk>', creditoPersonas_listOne_sinAutenticar,
+         name="creditoPersonas_listOne_sinAutenticar"),
     path('listOne/<str:pk>', creditoPersonas_listOne, name="creditoPersonas_listOne"),
     path('update/<str:pk>', creditoPersonas_update, name="creditoPersonas_update"),
+    path('updateSinAutenticar/<str:pk>', creditoPersonas_update_sinAutenticar,
+         name="creditoPersonas_update_sinAutenticar"),
     path('delete/<str:pk>', creditoPersonas_delete, name="creditoPersonas_delete"),
     path('upload/creditos/preaprobados/', uploadEXCEL_creditosPreaprobados, name="uploadEXCEL_creditosPreaprobados"),
     path('upload/creditos/preaprobados/empleados/', uploadEXCEL_creditosPreaprobados_empleados,
@@ -46,5 +54,6 @@ urlpatterns = [
     path('verificarPropietarioFirma', verificarPropietarioFirma, name="verificarPropietarioFirma"),
     path('recargar/lineasCreditos', recargar_lineas_creditos, name="recargar_lineas_creditos"),
     path('listar/recargar/lineasCreditos', listar_recargar_lineas_creditos, name="listar_recargar_lineas_creditos"),
-    path('actualizar/recargar/lineasCreditos/<str:pk>', actualizar_recargar_lineas_creditos, name="actualizar_recargar_lineas_creditos"),
+    path('actualizar/recargar/lineasCreditos/<str:pk>', actualizar_recargar_lineas_creditos,
+         name="actualizar_recargar_lineas_creditos"),
 ]

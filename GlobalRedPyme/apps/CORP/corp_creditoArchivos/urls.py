@@ -13,6 +13,8 @@ from .views import (
     viewEXCEL_creditosPreaprobados_negocios,
     uploadEXCEL_creditosPreaprobados_automotriz_empleados,
     uploadEXCEL_creditosPreaprobadosDigitales_empleados,
+    uploadEXCEL_creditosPreaprobadosLineasCreditosDigitales_empleados,
+    uploadEXCEL_creditosPreaprobadosAutomotrizDigitales_empleados,
 )
 
 app_name = 'corp_creditoArchivos'
@@ -42,5 +44,11 @@ urlpatterns = [
          name="uploadEXCEL_creditosPreaprobados_automotriz_empleados"),
     path('upload/creditos/preaprobadosDigitales/empleados/<int:pk>',
          uploadEXCEL_creditosPreaprobadosDigitales_empleados,
+         name="uploadEXCEL_creditosPreaprobadosDigitales_empleados"),
+    path('upload/creditos/preaprobadosLineasCreditosDigitales/empleados/<int:pk>',
+         uploadEXCEL_creditosPreaprobadosLineasCreditosDigitales_empleados,
+         name="uploadEXCEL_creditosPreaprobadosDigitales_empleados"),
+    path('upload/creditos/preaprobadosAutomotrizDigitales/empleados/<int:pk>',
+         uploadEXCEL_creditosPreaprobadosAutomotrizDigitales_empleados,
          name="uploadEXCEL_creditosPreaprobadosDigitales_empleados"),
 ]

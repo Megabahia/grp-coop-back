@@ -1306,3 +1306,344 @@ def enviarCodigoCorreoCreditoConsumoDigital(codigo, monto, email, alcance, empre
             """
     sendEmail(subject, txt_content, from_email, to, html_content)
 
+
+
+# METODO SUBIR ARCHIVOS EXCEL
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def uploadEXCEL_creditosPreaprobadosLineasCreditosDigitales_empleados(request, pk):
+    contValidos = 0
+    contInvalidos = 0
+    contTotal = 0
+    errores = []
+    try:
+        if request.method == 'POST':
+            archivo = PreAprobados.objects.filter(pk=pk, state=1).first()
+            # environ init
+            env = environ.Env()
+            environ.Env.read_env()  # LEE ARCHIVO .ENV
+            client_s3 = boto3.client(
+                's3',
+                aws_access_key_id=env.str('AWS_ACCESS_KEY_ID'),
+                aws_secret_access_key=env.str('AWS_SECRET_ACCESS_KEY')
+            )
+            with tempfile.TemporaryDirectory() as d:
+                ruta = d + 'creditosPreAprobados.xlsx'
+                s3 = boto3.resource('s3')
+                s3.meta.client.download_file(env.str('AWS_STORAGE_BUCKET_NAME'), str(archivo.linkArchivo), ruta)
+
+            first = True  # si tiene encabezado
+            #             uploaded_file = request.FILES['documento']
+            # you may put validations here to check extension or file size
+            wb = openpyxl.load_workbook(ruta)
+            # getting a particular sheet by name out of many sheets
+            worksheet = wb["Clientes"]
+            lines = list()
+        for row in worksheet.iter_rows():
+            row_data = list()
+            for cell in row:
+                if cell.value is None:
+                    break
+                row_data.append(str(cell.value))
+            if row_data:
+                lines.append(row_data)
+
+        for dato in lines:
+            contTotal += 1
+            if first:
+                first = False
+                continue
+            else:
+                if len(dato) == 14:
+                    resultadoInsertar = insertarDato_creditoPreaprobado_microCreditoDigital(dato, archivo.empresa_financiera,
+                                                                                     archivo.empresa_comercial)
+                    if resultadoInsertar != 'Dato insertado correctamente':
+                        contInvalidos += 1
+                        errores.append({"error": "Error en la línea " + str(contTotal) + ": " + str(resultadoInsertar)})
+                    else:
+                        contValidos += 1
+                else:
+                    contInvalidos += 1
+                    errores.append({"error": "Error en la línea " + str(
+                        contTotal) + ": la fila tiene un tamaño incorrecto (" + str(len(dato)) + ")"})
+
+        result = {"mensaje": "La Importación se Realizo Correctamente",
+                  "correctos": contValidos,
+                  "incorrectos": contInvalidos,
+                  "errores": errores
+                  }
+        os.remove(ruta)
+        # archivo.state = 0
+        archivo.estado = "Cargado"
+        archivo.save()
+        return Response(result, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        err = {"error": 'Error verifique el archivo, un error ha ocurrido: {}'.format(e)}
+        return Response(err, status=status.HTTP_400_BAD_REQUEST)
+
+
+def insertarDato_creditoPreaprobado_microCreditoDigital(dato, empresa_financiera, empresa_comercial):
+    try:
+        if (not utils.__validar_ced_ruc(str(dato[8]), 0)):
+            return f"""El usuario {dato[5]} {dato[6]} tiene la identificación incorrecta."""
+
+        if (not utils.__validar_ced_ruc(str(dato[4]), 0)):
+            return f"""El usuario {dato[3]} tiene el ruc incorrecto."""
+
+        timezone_now = timezone.localtime(timezone.now())
+        data = {}
+        data['vigencia'] = dato[0].replace('"', "")[0:10] if dato[0] != "NULL" else None
+        data['concepto'] = dato[1].replace('"', "") if dato[1] != "NULL" else None
+        data['monto'] = dato[2].replace('"', "") if dato[2] != "NULL" else None
+        # data['plazo'] = dato[3].replace('"', "") if dato[3] != "NULL" else None
+        # data['interes'] = dato[4].replace('"', "") if dato[4] != "NULL" else None
+        data['estado'] = 'Nuevo'
+        data['tipoCredito'] = ''
+        data['canal'] = 'Lineas Credito Digital Pymes-PreAprobado'
+        data['cargarOrigen'] = 'IFIS'
+        # persona = Personas.objects.filter(identificacion=dato[5],state=1).first()
+        # data['user_id'] = persona.user_id
+        data['numeroIdentificacion'] = dato[8]
+        data['nombres'] = dato[5].replace('"', "") if dato[5] != "NULL" else None
+        data['apellidos'] = dato[6].replace('"', "") if dato[6] != "NULL" else None
+        data['email'] = dato[10].replace('"', "") if dato[10] != "NULL" else None
+        data['nombresCompleto'] = data['nombres'] + ' ' + data['apellidos']
+        data['empresaIfis_id'] = empresa_financiera
+        # data['empresasAplican'] = dato[21]
+        # Genera el codigo
+        codigo = (''.join(random.choice(string.digits) for _ in range(int(6))))
+        data['codigoPreaprobado'] = codigo
+        data['created_at'] = str(timezone_now)
+        data['alcance'] = 'LOCAL'
+        empresaInfo['reprsentante'] = data['nombresCompleto']
+        empresaInfo['rucEmpresa'] = dato[4]
+        empresaInfo['comercial'] = dato[3]
+        empresaInfo['correo'] = data['email']
+        empresaInfo['esatdo_civil'] = dato[9]
+        empresaInfo['celular'] = dato[11]
+        empresaInfo['nombreIfi'] = dato[11]
+        data['empresaInfo'] = empresaInfo
+        url = config.API_FRONT_END_CENTRAL
+        # inserto el dato con los campos requeridos
+        creditoPreAprobado = CreditoPersonas.objects.create(**data)
+        creditoSerializer = CreditoPersonasSerializer(creditoPreAprobado)
+        subject, from_email, to = 'Generación de codigo de credito pre-aprobado', "08d77fe1da-d09822@inbox.mailtrap.io", \
+                                  dato[10]
+        txt_content = f"""
+            Estimad@ {data['nombresCompleto']}
+
+            Nos complace comunicarle que usted tiene una LÍNEA DE CRÉDITO PRE-APROBADA por $ {data['monto']}
+            para que pueda realizar pagos a sus PROVEEDORES y/o EMPLEADOS con una línea de crédito otorgada por {dato[13]}
+
+            Para acceder a su Línea de Crédito para realizar pagos a sus proveedores y/o empleados, haga click en el siguiente enlace:
+            {url}/pages/preApprovedCreditLineDigital Su código de ingreso es: {codigo}
+
+            Si su enlace no funciona, copia el siguiente link en una ventana del navegador: {url}/pages/preApprovedCreditLineDigital
+
+            Crédito Pagos en la mejor opción de crecimiento para su negocio
+
+            Saludos,
+            Crédito Pagos – {dato[13]}
+        """
+        html_content = f"""
+                <html>
+                    <body>
+                        <p>Estimad@ {data['nombresCompleto']}</p>
+                        <br>
+                        <p>
+                         Nos complace comunicarle que usted tiene una LÍNEA DE CRÉDITO PRE-APROBADA por $ {data['monto']}
+                         para que pueda realizar pagos a sus PROVEEDORES y/o EMPLEADOS con una línea de crédito otorgada por {dato[13]}
+                        </p>
+                        <br>
+                        <p>Para acceder a su Línea de Crédito para realizar pagos a sus proveedores y/o empleados, haga click en el siguiente enlace:
+                        <a href='{url}/pages/preApprovedCreditLineDigital'>Link</a> Su código de ingreso es: {codigo}
+                        </p>
+                        <br>
+                        <p>
+                        Si su enlace no funciona, copia el siguiente link en una ventana del navegador: {url}/pages/preApprovedCreditLineDigital
+                        </p>
+                        <br>
+                        <b>Crédito Pagos en la mejor opción de crecimiento para su negocio</b>
+                        <br>
+                        Saludos,<br>
+                        Crédito Pagos – {dato[13]}<br>
+                    </body>
+                </html>
+                """
+        sendEmail(subject, txt_content, from_email, to, html_content)
+        return "Dato insertado correctamente"
+    except Exception as e:
+        return str(e)
+
+
+# METODO SUBIR ARCHIVOS EXCEL
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def uploadEXCEL_creditosPreaprobadosAutomotrizDigitales_empleados(request, pk):
+    contValidos = 0
+    contInvalidos = 0
+    contTotal = 0
+    errores = []
+    try:
+        if request.method == 'POST':
+            archivo = PreAprobados.objects.filter(pk=pk, state=1).first()
+            # environ init
+            env = environ.Env()
+            environ.Env.read_env()  # LEE ARCHIVO .ENV
+            client_s3 = boto3.client(
+                's3',
+                aws_access_key_id=env.str('AWS_ACCESS_KEY_ID'),
+                aws_secret_access_key=env.str('AWS_SECRET_ACCESS_KEY')
+            )
+            with tempfile.TemporaryDirectory() as d:
+                ruta = d + 'creditosPreAprobados.xlsx'
+                s3 = boto3.resource('s3')
+                s3.meta.client.download_file(env.str('AWS_STORAGE_BUCKET_NAME'), str(archivo.linkArchivo), ruta)
+
+            first = True  # si tiene encabezado
+            #             uploaded_file = request.FILES['documento']
+            # you may put validations here to check extension or file size
+            wb = openpyxl.load_workbook(ruta)
+            # getting a particular sheet by name out of many sheets
+            worksheet = wb["Clientes"]
+            lines = list()
+        for row in worksheet.iter_rows():
+            row_data = list()
+            for cell in row:
+                row_data.append(str(cell.value))
+            lines.append(row_data)
+
+        for dato in lines:
+            contTotal += 1
+            if first:
+                first = False
+                continue
+            else:
+                if len(dato) == 23:
+                    resultadoInsertar = insertarDato_creditoPreaprobado_automotriz_digital_empleado(dato, archivo.empresa_financiera)
+                    if resultadoInsertar != 'Dato insertado correctamente':
+                        contInvalidos += 1
+                        errores.append({"error": "Error en la línea " + str(contTotal) + ": " + str(resultadoInsertar)})
+                    else:
+                        contValidos += 1
+                else:
+                    contInvalidos += 1
+                    errores.append({"error": "Error en la línea " + str(
+                        contTotal) + ": la fila tiene un tamaño incorrecto (" + str(len(dato)) + ")"})
+
+        result = {"mensaje": "La Importación se Realizo Correctamente",
+                  "correctos": contValidos,
+                  "incorrectos": contInvalidos,
+                  "errores": errores
+                  }
+        os.remove(ruta)
+        # archivo.state = 0
+        archivo.estado = "Cargado"
+        archivo.save()
+        return Response(result, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        err = {"error": 'Error verifique el archivo, un error ha ocurrido: {}'.format(e)}
+        return Response(err, status=status.HTTP_400_BAD_REQUEST)
+
+
+# INSERTAR DATOS EN LA BASE INDIVIDUAL
+def insertarDato_creditoPreaprobado_automotriz_digital_empleado(dato, empresa_financiera):
+    try:
+        timezone_now = timezone.localtime(timezone.now())
+        data = {}
+        data['vigencia'] = dato[0].replace('"', "")[0:10] if dato[0] != "NULL" else None
+        data['concepto'] = dato[1].replace('"', "") if dato[1] != "NULL" else None
+        data['monto'] = dato[2].replace('"', "") if dato[2] != "NULL" else None
+        data['plazo'] = dato[3].replace('"', "") if dato[3] != "NULL" else None
+        data['interes'] = dato[4].replace('"', "") if dato[4] != "NULL" else None
+        data['cuota'] = dato[5].replace('"', "") if dato[5] != "NULL" else None
+        data['tipoPersona'] = dato[6].replace('"', "") if dato[6] != "NULL" else None
+        data['estadoCivil'] = dato[7].replace('"', "") if dato[7] != "NULL" else None
+        data['estado'] = 'Nuevo'
+        data['tipoCredito'] = ''
+        data['tipoPersona'] = 'Empleado-PreAprobado'
+        data['canal'] = 'Credito Automotriz Digital Empleado-PreAprobado'
+        data['cargarOrigen'] = 'IFIS'
+        # persona = Personas.objects.filter(identificacion=dato[5],state=1).first()
+        # data['user_id'] = persona.user_id
+        # empleado = Empleados.objects.filter(identificacion=dato[8]).first()
+        # if empleado is None:
+        #     return f"Empleado {dato[9]} {dato[10]} {dato[8]} no existe"
+        data['numeroIdentificacion'] = dato[8]
+        data['nombres'] = dato[9].replace('"', "") if dato[9] != "NULL" else None
+        data['apellidos'] = dato[10].replace('"', "") if dato[10] != "NULL" else None
+        data['nombresCompleto'] = data['nombres'] + ' ' + data['apellidos']
+        data['email'] = dato[16].replace('"', "") if dato[16] != "NULL" else None
+        data['empresaIfis_id'] = empresa_financiera
+        data['empresasAplican'] = dato[22]
+        data['created_at'] = str(timezone_now)
+        data['alcance'] = 'LOCAL'
+        # Genera el codigo
+        codigo = (''.join(random.choice(string.digits) for _ in range(int(6))))
+        data['codigoPreaprobado'] = codigo
+        data['empresaInfo'] = {
+            'correo': dato[16].replace('"', '') if dato[16] != 'NULL' else None,
+            'representante': dato[10].replace('"', '') if dato[10] != 'NULL' else None,
+            'monto': dato[2].replace('"', '') if dato[2] != 'NULL' else None
+        }
+
+        # inserto el dato con los campos requeridos
+        credito = CreditoPersonas.objects.create(**data)
+        credito.external_id = credito._id
+        credito.save()
+        creditoSerializer = CreditoPersonasSerializer(credito, data=data, partial=True)
+        if creditoSerializer.is_valid():
+            enviarCodigoCorreoAutomotrizDigital(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'],
+                               empresa=dato[21], nombreCompleto=data['nombresCompleto'])
+        return 'Dato insertado correctamente'
+    except Exception as e:
+        return str(e)
+
+
+def enviarCodigoCorreoAutomotrizDigital(codigo, monto, email, alcance, empresa='COOP SANJOSE', nombreCompleto=''):
+    if alcance.upper() == 'LOCAL':
+        url = config.API_FRONT_END_SANJOSE + "/pages/preApprovedAutomotrizDigital"
+    subject, from_email, to = 'Generacion de codigo de credito pre-aprobado', "08d77fe1da-d09822@inbox.mailtrap.io", email
+    txt_content = f"""
+        FELICIDADES!
+
+        {nombreCompleto}
+
+        La {empresa} le acaba de preaprobar un crédito de $ {monto} para que realice compras en los
+        Locales Comerciales afiliados a la única Tienda de Comercio Electrónico del país en la que usted puede 
+        realizar compras con su Crédito de consumo otorgado por {empresa}
+
+        Para acceder a su Crédito y realizar compras en los mejores Locales Comerciales del país, 
+        COPIE Y PEGUE el siguiente código {codigo} en el siguiente {url}
+
+        Saludos
+
+        {empresa}
+    """
+    html_content = f"""
+        <html>
+            <body>
+                <h1>FELICIDADES!</h1>
+                <br>
+                <p>{nombreCompleto}</p>
+                <br>
+                <p>
+                La {empresa} le acaba de preaprobar un crédito de $ {monto} para que realice compras en los
+                Locales Comerciales afiliados a la única Tienda de Comercio Electrónico del país en la que usted puede 
+                realizar compras con su Crédito de consumo otorgado por {empresa}
+                </p>
+                <br>
+                <p>
+                Para acceder a su Crédito y realizar compras en los mejores Locales Comerciales del país, 
+                COPIE Y PEGUE el siguiente código {codigo} en el siguiente <a href='{url}'>ENLACE</a>
+                </p>
+                <br>
+                Saludos
+                <br>
+                {empresa}
+            </body>
+        </html>
+    """
+    sendEmail(subject, txt_content, from_email, to, html_content)
