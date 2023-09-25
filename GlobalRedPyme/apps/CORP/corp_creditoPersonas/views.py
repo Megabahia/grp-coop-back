@@ -510,7 +510,7 @@ def creditoPersonas_list(request):
 
             if "cargarOrigen" in request.data:
                 if request.data["cargarOrigen"] != '':
-                    filters['cargarOrigen'] = str(request.data["cargarOrigen"])
+                    filters['cargarOrigen__icontains'] = str(request.data["cargarOrigen"])
 
             if "alcance" in request.data:
                 if request.data["alcance"] != '':
