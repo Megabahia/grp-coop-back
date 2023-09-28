@@ -46,11 +46,6 @@ class CreditoPersonasSerializer(serializers.ModelSerializer):
         #     data.update({"apellidos": persona.apellidos})
         #     data.update({"whatsappPersona": persona.whatsapp})
         #     data.update({"emailPersona": persona.email})
-        if data['empresasAplican'] is not None:
-            if '[' in data['empresasAplican']:
-                data['empresasAplican'] = json.loads(data['empresasAplican'])
-            else:
-                data['empresasAplican'] = data['empresasAplican'].split(',')
         return data
 
 
@@ -81,11 +76,6 @@ class CreditoPersonasPersonaSerializer(serializers.ModelSerializer):
             data.update({"telefono": persona.telefono})
             data.update({"whatsapp": persona.whatsapp})
             data.update({"email": persona.email})
-        if data['empresasAplican'] is not None:
-            if '[' in data['empresasAplican']:
-                data['empresasAplican'] = json.loads(data['empresasAplican'])
-            else:
-                data['empresasAplican'] = data['empresasAplican'].split(',')
         return data
 
 

@@ -447,7 +447,7 @@ def insertarDato_creditoPreaprobadoNegocio(dato, empresa_financiera):
         credito.save()
         creditoSerializer = CreditoPersonasSerializer(credito, data=data, partial=True)
         if creditoSerializer.is_valid():
-            enviarCodigoCorreo(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'],
+            enviarCodigoCorreoConsumo(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'],
                                nombreCompleto=data['nombresCompleto'])
             if creditoSerializer.data['alcance'].upper() != 'LOCAL':
                 publish_credit(creditoSerializer.data)
@@ -548,7 +548,7 @@ def insertarDato_creditoPreaprobado_empleado(dato, empresa_financiera):
         credito.save()
         creditoSerializer = CreditoPersonasSerializer(credito, data=data, partial=True)
         if creditoSerializer.is_valid():
-            enviarCodigoCorreo(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'],
+            enviarCodigoCorreoConsumo(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'],
                                empresa=dato[21], nombreCompleto=data['nombresCompleto'])
             if creditoSerializer.data['alcance'].upper() != 'LOCAL':
                 publish_credit(creditoSerializer.data)
@@ -557,7 +557,7 @@ def insertarDato_creditoPreaprobado_empleado(dato, empresa_financiera):
         return str(e)
 
 
-def enviarCodigoCorreo(codigo, monto, email, alcance, empresa='COOP SANJOSE', nombreCompleto=''):
+def enviarCodigoCorreoConsumo(codigo, monto, email, alcance, empresa='COOP SANJOSE', nombreCompleto=''):
     if alcance.upper() == 'LOCAL':
         url = config.API_FRONT_END_SANJOSE + "/pages/preApprovedCreditConsumer"
     else:
@@ -1081,7 +1081,7 @@ def insertarDato_creditoPreaprobado_automotriz_empleado(dato, empresa_financiera
         credito.save()
         creditoSerializer = CreditoPersonasSerializer(credito, data=data, partial=True)
         if creditoSerializer.is_valid():
-            enviarCodigoCorreo(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'],
+            enviarCodigoCorreoAutomotriz(codigo, monto=data['monto'], email=dato[16], alcance=creditoSerializer.data['alcance'],
                                empresa=dato[21], nombreCompleto=data['nombresCompleto'])
             if creditoSerializer.data['alcance'].upper() != 'LOCAL':
                 publish_credit(creditoSerializer.data)
@@ -1090,7 +1090,7 @@ def insertarDato_creditoPreaprobado_automotriz_empleado(dato, empresa_financiera
         return str(e)
 
 
-def enviarCodigoCorreo(codigo, monto, email, alcance, empresa='COOP SANJOSE', nombreCompleto=''):
+def enviarCodigoCorreoAutomotriz(codigo, monto, email, alcance, empresa='COOP SANJOSE', nombreCompleto=''):
     if alcance.upper() == 'LOCAL':
         url = config.API_FRONT_END_SANJOSE + "/pages/preApprovedCreditConsumerAutomotive"
     else:
