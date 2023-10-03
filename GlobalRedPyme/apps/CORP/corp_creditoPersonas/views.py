@@ -1039,8 +1039,7 @@ def creditoPersonas_validar_codigo_creditoAprobado(request):
                                              nombre='DURACION_CODIGO_CREDITO_APROBADO', state=1).first().valor
             duracion = query.created_at + relativedelta(minutes=int(tiempo))
             if duracion > timezone.now():
-                credito = CreditoPersonas.objects.get(_id=ObjectId(query.credito_id))
-                print(credito)
+                credito = CreditoPersonas.objects.get(_id=ObjectId(query.credito_id), empresasAplican__icontains=request.data['empresaRuc'])
                 serializer = CreditoPersonasSerializer(credito)
                 createLog(logModel, serializer.data, logTransaccion)
                 return Response(serializer.data, status=status.HTTP_200_OK)
