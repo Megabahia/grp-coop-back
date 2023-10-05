@@ -7,7 +7,7 @@ def upload_path(instance, filname):
 
 
 def upload_path2(instance, filname):
-    return '/'.join(['CORP/archivosFirmados', str(timezone.localtime(timezone.now())) + "_" + filname])
+    return '/'.join(['CORP/archivosFirmados/'+str(instance.numeroIdentificacion), str(timezone.localtime(timezone.now())) + "_" + filname])
 
 
 # Create your models here.
@@ -69,6 +69,7 @@ class ArchivosFirmados(models.Model):
     facturasVenta = models.FileField(blank=True, null=True, upload_to=upload_path2)
     facturasCompra = models.FileField(blank=True, null=True, upload_to=upload_path2)
     numeroIdentificacion = models.CharField(max_length=255, blank=False, null=False)
+    credito_id = models.CharField(max_length=255, blank=False, null=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)

@@ -1,4 +1,5 @@
 from .models import PreAprobados, ArchivosFirmados
+from .service import enviarDocumentos
 from ..corp_empresas.models import Empleados
 from ..corp_creditoPersonas.models import CreditoPersonas
 from .serializers import (
@@ -661,6 +662,9 @@ def creditoArchivos_subir_documentosFirmados_create(request):
             serializer = ArchivosFirmadosSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
+                creditoPersona = CreditoPersonas.objects.filter(_id=ObjectId(request.data['credito_id'])).first()
+                cliente = CreditoPersonasSerializer(creditoPersona).data
+                enviarDocumentos(serializer.data, cliente['user'])
                 createLog(logModel, serializer.data, logTransaccion)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             createLog(logModel, serializer.errors, logExcepcion)

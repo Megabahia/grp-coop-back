@@ -3,7 +3,7 @@ from djongo import models
 
 
 def upload_path(instance, filname):
-    return '/'.join(['CORP/documentosCreditosPersonas', str(instance._id) + "_" + filname])
+    return '/'.join(['CORP/documentosCreditosPersonas/'+str(instance.numeroIdentificacion), str(instance._id) + "_" + filname])
 
 
 # Create your models here.
