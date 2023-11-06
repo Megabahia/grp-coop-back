@@ -3,10 +3,19 @@ from djongo import models
 
 
 def upload_path(instance, filname):
-    return '/'.join(['CORP/documentosCreditosPersonas/'+str(instance.numeroIdentificacion), str(instance._id) + "_" + filname])
+    """
+    Este metodo se utiliza para subir los archivos
+    @type filname: el campo filname es el nombre del archivo
+    @type instance: el campo instance es el registro que se esta guardando
+    @rtype: Devuelve la ruta del archivo donde se guardo
+    """
+    return '/'.join(
+        ['CORP/documentosCreditosPersonas/' + str(instance.numeroIdentificacion), str(instance._id) + "_" + filname])
 
 
-# Create your models here.
+# Mundo: coop
+# Portales: PERSONAS, coop, center
+# Esta clase sirve para conectar con la tabla CreditoPersonas de la base datos corp
 class CreditoPersonas(models.Model):
     _id = models.ObjectIdField()
     numero = models.IntegerField(blank=True, null=True)
@@ -134,6 +143,9 @@ class CreditoPersonas(models.Model):
     state = models.SmallIntegerField(default=1)
 
 
+# Mundo: coop
+# Portales: PERSONAS, coop, center
+# Esta clase sirve para conectar con la tabla AutorizacionCredito de la base datos corp
 class AutorizacionCredito(models.Model):
     _id = models.ObjectIdField()
     codigo = models.CharField(max_length=200, null=False)
@@ -146,6 +158,9 @@ class AutorizacionCredito(models.Model):
     state = models.SmallIntegerField(default=1)
 
 
+# Mundo: coop
+# Portales: PERSONAS, coop, center
+# Esta clase sirve para conectar con la tabla LecturaArchivos de la base datos corp
 class LecturaArchivos(models.Model):
     _id = models.ObjectIdField()
     numeroCredito = models.CharField(max_length=200, null=False)  # Relacion credito persona
@@ -157,6 +172,9 @@ class LecturaArchivos(models.Model):
     state = models.SmallIntegerField(default=1)
 
 
+# Mundo: coop
+# Portales: PERSONAS, coop, center
+# Esta clase sirve para conectar con la tabla CodigoCredito de la base datos corp
 class CodigoCredito(models.Model):
     _id = models.ObjectIdField()
     credito_id = models.CharField(max_length=200, blank=False, null=False)
@@ -168,6 +186,9 @@ class CodigoCredito(models.Model):
     state = models.SmallIntegerField(default=1)
 
 
+# Mundo: coop
+# Portales: PERSONAS, coop, center
+# Esta clase sirve para conectar con la tabla RegarcarCreditos de la base datos corp
 class RegarcarCreditos(models.Model):
     _id = models.ObjectIdField()
     fechaRecarga = models.DateField(null=True, blank=True)

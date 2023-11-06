@@ -1,13 +1,21 @@
 import jsonfield
 from djongo import models
-from apps.CORP.corp_empresas.models import Empresas
+from ..corp_empresas.models import Empresas
 
 
 def upload_path(instance, filname):
+    """
+    Este metodo se utiliza para subir los archivos
+    @type filname: el campo filname es el nombre del archivo
+    @type instance: el campo instance es el registro que se esta guardando
+    @rtype: Devuelve la ruta del archivo donde se guardo
+    """
     return '/'.join(['CORP/facturas', str(instance._id) + "_" + filname])
 
 
-# Create your models here.
+# Nube: coop
+# PORTALES: CENTER, CORP
+# Esta clase sirve para relacionar la tabla facturas encabezado de la base datos corp
 class FacturasEncabezados(models.Model):
     numeroFactura = models.CharField(max_length=150, null=True, blank=True)
     fecha = models.DateField(null=True)
@@ -33,10 +41,10 @@ class FacturasEncabezados(models.Model):
     updated_at = models.DateTimeField(null=True)
     state = models.SmallIntegerField(default=1)
 
-    def save(self, *args, **kwargs):
-        return super(FacturasEncabezados, self).save(*args, **kwargs)
 
-
+# Nube: coop
+# PORTALES: CENTER, CORP
+# Esta clase sirve para relacionar la tabla facturas detalle de la base datos corp
 class FacturasDetalles(models.Model):
     # NOMBRAMOS A LA RELACION DETALLATES
     facturaEncabezado = models.ForeignKey(FacturasEncabezados, related_name='detalles', null=True, blank=True,
@@ -56,14 +64,13 @@ class FacturasDetalles(models.Model):
     updated_at = models.DateTimeField(null=True)
     state = models.SmallIntegerField(default=1)
 
-    def save(self, *args, **kwargs):
-        # self.tipo = self.tipo.upper()
-        return super(FacturasDetalles, self).save(*args, **kwargs)
-
     def __str__(self):
         return '{}'.format(self.id)
 
 
+# Nube: coop
+# PORTALES: CENTER, CORP
+# Esta clase sirve para relacionar la tabla facturas fisicas de la base datos corp
 class FacturasFisicas(models.Model):
     _id = models.ObjectIdField()
     credito_id = models.CharField(max_length=255, null=True, blank=True)

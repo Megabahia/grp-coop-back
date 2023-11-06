@@ -18,7 +18,13 @@ kdf = PBKDF2HMAC(
 )
 clave = kdf.derive(clave_secreta)
 
+
 def encriptar(texto):
+    """
+    ESte metodo sirve para encriptar cadenas de texto
+    @type texto: El campo request recibe el texto que se desea encriptar
+    @rtype: DEvuelve la cadena de texto encriptada
+    """
     # Generar una clave de cifrado a partir de la clave segura
     backend = default_backend()
     cipher = Cipher(algorithms.AES(clave), modes.ECB(), backend=backend)
@@ -33,7 +39,13 @@ def encriptar(texto):
 
     return texto_encriptado
 
+
 def desencriptar(texto_encriptado):
+    """
+    ESte metodo sirve para desencriptar cadenas de texto
+    @type texto: El campo request recibe el texto que se desea desencriptar
+    @rtype: DEvuelve la cadena de texto desencriptado
+    """
     # Generar una clave de cifrado a partir de la clave segura
     backend = default_backend()
     cipher = Cipher(algorithms.AES(clave), modes.ECB(), backend=backend)

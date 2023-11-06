@@ -1,7 +1,9 @@
 from djongo import models
 
 
-# Create your models here.
+# Mundo: coop
+# Portales: PERSONAS, corp, center
+# Esta clase sirve para conectar con la tabla CobrarSupermonedas de la base datos corp
 class CobrarSupermonedas(models.Model):
     _id = models.ObjectIdField()
     identificacion = models.CharField(max_length=13, null=False)

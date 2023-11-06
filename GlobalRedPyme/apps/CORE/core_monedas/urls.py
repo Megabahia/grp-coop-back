@@ -12,8 +12,10 @@ from .views import (
     list_monedas_regaladas_empresa,
 )
 
+# Esta variable se utiliza para colocar el nombre aplicacion de facturas
 app_name = 'core_monedas'
 
+# La variable urlpatterns se utiliza para exportar las diferentes rutas a las que pueden acceder el front
 urlpatterns = [
     path('create/', monedas_create, name="monedas_create"),
     path('list/', monedas_list, name="monedas_list"),

@@ -10,12 +10,19 @@ from ..corp_creditoArchivos.serializers import ArchivosFirmadosSerializer
 
 
 class PagoProveedorSerializer(serializers.ModelSerializer):
+    # La clase meta se relaciona con la tabla Facturas
+    # el campo fields indica los campos que se devolveran
     class Meta:
         model = PagoProveedores
         fields = '__all__'
         read_only_fields = ['_id']
 
     def to_representation(self, instance):
+        """
+        Este metodo se usa para modificar la respuesta de los campos
+        @type instance: El campo instance contiene el registro con los campos
+        @rtype: DEvuelve los valores modificados
+        """
         data = super(PagoProveedorSerializer, self).to_representation(instance)
         # tomo el campo persona y convierto de OBJECTID a string
         if data['archivoFirmado']:
@@ -28,7 +35,8 @@ class PagoProveedorSerializer(serializers.ModelSerializer):
         if data['usuario']:
             usuario_json = json.loads(data['usuario'])
             if usuario_json:
-                archivosFirmados = ArchivosFirmados.objects.filter(numeroIdentificacion=json.loads(data['usuario'])['identificacion'],state=1).first()
+                archivosFirmados = ArchivosFirmados.objects.filter(
+                    numeroIdentificacion=json.loads(data['usuario'])['identificacion'], state=1).first()
                 data['archivosFirmados'] = ArchivosFirmadosSerializer(archivosFirmados).data
 
         return data
@@ -42,6 +50,11 @@ from endesive import pdf
 
 
 def prueba_verificar(url):
+    """
+    ESte metodo sirve para verificar la verificacion de lafirma del documento
+    @type url: REcibe la url del archivo que esta en S3
+    @rtype: Devuelve true o false
+    """
     env = environ.Env()
     environ.Env.read_env()  # LEE ARCHIVO .ENV
     client_s3 = boto3.client(

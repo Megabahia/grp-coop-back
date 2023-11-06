@@ -6,6 +6,8 @@ from .models import (
 
 
 class CobrarSupermonedasSerializer(serializers.ModelSerializer):
+    # La clase meta se relaciona con la tabla CobrarSupermonedas
+    # el campo fields indica los campos que se devolveran
     class Meta:
         model = CobrarSupermonedas
         fields = '__all__'

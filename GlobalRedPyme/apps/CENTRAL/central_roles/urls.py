@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url, include
-from apps.CENTRAL.central_roles.views import(
-	rol_list,
+from .views import (
+    rol_list,
     rol_listExport,
     rol_create,
     rol_findOne,
@@ -14,6 +14,7 @@ from apps.CENTRAL.central_roles.views import(
     rol_listUsuario
 )
 
+# La variable urlpatterns se utiliza para exportar las diferentes rutas a las que pueden acceder el front
 urlpatterns = [
     path('list/', rol_list, name="rol_list"),
     path('list/export/', rol_listExport, name="rol_listExport"),
@@ -26,4 +27,3 @@ urlpatterns = [
     path('usuario/create/', rol_createUsuario, name="rol_createUsuario"),
     path('usuario/list/<str:pk>', rol_listUsuario, name="rol_listUsuario"),
 ]
-

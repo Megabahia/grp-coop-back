@@ -3,10 +3,18 @@ from djongo import models
 
 
 def upload_path(instance, filname):
+    """
+    Este metodo se utiliza para subir los archivos
+    @type filname: el campo filname es el nombre del archivo
+    @type instance: el campo instance es el registro que se esta guardando
+    @rtype: Devuelve la ruta del archivo donde se guardo
+    """
     return '/'.join(['PERSONAS/imgPersonas', str(instance._id) + "_" + filname])
 
 
-# Create your models here.
+# Mundo: bigpuntos
+# Portales: PERSONAS
+# Esta clase sirve para conectar con la tabla personas de la base datos personas
 class Personas(models.Model):
     _id = models.ObjectIdField()
     identificacion = models.TextField()
@@ -60,6 +68,9 @@ class Personas(models.Model):
     state = models.SmallIntegerField(default=1)
 
 
+# Mundo: bigpuntos
+# Portales: PERSONAS
+# Esta clase sirve para conectar con la tabla personas de la base datos personas
 class ValidarCuenta(models.Model):
     _id = models.ObjectIdField()
     codigo = models.CharField(max_length=200, null=False)

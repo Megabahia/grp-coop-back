@@ -10,17 +10,24 @@ from .models import (
 )
 
 from ..corp_empresas.models import Empresas
-from apps.PERSONAS.personas_personas.models import Personas
+from ...PERSONAS.personas_personas.models import Personas
 from ..corp_empresas.serializers import EmpresasInfoBasicaSerializer
 
 
 class CreditoPersonasSerializer(serializers.ModelSerializer):
+    # La clase meta se relaciona con la tabla CreditoPersonas
+    # el campo fields indica los campos que se devolveran
     class Meta:
         model = CreditoPersonas
         fields = '__all__'
         read_only_fields = ['_id']
 
     def to_representation(self, instance):
+        """
+        Este metod sirve para modificar los datos que se devulveran a frontend
+        @type instance: El campo instance contiene el registro de la base datos
+        @rtype: Devuelve la informacion modificada
+        """
         data = super(CreditoPersonasSerializer, self).to_representation(instance)
         # tomo el campo persona y convierto de OBJECTID a string
         # empresaIfis_id = data.pop('empresaIfis_id')
@@ -50,12 +57,19 @@ class CreditoPersonasSerializer(serializers.ModelSerializer):
 
 
 class CreditoPersonasPersonaSerializer(serializers.ModelSerializer):
+    # La clase meta se relaciona con la tabla ArchivosFirmados
+    # el campo fields indica los campos que se devolveran
     class Meta:
         model = CreditoPersonas
         fields = ['_id', 'monto', 'plazo', 'user_id', 'empresaIfis_id']
         read_only_fields = ['_id']
 
     def to_representation(self, instance):
+        """
+        Este metod sirve para modificar los datos que se devulveran a frontend
+        @type instance: El campo instance contiene el registro de la base datos
+        @rtype: Devuelve la informacion modificada
+        """
         data = super(CreditoPersonasPersonaSerializer, self).to_representation(instance)
         # tomo el campo persona y convierto de OBJECTID a string
         empresaIfis_id = data.pop('empresaIfis_id')
@@ -80,6 +94,8 @@ class CreditoPersonasPersonaSerializer(serializers.ModelSerializer):
 
 
 class CodigoCreditoSerializer(serializers.ModelSerializer):
+    # La clase meta se relaciona con la tabla ArchivosFirmados
+    # el campo fields indica los campos que se devolveran
     class Meta:
         model = CodigoCredito
         fields = '__all__'
@@ -87,6 +103,8 @@ class CodigoCreditoSerializer(serializers.ModelSerializer):
 
 
 class RegarcarCreditosSerializer(serializers.ModelSerializer):
+    # La clase meta se relaciona con la tabla ArchivosFirmados
+    # el campo fields indica los campos que se devolveran
     class Meta:
         model = RegarcarCreditos
         fields = '__all__'

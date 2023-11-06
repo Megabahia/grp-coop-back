@@ -32,7 +32,7 @@ from apps.config.util import sendEmail
 # ObjectId
 from bson import ObjectId
 # logs
-from apps.CENTRAL.central_logs.methods import createLog, datosTipoLog, datosProductosMDP
+from ...CENTRAL.central_logs.methods import createLog, datosTipoLog, datosProductosMDP
 
 # declaracion variables log
 datosAux = datosProductosMDP()
@@ -48,6 +48,11 @@ logExcepcion = datosTipoLogAux['excepcion']
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def uploadEXCEL_pagosEmpleados(request):
+    """
+    ESte metodo sirve para cargar los pagos a los empleados
+    @type request: El campo request recibe el archivo excel
+    @rtype: DEvuele la lista de los ingresos correctos, incorrectos, caso contrario devuelve el error generado
+    """
     contValidos = 0
     contInvalidos = 0
     contTotal = 0
@@ -100,6 +105,12 @@ def uploadEXCEL_pagosEmpleados(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def pagoEmpleados_update(request, pk):
+    """
+    El metodo sirve para actualizar el pago del empleado
+    @type pk: El campo pk recibe el id del pago empleado
+    @type request: El campo request recibe los campos del pago empleado
+    @rtype: DEvuelve el registro actualizado, caso contrario devuelve el error generado
+    """
     request.POST._mutable = True
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
@@ -149,7 +160,8 @@ def pagoEmpleados_update(request, pk):
 
                 if serializer.data['estado'] == 'Negado':
                     registro = serializer.data
-                    envioCorreoNegado(registro['correo'], registro['nombresCompletos'], registro['observacion'], registro['montoPagar'])
+                    envioCorreoNegado(registro['correo'], registro['nombresCompletos'], registro['observacion'],
+                                      registro['montoPagar'])
                 if serializer.data['estado'] == 'Aprobado':
                     registro = serializer.data
                     envioCorreoAprobado(registro['empresa']['correo'], registro['nombresCompletos'],
@@ -186,6 +198,11 @@ def pagoEmpleados_update(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def pagoEmpleados_list(request):
+    """
+    ESte metodo sirve para listar los pagos de los empleados
+    @type request: El campo request recibe page, page_size, user_id, estado
+    @rtype: DEVUELVE una lista de pagos empleados, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'list/',
@@ -233,6 +250,11 @@ from endesive.pdf import cms
 
 
 def firmar(request):
+    """
+    Este metodo sirve para firma un documento
+    @type request: El campo request recibe el documento que se va firmar
+    @rtype: Devuelve el documento firmado
+    """
     usuario = json.loads(request.data['usuarioEmpresa'])
     certificado = request.data['certificado']
     pdf = request.data['archivoFirmado']
@@ -276,6 +298,12 @@ def firmar(request):
 
 
 def enviarNegadoPago(email, monto):
+    """
+    Este metodo sirve para enviar el correo de pago negado
+    @type monto: El campo monto recibe la cantidad de monto
+    @type email: El campo email recibe el email del usuario
+    @rtype: No devuelve nada
+    """
     subject, from_email, to = 'RAZÓN POR LA QUE SE NIEGA EL PAGO A PROVEEDORES', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
@@ -316,6 +344,12 @@ def enviarNegadoPago(email, monto):
 
 
 def enviarProcesandoPago(email, monto):
+    """
+    Este metodo sirve para enviar el correo de pago procesado
+    @type monto: El campo monto recibe la cantidad de monto
+    @type email: El campo email recibe el email del usuario
+    @rtype: No devuelve nada
+    """
     subject, from_email, to = 'Transferencia exitosa', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
@@ -354,6 +388,11 @@ def enviarProcesandoPago(email, monto):
 
 
 def generarPDF(datos):
+    """
+    ESte metodo sirve para generar un pdf
+    @type datos: El campo datos no recibe nada
+    @rtype: Devuelve el docmuento pdf
+    """
     # save FPDF() class into a
     # variable pdf
     pdf = FPDF()
@@ -377,6 +416,12 @@ def generarPDF(datos):
 
 
 def insertarDato_PagoEmpleado(dato, user_id):
+    """
+    ESte metodo sirve para gardar en la tabla de pago empleado
+    @type user_id: El campo user_id recibe el id del usuario
+    @type dato: El campo dato recibe la fila del excel
+    @rtype: DEvuelve el registro guardado, caso contrario devuelve el error generado
+    """
     try:
         if ('None' in dato):
             return 'Tiene campos vacios'
@@ -410,6 +455,14 @@ def insertarDato_PagoEmpleado(dato, user_id):
 
 
 def envioCorreoNegado(email, nombresCompletosEmpleado, observacion, montoPagar):
+    """
+    Este metodo sirve para enviar el correo negado
+    @type montoPagar: El campo montopagar recibe el monto a pagar
+    @type observacion: El campo observacion recibe la observacion
+    @type nombresCompletosEmpleado: El campo recibe los nombres del usuario
+    @type email: El campo email recibe el email del usuario
+    @rtype: No devuelve nada
+    """
     subject, from_email, to = 'PAGO FALLIDO', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
@@ -448,6 +501,15 @@ def envioCorreoNegado(email, nombresCompletosEmpleado, observacion, montoPagar):
 
 
 def envioCorreoAprobado(email, nombresCompletosEmpleado, monto, montoDisponible, registro):
+    """
+    ESte metodo sirve para enviar el correo aprobado
+    @param registro: Este campo recibe el registro guardado
+    @type montoDisponible: El campo recibe el monto disponible
+    @type monto: El campo recibe el monto
+    @type nombresCompletosEmpleado: El campo recibe el nombre del usuario
+    @type email: El campo recibe el email
+    @rtype: No devuelve nada
+    """
     subject, from_email, to = 'Transferencia existosa', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
@@ -499,6 +561,16 @@ def envioCorreoAprobado(email, nombresCompletosEmpleado, monto, montoDisponible,
 
 
 def envioCorreoTranserencia(email, monto, nombresCompletosEmpleado, nombreRepresentanteLegal, nombrePyme, mesPago):
+    """
+    ESte metodo sirve para enviar el correo aprobado
+    @param mesPago: Recibe el mes de pago
+    @param nombrePyme: REcibe el nombre de la pyme
+    @param nombreRepresentanteLegal: El campo recibe el nombre del representante
+    @type monto: El campo recibe el monto
+    @type nombresCompletosEmpleado: El campo recibe el nombre del usuario
+    @type email: El campo recibe el email
+    @rtype: No devuelve nada
+    """
     subject, from_email, to = 'TRANSFERENCIA RECIBIDA', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
@@ -536,13 +608,25 @@ def envioCorreoTranserencia(email, monto, nombresCompletosEmpleado, nombreRepres
 
 
 def generarQR(datos):
+    """
+    ESte metodo sirve para generar un QR
+    @type datos: Recibe la informacion del usuario
+    @rtype: No devuelve nada
+    """
     img = qrcode.make(datos)
     f = open("output.png", "wb")
     img.save(f)
     f.close()
 
 
-def agregarQRDatosFirmante(datosFirmante,output_file, ruta):
+def agregarQRDatosFirmante(datosFirmante, output_file, ruta):
+    """
+    ESte metodo sirve para agregar el qr a un documento pdf
+    @param ruta: recibe la ruta de donde este el qr
+    @param output_file: recibe la ruta donde se va guardar el documento generado
+    @type datosFirmante: REcibe los datos del usuario que firma
+    @rtype: no devuelve nada
+    """
     # Define the position and size of the image rectangle
     image_rectangle = fitz.Rect(0, 420, 150, 520)  # Adjust the coordinates and size as needed
 
@@ -564,7 +648,6 @@ def agregarQRDatosFirmante(datosFirmante,output_file, ruta):
     img_xref = 0
     first_page.insert_image(image_rectangle, stream=img, xref=img_xref)
     ##############
-
 
     # Crear una nueva imagen con fondo blanco
     width = 400

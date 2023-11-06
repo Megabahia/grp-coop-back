@@ -1,6 +1,11 @@
+"""NUBE DE BIGPUNTOS
+PORTALES: CENTER, PERSONAS
+Este archivo sirve para conectar el backend de la nube de bigpuntos con la base datos de bigpuntos central
+"""
+
 from djongo import models
 
-# Create your models here.
+# La clase Correos se utiliza para guardar los correos que ingresan por el portal personas y lista en el portal center
 class Correos(models.Model):
     fechaRegistro = models.DateField(auto_now_add=True)
     correo = models.EmailField(max_length=255,null=False, blank=False)

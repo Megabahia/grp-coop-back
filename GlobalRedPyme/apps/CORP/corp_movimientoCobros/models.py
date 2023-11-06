@@ -5,7 +5,9 @@ from ..corp_pagoEmpleados.models import PagoEmpleados
 from ..corp_pagoProveedores.models import PagoProveedores
 
 
-# Create your models here.
+# Nube: coop
+# PORTALES: CENTER, PERSONAS, CORP, IFIS
+# Este archivo sirve para conectar el backend de la nube de bigpuntos con la base datos de corp
 class MovimientoCobros(models.Model):
     _id = models.ObjectIdField()
     autorizacion = models.IntegerField(null=True, blank=True)
@@ -21,6 +23,9 @@ class MovimientoCobros(models.Model):
     state = models.SmallIntegerField(default=1)
 
 
+# Nube: coop
+# PORTALES: CENTER, PERSONAS, CORP, IFIS
+# Este archivo sirve para conectar el backend de la nube de coop con la base datos de corp
 class Transacciones(models.Model):
     _id = models.ObjectIdField()
     fechaTransaccion = models.DateField(null=True, blank=True)
@@ -35,9 +40,9 @@ class Transacciones(models.Model):
     creditoPersona_id = models.CharField(max_length=250, blank=True, null=True)  # Relacion empresa
     pagoEmpleados = models.ForeignKey(PagoEmpleados, null=True, on_delete=models.CASCADE)  # Relacion pagoEmpleados
     pagoProveedores = models.ForeignKey(PagoProveedores, null=True,
-                                           on_delete=models.CASCADE)  # Relacion pagoProveedores
+                                        on_delete=models.CASCADE)  # Relacion pagoProveedores
     regarcarCreditos = models.ForeignKey(RegarcarCreditos, null=True,
-                                            on_delete=models.CASCADE)  # Relacion regarcarCreditos
+                                         on_delete=models.CASCADE)  # Relacion regarcarCreditos
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)

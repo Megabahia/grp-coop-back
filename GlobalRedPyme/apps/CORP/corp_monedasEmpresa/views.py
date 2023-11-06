@@ -32,6 +32,11 @@ logExcepcion = datosTipoLogAux['excepcion']
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def monedasEmpresa_create(request):
+    """
+    Este metodo se para crear un registro de monedas de la empresa de la tabla monedasempresas de la base datos corp
+    @type request: El campo resquest recibe los campos de la tabla monedas empresa
+    @rtype: Devuelve el registro creado, caso contrario devuelve el error generado
+    """
     request.POST._mutable = True
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
@@ -67,6 +72,11 @@ def monedasEmpresa_create(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def monedasEmpresa_list(request):
+    """
+    Este metodo se usa para listar todas las monedas de la empresa de la tabla monedas empresas de la base datos corp
+    @type request: El campo request recibe el campo empresa_id por el cual se filtra las monedas de la empresa
+    @rtype: Devuel una lista de las monedas de la empresa, caso contrario devuel el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'list/',

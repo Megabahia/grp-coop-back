@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from bson import ObjectId
 
-from apps.CENTRAL.central_logs.methods import createLog, datosTipoLog, datosProductosMDP
+from ...CENTRAL.central_logs.methods import createLog, datosTipoLog, datosProductosMDP
 
 # declaracion variables log
 datosAux = datosProductosMDP()
@@ -25,6 +25,11 @@ logExcepcion = datosTipoLogAux['excepcion']
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def proveedores_create(request):
+    """
+    ESte metodo sirve para crear el proveedor en la tabla proveedor de la base datos personas
+    @type request: El campo request recibe los campos de la tabla proveedor
+    @rtype: Devuelve el registro creado, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'create/',
@@ -60,6 +65,12 @@ def proveedores_create(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def proveedores_listOne(request, pk):
+    """
+    ESte metodo sirve para obtener el proveedor en la tabla proveedor de la base datos personas
+    @param pk: El campo pk recibe el id del proveedor
+    @type request: El campo request recibe los campos de la tabla proveedor
+    @rtype: Devuelve el registro creado, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listOne/',
@@ -93,6 +104,12 @@ def proveedores_listOne(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def proveedores_update(request, pk):
+    """
+    ESte metodo sirve para actualizar el proveedor en la tabla proveedor de la base datos personas
+    @param pk: El campo pk recibe el id del proveedor
+    @type request: El campo request recibe los campos de la tabla proveedor
+    @rtype: Devuelve el registro actualizado, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'update/',
@@ -134,6 +151,12 @@ def proveedores_update(request, pk):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def proveedores_delete(request, pk):
+    """
+    ESte metodo sirve para borrar el proveedor en la tabla proveedor de la base datos personas
+    @param pk: El campo pk recibe el id del proveedor
+    @type request: El campo request no recibe nada
+    @rtype: Devuelve el registro eliminado, caso contrario devuelve el error generado
+    """
     nowDate = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'delete/',
@@ -152,7 +175,6 @@ def proveedores_delete(request, pk):
             err = {"error": "No existe"}
             createLog(logModel, err, logExcepcion)
             return Response(err, status=status.HTTP_404_NOT_FOUND)
-            return Response(status=status.HTTP_404_NOT_FOUND)
         # tomar el dato
         if request.method == 'DELETE':
             serializer = ProveedoresSerializer(query, data={'state': '0', 'updated_at': str(nowDate)}, partial=True)
@@ -172,6 +194,11 @@ def proveedores_delete(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def proveedores_list(request):
+    """
+    ESte metodo sirve para listar el proveedor en la tabla proveedor de la base datos personas
+    @type request: El campo request recibe codigoCobro, empresa_id, user_id, page, page_size
+    @rtype: Devuelve el registro una lista, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'list/',

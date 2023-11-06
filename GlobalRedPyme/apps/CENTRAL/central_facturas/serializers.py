@@ -4,16 +4,30 @@ from datetime import datetime
 from rest_framework import serializers
 
 
-from apps.CENTRAL.central_facturas.models import (
+from .models import (
     Facturas
 )
 
+# NUBE DE BIGPUNTOS
+# PORTALES: CENTER, PERSONAS
+# Esta clase sirve para conectar el modelo de la tabla de Facturas de la nube de bigpuntos
+# para convertir en un objeto de python con el objetivo de manipular los datos y se utiliza
+# para retornar todos los campos de la tabla
 class FacturasSerializer(serializers.ModelSerializer):
+    # La clase meta se relaciona con la tabla Facturas
+    # el campo fields indica los campos que se devolveran
     class Meta:
         model = Facturas
         fields = '__all__'
 
+# NUBE DE BIGPUNTOS
+# PORTALES: CENTER, PERSONAS
+# Esta clase sirve para conectar el modelo de la tabla de Facturas de la nube de bigpuntos
+# para convertir en un objeto de python con el objetivo de manipular los datos y se utiliza
+# para retornar todos los campos de la tabla
 class SubirFacturasSerializer(serializers.ModelSerializer):
+    # La clase meta se relaciona con la tabla Facturas
+    # el campo fields indica los campos que se devolveran
     class Meta:
         model = Facturas
         fields = ['urlArchivo','user_id']
@@ -41,8 +55,16 @@ class SubirFacturasSerializer(serializers.ModelSerializer):
     #     factura = Facturas.objects.create(**validated_data)
     #     return factura
 
+
+# NUBE DE BIGPUNTOS
+# PORTALES: CENTER, PERSONAS
+# Esta clase sirve para conectar el modelo de la tabla de Facturas de la nube de bigpuntos
+# para convertir en un objeto de python con el objetivo de manipular los datos y se utiliza
+# para retornar todos los campos de la tabla
 # Listar factura
 class ListFacturasSerializer(serializers.ModelSerializer):
+    # La clase meta se relaciona con la tabla Facturas
+    # el campo fields indica los campos que se devolveranƒ
     class Meta:
         model = Facturas
         fields = ['_id', 'created_at', 'numeroFactura',

@@ -17,8 +17,10 @@ from .views import (
     uploadEXCEL_creditosPreaprobadosAutomotrizDigitales_empleados,
 )
 
+# Esta variable se utiliza para colocar el nombre aplicacion de corp_creditoArchivos
 app_name = 'corp_creditoArchivos'
 
+# La variable urlpatterns se utiliza para exportar las diferentes rutas a las que pueden acceder el front
 urlpatterns = [
     path('create/', creditoArchivos_create, name="creditoArchivos_create"),
     path('list/', creditoArchivos_list, name="creditoArchivos_list"),

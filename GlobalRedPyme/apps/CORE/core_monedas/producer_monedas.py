@@ -5,6 +5,11 @@ from ...config import config
 
 
 def publish_monedas_otrogadas(data):
+    """
+    Este metodo sirve para publicar en la cola de aws
+    @type data: El campo data recibe la informacion que se publicara
+    @rtype: No devuelve nada
+    """
     topicArn = config.AWS_TOPIC_ARN_MONEDAS
     snsClient = boto3.client(
         'sns',

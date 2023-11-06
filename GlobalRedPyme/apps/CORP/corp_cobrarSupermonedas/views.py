@@ -51,6 +51,11 @@ logExcepcion = datosTipoLogAux['excepcion']
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def cobrarSupermonedas_list(request):
+    """
+    Este metodo sirve para listar
+    @type request: recibe page, page_size, identificacion, codigoCobro, monto, correo
+    @rtype: Devuelve una lista, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'list/',
@@ -105,6 +110,11 @@ def cobrarSupermonedas_list(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def cobrarSupermonedas_create(request):
+    """
+    El metodo sirve para crear
+    @type request: recibe los campos de la tabla cobrarsupermonedas
+    @rtype: DEvuelve el registro, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'create/',
@@ -118,7 +128,8 @@ def cobrarSupermonedas_create(request):
     }
     if request.method == 'POST':
         try:
-            monedasUsuario = Monedas.objects.filter(user_id=request.data['user_id'], tipo='Credito', state=1).order_by('-created_at').first()
+            monedasUsuario = Monedas.objects.filter(user_id=request.data['user_id'], tipo='Credito', state=1).order_by(
+                '-created_at').first()
             if float(monedasUsuario.credito) < float(request.data['monto']):
                 data = {'error': 'Supera las monedas de su cuenta.'}
                 return Response(data, status=status.HTTP_400_BAD_REQUEST)
@@ -145,6 +156,12 @@ def cobrarSupermonedas_create(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def cobrarSupermonedas_listOne(request, pk):
+    """
+    El metodo sirve para obtener un registro
+    @type pk: recibe el id de la tabla cobrar supermonedas
+    @type request: no recibe nada
+    @rtype: DEvuelve el registro, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listOne/',
@@ -182,6 +199,12 @@ def cobrarSupermonedas_listOne(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def cobrarSupermonedas_update(request, pk):
+    """
+    Este metodo sirve para actualizar
+    @param pk: El campo recibe el id de la tabla cobrarsupermonedas
+    @type request: Recibe los campos de la tabla de cobrar supermonedas
+    @rtype: DEvuelve el registro actualizado, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'update/',
@@ -235,6 +258,12 @@ def cobrarSupermonedas_update(request, pk):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def cobrarSupermonedas_delete(request, pk):
+    """
+    Este metodo sirve para eliminar
+    @param pk: el campo recibe el id de la tabla cobrar supermonedas
+    @type request: no recibe nada
+    @rtype: Devuelve el registro elimado, caso contrario devuelve el error generado
+    """
     nowDate = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'delete/',
@@ -255,7 +284,6 @@ def cobrarSupermonedas_delete(request, pk):
             err = {"error": "No existe"}
             createLog(logModel, err, logExcepcion)
             return Response(err, status=status.HTTP_404_NOT_FOUND)
-            return Response(status=status.HTTP_404_NOT_FOUND)
         # tomar el dato
         if request.method == 'DELETE':
             serializer = CobrarSupermonedasSerializer(persona, data={'state': '0', 'updated_at': str(nowDate)},
@@ -275,6 +303,11 @@ def cobrarSupermonedas_delete(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def cobrarSupermonedas_search(request):
+    """
+    Este metodo sirve para buscar
+    @type request: Recibe el campo codigoCobro
+    @rtype: DEvuelve una lista, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'list/',

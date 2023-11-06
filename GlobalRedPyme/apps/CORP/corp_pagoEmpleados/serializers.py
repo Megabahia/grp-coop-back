@@ -11,12 +11,19 @@ from ..corp_creditoPersonas.serializers import CreditoPersonasSerializer
 
 
 class PagoEmpleadosSerializer(serializers.ModelSerializer):
+    # La clase meta se relaciona con la tabla PagoEmpleados
+    # el campo fields indica los campos que se devolveran
     class Meta:
         model = PagoEmpleados
         fields = '__all__'
         read_only_fields = ['_id']
 
     def to_representation(self, instance):
+        """
+        Este metod sirve para modificar los datos que se devulveran a frontend
+        @type instance: El campo instance contiene el registro de la base datos
+        @rtype: Devuelve la informacion modificada
+        """
         data = super(PagoEmpleadosSerializer, self).to_representation(instance)
         # tomo el campo persona y convierto de OBJECTID a string
         if data['archivoFirmado']:
@@ -27,9 +34,13 @@ class PagoEmpleadosSerializer(serializers.ModelSerializer):
             data['documentoVerificado'] = False
 
         if data['user_id']:
-            archivosFirmados = CreditoPersonas.objects.filter(user_id=str(data['user_id']), estado='Aprobado', tipoCredito='Pymes-Normales',state=1).order_by('-created_at').first()
+            archivosFirmados = CreditoPersonas.objects.filter(user_id=str(data['user_id']), estado='Aprobado',
+                                                              tipoCredito='Pymes-Normales', state=1).order_by(
+                '-created_at').first()
             if archivosFirmados is None:
-                archivosFirmados = CreditoPersonas.objects.filter(user_id=str(data['user_id']), estado='Aprobado', tipoCredito='Pymes-PreAprobado',state=1).order_by('-created_at').first()
+                archivosFirmados = CreditoPersonas.objects.filter(user_id=str(data['user_id']), estado='Aprobado',
+                                                                  tipoCredito='Pymes-PreAprobado', state=1).order_by(
+                    '-created_at').first()
             data['empresa'] = CreditoPersonasSerializer(archivosFirmados).data['empresaInfo']
             data['montoDisponible'] = CreditoPersonasSerializer(archivosFirmados).data['montoDisponible']
 
@@ -44,6 +55,11 @@ from endesive import pdf
 
 
 def prueba_verificar(url):
+    """
+    ESte metodo sirve para verificar el documento firmado
+    @type url: El campo url recibe la url del documento
+    @rtype: DEvuelve verdaro o falso
+    """
     env = environ.Env()
     environ.Env.read_env()  # LEE ARCHIVO .ENV
     client_s3 = boto3.client(

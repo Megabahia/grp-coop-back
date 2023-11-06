@@ -1,9 +1,11 @@
 from djongo import models
-from django.utils.translation import gettext_lazy as _
 
-# Create your models here.
+
+# Nube: coop
+# Portales: Center, Personas, Corp, IFIS, Credit
+# La clase se conecta con la tabla de monedas de la base datos core
 class Monedas(models.Model):
-
+    # esta clase se usa para las opciones del campo tipo
     class TipoEnum(models.TextChoices):
         SUPERMONEDAS = 'Supermonedas'
         CREDITO = 'Credito'
@@ -14,6 +16,7 @@ class Monedas(models.Model):
         COMSUMO = 'Consumo'
         OTRO = 'Otro'
 
+    # esta clase se crea para las opciones del campo estado
     class EstadoEnum(models.TextChoices):
         APROBADO = 'aprobado'
         RECHAZADO = 'rechazado'
@@ -21,7 +24,7 @@ class Monedas(models.Model):
         PENDIENTE = 'pendiente'
 
     _id = models.ObjectIdField()
-    user_id = models.CharField(max_length=200,null=True, blank=True)
+    user_id = models.CharField(max_length=200, null=True, blank=True)
     identificacion = models.CharField(max_length=200, null=True, blank=True)
     nombres = models.CharField(max_length=200, null=True, blank=True)
     apellidos = models.CharField(max_length=200, null=True, blank=True)

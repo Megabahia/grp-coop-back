@@ -5,6 +5,11 @@ from ...config import config
 
 
 def publish_monedas(data):
+    """
+    Este metodo sirve para publicar en la cola de aws
+    @type data: Este campo recibe los campos que se van a enviar
+    @rtype: No devuelve nada
+    """
     topicArn = config.AWS_TOPIC_ARN_MONEDAS
     snsClient = boto3.client(
         'sns',

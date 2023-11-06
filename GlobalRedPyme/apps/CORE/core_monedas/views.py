@@ -1,6 +1,6 @@
 from .models import Monedas
-from apps.PERSONAS.personas_personas.models import Personas
-from apps.CORP.corp_empresas.models import Empresas
+from ...PERSONAS.personas_personas.models import Personas
+from ...CORP.corp_empresas.models import Empresas
 
 from .producer_monedas import publish_monedas_otrogadas
 from .serializers import (
@@ -23,7 +23,7 @@ from bson import ObjectId
 # excel
 import openpyxl
 # logs
-from apps.CENTRAL.central_logs.methods import createLog, datosTipoLog, datosProductosMDP
+from ...CENTRAL.central_logs.methods import createLog, datosTipoLog, datosProductosMDP
 
 import environ
 # declaracion variables log
@@ -55,6 +55,11 @@ logExcepcion = datosTipoLogAux['excepcion']
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def monedas_list(request):
+    """
+    Este metodo se usa para listar las monedas por usuario de la tabla monedas de la base datos core
+    @type request: El campo request recibe page, page_size, user_id
+    @rtype: Devuelve una lista de las monedas de los usuario, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'list/',
@@ -100,6 +105,11 @@ def monedas_list(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def monedas_create(request):
+    """
+    Este metodo se usa para crear las monedas de los usuario en la tabla monedas de la base datos core
+    @type request: El campo request recibe los campo de la tabla monedas
+    @rtype: Devuelve el registro que se crea, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'create/',
@@ -135,6 +145,12 @@ def monedas_create(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def monedas_listOne(request, pk):
+    """
+    Este metodo se usa para listar un registro por el id en la tabla de monedas de la base datos core
+    @type pk: El campo pk recibe el id del registro
+    @type request: El campo request no recibe nada
+    @rtype: Devuelve el registro que se busca, caso contrario devuelve
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listOne/',
@@ -172,6 +188,12 @@ def monedas_listOne(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def monedas_update(request, pk):
+    """
+    Este metodo se usa para actualizar registro por el id en la tabla de monedas de la base datos core
+    @type pk: El campo pk recibe el id del registro
+    @type request: El campo request recibe los campos de la tabla de monedas
+    @rtype: Devuelve el registro que se actualiza, caso contrario devuelve error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'update/',
@@ -217,6 +239,12 @@ def monedas_update(request, pk):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def monedas_delete(request, pk):
+    """
+    Este metodo se usa para borrar el registro de la moneda de la tabla monedas de la base datos core
+    @type pk: el campo pk recibe el id del registro
+    @type request: El campo request no recibe nada
+    @rtype: Devuelve el registro eliminado,caso contrario devuelve el error generado
+    """
     nowDate = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'delete/',
@@ -258,6 +286,12 @@ def monedas_delete(request, pk):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def monedas_usuario(request, pk):
+    """
+    este metodo obtine elultimo registro usuario en orden cronologico de la tabla de monedas de la base datos core
+    @type pk: El campo pk recibe el user_id
+    @type request: El campo request no recibe nada
+    @rtype: Devuelve el ultimo registro de las monedas del usuario, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listOne/',
@@ -304,6 +338,11 @@ def monedas_usuario(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def monedas_listOtorgadas(request):
+    """
+    este metodo sirve para consultar la monedas otorgadas al usuario de la tabla monedas de la base datos core
+    @type request: El campo request recibe el campo tipo, page, page_size, user_id
+    @rtype: Devuelve una lista de los registros filtrados, caso contrario devuevle error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'list/otorgadas/',
@@ -348,6 +387,11 @@ def monedas_listOtorgadas(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def uploadEXCEL_monedasRegaladas(request):
+    """
+    Este metodo se usa para leer el excel para ingresar los registros en la tabla de monedas de base datos core
+    @type request: El campo request recibe el archivo con los registros de las monedas regaladas
+    @rtype: Devuelve una lista con los registros correctos, incorrectos, caso contrario devuelve el error generado
+    """
     contValidos = 0
     contInvalidos = 0
     contTotal = 0
@@ -399,6 +443,11 @@ def uploadEXCEL_monedasRegaladas(request):
 
 # INSERTAR DATOS EN LA BASE INDIVIDUAL
 def insertarDato_monedas(dato):
+    """
+    este metodo se ingresa en la tabla de monedas
+    @type dato: El campo dato recibe la fila del excel
+    @rtype: Devuelve el estado correcto, caso contrario los errores generados
+    """
     try:
         timezone_now = timezone.localtime(timezone.now())
         print(utils.__validar_ced_ruc(dato[1], 0))
@@ -479,6 +528,11 @@ def insertarDato_monedas(dato):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def uploadEXCEL_monedasRegaladasClientes(request):
+    """
+    Este metodo se usa para leer el excel para ingresar los registros en la tabla de monedas de base datos core
+    @type request: El campo request recibe el archivo con los registros de las monedas regaladas
+    @rtype: Devuelve una lista con los registros correctos, incorrectos, caso contrario devuelve el error generado
+    """
     contValidos = 0
     contInvalidos = 0
     contTotal = 0
@@ -530,6 +584,11 @@ def uploadEXCEL_monedasRegaladasClientes(request):
 
 # INSERTAR DATOS EN LA BASE INDIVIDUAL
 def insertarDato_monedasClientes(dato):
+    """
+    este metodo se ingresa en la tabla de monedas
+    @type dato: El campo dato recibe la fila del excel
+    @rtype: Devuelve el estado correcto, caso contrario los errores generados
+    """
     try:
         timezone_now = timezone.localtime(timezone.now())
         print(utils.__validar_ced_ruc(dato[1], 0))
@@ -611,6 +670,11 @@ def insertarDato_monedasClientes(dato):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def list_monedas_regaladas_empresa(request):
+    """
+    Este metodo lista las monedas regaladas que estan en la tabla monedas de la base datos core
+    @type request: El campo request recibe page, page_size, user_id
+    @rtype: Devuelve una lista de las monedas que se regalaron
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'list/otorgadas/',

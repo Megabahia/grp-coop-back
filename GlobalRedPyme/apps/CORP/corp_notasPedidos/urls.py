@@ -6,8 +6,10 @@ from .views import (
     factura_listOne_facturaFisica,
 )
 
+# Esta variable se utiliza para colocar el nombre aplicacion de facturas
 app_name = 'facturas'
 
+# La variable urlpatterns se utiliza para exportar las diferentes rutas a las que pueden acceder el front
 urlpatterns = [
     # facturas
     path('list/', factura_list, name="factura_list"),

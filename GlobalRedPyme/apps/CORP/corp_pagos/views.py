@@ -1,10 +1,8 @@
-from apps.CENTRAL.central_catalogo.models import Catalogo
-from apps.CORP.corp_pagos.models import Pagos
-from apps.PERSONAS.personas_personas.models import Personas
-from apps.CORE.core_monedas.models import Monedas
-from apps.CORE.core_monedas.serializers import MonedasGuardarSerializer
-from apps.PERSONAS.personas_personas.serializers import PersonasSearchSerializer
-from apps.CORP.corp_pagos.serializers import (
+from ...CENTRAL.central_catalogo.models import Catalogo
+from .models import Pagos
+from ...PERSONAS.personas_personas.models import Personas
+from ...PERSONAS.personas_personas.serializers import PersonasSearchSerializer
+from .serializers import (
     PagosSerializer
 )
 from .consumer_pagos import get_queue_url
@@ -25,7 +23,7 @@ from dateutil.relativedelta import relativedelta
 # ObjectId
 from bson import ObjectId
 # logs
-from apps.CENTRAL.central_logs.methods import createLog, datosTipoLog, datosProductosMDP
+from ...CENTRAL.central_logs.methods import createLog, datosTipoLog, datosProductosMDP
 
 # declaracion variables log
 datosAux = datosProductosMDP()
@@ -45,6 +43,11 @@ logExcepcion = datosTipoLogAux['excepcion']
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def pagos_create(request):
+    """
+    ESTE metodo sirve para crear pagos en la tabla pagos de la base datos corp
+    @type request: El campo request recibe los campos de la tabla pagos
+    @rtype: DEvuelve el pago creado, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'create/',
@@ -94,6 +97,12 @@ def pagos_create(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def pagos_listOne(request, pk):
+    """
+    Este metodo obtiene el pago por id de la tabla pagos de la base datos corp
+    @type pk: El campos pk recibe el id del pago
+    @type request: El campo request no recibe nada
+    @rtype: DEvuelve el pago, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listOne/',
@@ -129,6 +138,12 @@ def pagos_listOne(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def pagos_update(request, pk):
+    """
+    Este metodo actualiza el pago de la tabla de pagos de la base datos corp
+    @type pk: El campo pk recibe el id de la tabla pagos
+    @type request: El campo request recibe los campos de la tabla pagos
+    @rtype: Devuelve el registro actualizado, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'update/',
@@ -171,6 +186,12 @@ def pagos_update(request, pk):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def pagos_delete(request, pk):
+    """
+    Este metodo sirve para eliminar pagos de la tabla pagos de la base datos
+    @type pk: El campo pk recibe el id del pago
+    @type request: El campo request no recibe nada
+    @rtype: DEvuelve el registro eliminado, caso contrario no devuelve nada
+    """
     nowDate = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'delete/',
@@ -189,7 +210,6 @@ def pagos_delete(request, pk):
             err = {"error": "No existe"}
             createLog(logModel, err, logExcepcion)
             return Response(err, status=status.HTTP_404_NOT_FOUND)
-            return Response(status=status.HTTP_404_NOT_FOUND)
         # tomar el dato
         if request.method == 'DELETE':
             serializer = PagosSerializer(query, data={'state': '0', 'updated_at': str(nowDate)}, partial=True)
@@ -208,6 +228,11 @@ def pagos_delete(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def pagos_list(request):
+    """
+    Este metodo sirve para listar los pagos de la tabla pagos de la base datos corp
+    @type request: El campo request recibe codigoCobro, codigoReferido, empresa_id
+    @rtype: object
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'list/',
@@ -256,6 +281,11 @@ def pagos_list(request):
 
 @api_view(['GET'])
 def consumirCola(request):
+    """
+    ESte metodo sirve para consumir la cola de aws
+    @type request: El campo request no recibe nada
+    @rtype: No devuelve nada
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listOne/',

@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from .views import (
     autorizacion_create,
     autorizacion_list,
@@ -7,8 +7,10 @@ from .views import (
     autorizacion_delete
 )
 
+# Esta variable se utiliza para colocar el nombre aplicacion de corp_autorizaciones
 app_name = 'corp_autorizaciones'
 
+# La variable urlpatterns se utiliza para exportar las diferentes rutas a las que pueden acceder el front
 urlpatterns = [
     path('create/', autorizacion_create, name="autorizacion_create"),
     path('list/', autorizacion_list, name="autorizacion_list"),

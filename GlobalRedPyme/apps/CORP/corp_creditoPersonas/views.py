@@ -19,10 +19,10 @@ from ..corp_movimientoCobros.models import Transacciones
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
-from apps.CENTRAL.central_catalogo.models import Catalogo
+from ...CENTRAL.central_catalogo.models import Catalogo
 from .models import CreditoPersonas, CodigoCredito, RegarcarCreditos
-from apps.PERSONAS.personas_personas.models import Personas
-from apps.CORP.corp_empresas.models import Empresas
+from ...PERSONAS.personas_personas.models import Personas
+from ..corp_empresas.models import Empresas
 from .serializers import (
     CreditoPersonasSerializer, CreditoPersonasPersonaSerializer, CodigoCreditoSerializer,
     RegarcarCreditosSerializer,
@@ -59,7 +59,7 @@ from dateutil.relativedelta import relativedelta
 # ObjectId
 from bson import ObjectId
 # logs
-from apps.CENTRAL.central_logs.methods import createLog, datosTipoLog, datosProductosMDP
+from ...CENTRAL.central_logs.methods import createLog, datosTipoLog, datosProductosMDP
 
 from ...utils.extraerDatosFirmaElectronica import usuarioPropietarioFirma
 
@@ -81,6 +81,11 @@ logExcepcion = datosTipoLogAux['excepcion']
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def creditoPersonas_create(request):
+    """
+    Este metod sirve para crear un creditopersona
+    @type request: recibe los campos de la tabla credito persona
+    @rtype: DEvuelve el registro creado, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'create/',
@@ -133,8 +138,15 @@ def creditoPersonas_create(request):
             createLog(logModel, err, logExcepcion)
             return Response(err, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['POST'])
 def creditoPersonas_listOne_sinAutenticar(request, pk):
+    """
+    Este metod sirve para obtener un creditopersona
+    @type pk: recibe el id de la tabla credito persona
+    @type request: no recibe
+    @rtype: DEvuelve el registro obtenido, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listOne/',
@@ -172,6 +184,12 @@ def creditoPersonas_listOne_sinAutenticar(request, pk):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def creditoPersonas_listOne(request, pk):
+    """
+    Este metod sirve para obtener un creditopersona
+    @type pk: recibe el id de la tabla credito persona
+    @type request: no recibe
+    @rtype: DEvuelve el registro obtenido, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listOne/',
@@ -207,6 +225,12 @@ def creditoPersonas_listOne(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def creditoPersonas_update(request, pk):
+    """
+    Este metod sirve para actualizar un creditopersona
+    @type pk: recibe el id de la tabla credito persona
+    @type request: recibe los campos de la tabla credito personas
+    @rtype: DEvuelve el registro obtenido, caso contrario devuelve el error generado
+    """
     request.POST._mutable = True
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
@@ -366,6 +390,12 @@ def creditoPersonas_update(request, pk):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def creditoPersonas_delete(request, pk):
+    """
+    Este metod sirve para eliminar un creditopersona
+    @type pk: recibe el id de la tabla credito persona
+    @type request: no recibe nada
+    @rtype: DEvuelve el registro eliminado, caso contrario devuelve el error generado
+    """
     nowDate = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'delete/',
@@ -384,7 +414,6 @@ def creditoPersonas_delete(request, pk):
             err = {"error": "No existe"}
             createLog(logModel, err, logExcepcion)
             return Response(err, status=status.HTTP_404_NOT_FOUND)
-            return Response(status=status.HTTP_404_NOT_FOUND)
         # tomar el dato
         if request.method == 'DELETE':
             serializer = CreditoPersonasSerializer(query, data={'state': '0', 'updated_at': str(nowDate)}, partial=True)
@@ -403,6 +432,11 @@ def creditoPersonas_delete(request, pk):
 # ENCONTRAR CODIGO CREDITO PREAPROBADO
 @api_view(['POST'])
 def creditoPersonas_creditoPreaprobado_codigo(request):
+    """
+    Este metodo sirve para consultar un credito por el codigo
+    @type request: recibe el codigo, cedula, rucEmpresa
+    @rtype: devuelve el registro, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'creditoPreaprobado/codigo',
@@ -458,6 +492,11 @@ def creditoPersonas_creditoPreaprobado_codigo(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def creditoPersonas_list(request):
+    """
+    Este metodo sirve para listar los
+    @type request: recibe page, page_size, empresaComercial_id, empresaIfis_id, estado, tipoCredito, user_id, canal, cargarOrigen, enviado
+    @rtype: DEvuelve una lista, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'list/',
@@ -536,6 +575,12 @@ def creditoPersonas_list(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def uploadEXCEL_creditosPreaprobados(request):
+    """
+    ESte metodo sirve para cargar el archivo de credito preaprobados empleados
+    @type pk: el id de la tabla creditopreaprobado empleados
+    @type request: no recibe nada
+    @rtype: Devuelve los registros correctos, incorrectos, caso contrario devuelve el error generado
+    """
     contValidos = 0
     contInvalidos = 0
     contTotal = 0
@@ -587,6 +632,13 @@ def uploadEXCEL_creditosPreaprobados(request):
 
 # INSERTAR DATOS EN LA BASE INDIVIDUAL
 def insertarDato_creditoPreaprobado(dato, empresa_financiera):
+    """
+    ESte metodo sirve para enviar el correo
+    @param dato: recibe la fila del excel
+    @param empresa_financiera: recibe la empresa
+    @param empresa_comercial: recibe la empresa
+    @rtype: No devuelve nada
+    """
     try:
         timezone_now = timezone.localtime(timezone.now())
         data = {}
@@ -618,6 +670,12 @@ def insertarDato_creditoPreaprobado(dato, empresa_financiera):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def uploadEXCEL_creditosPreaprobados_empleados(request):
+    """
+    ESte metodo sirve para cargar el archivo de credito preaprobados empleados
+    @type pk: el id de la tabla creditopreaprobado empleados
+    @type request: no recibe nada
+    @rtype: Devuelve los registros correctos, incorrectos, caso contrario devuelve el error generado
+    """
     contValidos = 0
     contInvalidos = 0
     contTotal = 0
@@ -670,6 +728,13 @@ def uploadEXCEL_creditosPreaprobados_empleados(request):
 
 # INSERTAR DATOS EN LA BASE INDIVIDUAL
 def insertarDato_creditoPreaprobado_empleado(dato, empresa_financiera):
+    """
+    ESte metodo sirve para enviar el correo
+    @param dato: recibe la fila del excel
+    @param empresa_financiera: recibe la empresa
+    @param empresa_comercial: recibe la empresa
+    @rtype: No devuelve nada
+    """
     try:
         timezone_now = timezone.localtime(timezone.now())
         data = {}
@@ -701,6 +766,12 @@ def insertarDato_creditoPreaprobado_empleado(dato, empresa_financiera):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def creditoPersonas_listOne_persona(request, pk):
+    """
+    Este metod sirve para obtener un creditopersona
+    @type pk: recibe el id de la tabla credito persona
+    @type request: no recibe
+    @rtype: DEvuelve el registro obtenido, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listOne/',
@@ -733,6 +804,12 @@ def creditoPersonas_listOne_persona(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def creditoPersonas_listOne_usuario(request, pk):
+    """
+    Este metod sirve para obtener un creditopersona
+    @type pk: recibe el id de la tabla credito persona
+    @type request: no recibe
+    @rtype: DEvuelve el registro obtenido, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listOne/usuario/' + pk,
@@ -768,6 +845,12 @@ def creditoPersonas_listOne_usuario(request, pk):
 @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
 def creditoPersonas_lecturaArchivos(request, pk):
+    """
+    Este metodo sirve para obtener los datos de un archivo
+    @type pk: recibe el id del credito
+    @type request: no recibe nada
+    @rtype: devuelve los datos del documento, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'lecturaArchivos/' + pk,
@@ -801,6 +884,11 @@ def creditoPersonas_lecturaArchivos(request, pk):
 
 
 def obtenerDatosArchivos(nombreArchivo):
+    """
+    Este metodo sirve para leer un documento pdf
+    @type nombreArchivo: recibe el nombre del archivo a leer
+    @rtype: DEvuelve los datos del archivo, caso contrario devuelve el error generado
+    """
     # environ init
     env = environ.Env()
     environ.Env.read_env()  # LEE ARCHIVO .ENV
@@ -899,6 +987,11 @@ def JobResults(jobId):
 
 @api_view(['GET'])
 def prueba(request):
+    """
+    Este metodo sirve para actualizar la cola aws
+    @type request: no recibe nada
+    @rtype: No devuelve nada
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listOne/',
@@ -921,6 +1014,12 @@ def prueba(request):
 
 
 def enviarCodigoCorreoMicroCredito(codigo, email, nombreSolicitante):
+    """
+    Este metodo sirve para enviar correo
+    @type email: Recibe el email
+    @type codigo: recibe el codigo
+    @type nombreSolicitante: recibe el nombre del solicitante
+    """
     subject, from_email, to = 'Código de seguridad para Consulta de Crédito', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
@@ -969,6 +1068,11 @@ def enviarCodigoCorreoMicroCredito(codigo, email, nombreSolicitante):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def creditoPersonas_codigo_creditoAprobado(request):
+    """
+    Este metodo sirve para buscar el credito aprobado
+    @type request: recibe numeroIdentificacion
+    @rtype: deveulve el credito aprobado, caso contrario devuelve el error generado
+    """
     print('metodo')
     nowDate = timezone.localtime(timezone.now())
     logModel = {
@@ -1014,6 +1118,11 @@ def creditoPersonas_codigo_creditoAprobado(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def creditoPersonas_validar_codigo_creditoAprobado(request):
+    """
+    Este metodo sirve para validar el credito aprobado
+    @type request: recibe numeroIdentificacion, codigo
+    @rtype: deveulve el credito aprobado, caso contrario devuelve el error generado
+    """
     nowDate = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'validar/codigo/creditoAprobado',
@@ -1039,7 +1148,8 @@ def creditoPersonas_validar_codigo_creditoAprobado(request):
                                              nombre='DURACION_CODIGO_CREDITO_APROBADO', state=1).first().valor
             duracion = query.created_at + relativedelta(minutes=int(tiempo))
             if duracion > timezone.now():
-                credito = CreditoPersonas.objects.get(_id=ObjectId(query.credito_id), empresasAplican__icontains=request.data['empresaRuc'])
+                credito = CreditoPersonas.objects.get(_id=ObjectId(query.credito_id),
+                                                      empresasAplican__icontains=request.data['empresaRuc'])
                 serializer = CreditoPersonasSerializer(credito)
                 createLog(logModel, serializer.data, logTransaccion)
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -1054,6 +1164,11 @@ def creditoPersonas_validar_codigo_creditoAprobado(request):
 
 
 def enviarCorreoSolicitud(email):
+    """
+    Este metodo sirve para enviar el corrreo
+    @type email: Recibe el email
+    @rtype: no devuelve nada
+    """
     subject, from_email, to = 'Solicitud de Crédito Recibida – Crédito Pagos', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
@@ -1081,6 +1196,13 @@ def enviarCorreoSolicitud(email):
 
 
 def firmar(request, dct, nombreArchivo):
+    """
+    Este metodo sirve para firmar un documento
+    @type nombreArchivo: recibe el nombre
+    @type dct: recibe los parametros para la firma
+    @type request: recibe los datos enviados para la tabla creditos personas
+    @rtype: devuelve el archivo firmado
+    """
     certificado = request.data['certificado']
     # environ init
     env = environ.Env()
@@ -1093,7 +1215,8 @@ def firmar(request, dct, nombreArchivo):
     with tempfile.TemporaryDirectory() as d:
         ruta = d + 'SOLICITUD_REMATRICULA_DE_.pdf'
         s3 = boto3.resource('s3')
-        archivo = s3.meta.client.download_file(env.str('AWS_STORAGE_BUCKET_NAME'), urllib.parse.unquote(str(request.data[nombreArchivo])), ruta)
+        archivo = s3.meta.client.download_file(env.str('AWS_STORAGE_BUCKET_NAME'),
+                                               urllib.parse.unquote(str(request.data[nombreArchivo])), ruta)
     date = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     datosFirmante = f"""FIRMADO POR:\n {dct['signature']} \n FECHA:\n {date}"""
     generarQR(datosFirmante)
@@ -1115,6 +1238,12 @@ def firmar(request, dct, nombreArchivo):
 
 
 def enviarCorreoNegado(montoAprobado, email):
+    """
+    Este metodo sirve para enviar el correo de credito negado
+    @type email: recibe el email
+    @type montoAprobado: recibe el monto aprobado
+    @rtype: no devuelve nada
+    """
     subject, from_email, to = 'Solicitud de Línea de Crédito NEGADA', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
@@ -1153,6 +1282,12 @@ def enviarCorreoNegado(montoAprobado, email):
 
 
 def enviarCorreoNegado(montoAprobado, email):
+    """
+    Este metodo sirve para enviar el correo de credito negado
+    @type email: recibe el email
+    @type montoAprobado: recibe el monto aprobado
+    @rtype: no devuelve nada
+    """
     subject, from_email, to = 'Solicitud de Línea de Crédito NEGADA', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
@@ -1191,6 +1326,12 @@ def enviarCorreoNegado(montoAprobado, email):
 
 
 def enviarCorreoPorcompletar(montoAprobado, email):
+    """
+    Este metodo sirve para enviar el correo de credito negado
+    @type email: recibe el email
+    @type montoAprobado: recibe el monto aprobado
+    @rtype: no devuelve nada
+    """
     subject, from_email, to = 'Solicitud de Crédito DEVUELTA para Completar información', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
@@ -1229,6 +1370,12 @@ def enviarCorreoPorcompletar(montoAprobado, email):
 
 
 def enviarCorreoPorcompletarLineaCredito(montoAprobado, email):
+    """
+    Este metodo sirve para enviar el correo de credito negado
+    @type email: recibe el email
+    @type montoAprobado: recibe el monto aprobado
+    @rtype: no devuelve nada
+    """
     subject, from_email, to = 'Solicitud de Línea de Crédito DEVUELTA para completar información', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""
@@ -1266,6 +1413,12 @@ def enviarCorreoPorcompletarLineaCredito(montoAprobado, email):
 
 
 def enviarCorreoAprobado(montoAprobado, email, nombreCompleto):
+    """
+    Este metodo sirve para enviar el correo de credito negado
+    @type email: recibe el email
+    @type montoAprobado: recibe el monto aprobado
+    @rtype: no devuelve nada
+    """
     subject, from_email, to = 'Su Solicitud de Línea de Crédito ha sido APROBADA', "08d77fe1da-d09822@inbox.mailtrap.io", email
     txt_content = f"""
     LÍNEA DE CRÉDITO PARA PAGO A PROVEEDORES Y/O EMPLEADOS APROBADA
@@ -1320,6 +1473,12 @@ def enviarCorreoAprobado(montoAprobado, email, nombreCompleto):
 
 
 def enviarCorreoAprobadoCreditoConsumo(montoAprobado, email):
+    """
+    Este metodo sirve para enviar el correo de credito negado
+    @type email: recibe el email
+    @type montoAprobado: recibe el monto aprobado
+    @rtype: no devuelve nada
+    """
     subject, from_email, to = 'Su Solicitud de crédito de consumo ha sido APROBADA', "08d77fe1da-d09822@inbox.mailtrap.io", email
     txt_content = f"""
     CRÉDITO DE CONSUMO APROBADO
@@ -1376,6 +1535,11 @@ def enviarCorreoAprobadoCreditoConsumo(montoAprobado, email):
 
 
 def generarQR(datos):
+    """
+    Este metodo sirve para generar el codigo qr
+    @type datos: recibe los datos que se agregaran al qr
+    @rtype: no devuelve nada
+    """
     img = qrcode.make(datos)
     f = open("output.png", "wb")
     img.save(f)
@@ -1383,6 +1547,13 @@ def generarQR(datos):
 
 
 def agregarQRDatosFirmante(datosFirmante, output_file, ruta):
+    """
+    Este metodo sirve para agregar el qr a un documento pdf
+    @type ruta: recibe la ruta de donde esta el qr
+    @type output_file: recibe la ruta donde se guarda el documento
+    @type datosFirmante: recibe los datos del cliente
+    @rtype: no devuelve nada
+    """
     # Define the position and size of the image rectangle
     image_rectangle = fitz.Rect(0, 0, 250, 220)  # Adjust the coordinates and size as needed
 
@@ -1436,6 +1607,11 @@ def agregarQRDatosFirmante(datosFirmante, output_file, ruta):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def prueba_verificar(request):
+    """
+    ESte metodo sirve para actualizar la cola aws
+    @type request: no recibe nada
+    @rtype: no devuelve nada
+    """
     env = environ.Env()
     environ.Env.read_env()  # LEE ARCHIVO .ENV
     client_s3 = boto3.client(
@@ -1474,6 +1650,11 @@ def prueba_verificar(request):
 @api_view(['POST'])
 # @permission_classes([IsAuthenticated])
 def verificarPropietarioFirma(request):
+    """
+    Este metodo sirve para verificar la firma electronica
+    @type request: recibe el archivo, clavefirma, rucempresa
+    @rtype: devuelve el mensaje de si verificada, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'verificarPropietarioFirma',
@@ -1491,7 +1672,8 @@ def verificarPropietarioFirma(request):
         if firmaCorresponde is False:
             return Response({"message": "Lo sentimos, parece que la firma registrada no corresponde a "
                                         "la del representante legal o el dueño de la empresa o negocio. "
-                                        "Por favor verifica la información y vuelve a intentarlo."}, status=status.HTTP_200_OK)
+                                        "Por favor verifica la información y vuelve a intentarlo."},
+                            status=status.HTTP_200_OK)
 
         return Response(status=status.HTTP_200_OK)
     except Exception as e:
@@ -1503,6 +1685,11 @@ def verificarPropietarioFirma(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def recargar_lineas_creditos(request):
+    """
+    Este metodo sirve para subir el archivo de recargar lineas credito
+    @type request: recibe el archivo excel
+    @rtype: devuelve el registro creado, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'recargar/lineasCreditos',
@@ -1580,6 +1767,12 @@ def recargar_lineas_creditos(request):
 
 
 def insertarDato_creditoPreaprobadoNegocio(dato, empresa_financiera):
+    """
+    Este metodo sirve para registra en la tabla recargacredito
+    @type empresa_financiera: recibe el idde la empresa financiera
+    @type dato: recibe la fila del excel
+    @rtype: no devuelve nada
+    """
     try:
         info = {
             "nombreNegocio": dato[1],
@@ -1609,6 +1802,11 @@ def insertarDato_creditoPreaprobadoNegocio(dato, empresa_financiera):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def listar_recargar_lineas_creditos(request):
+    """
+    Este metodo sirve para subir el archivo de recargar lineas credito
+    @type request: recibe el archivo excel
+    @rtype: devuelve el registro creado, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listar/recargar/lineasCreditos',
@@ -1659,6 +1857,11 @@ def listar_recargar_lineas_creditos(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def actualizar_recargar_lineas_creditos(request, pk):
+    """
+    Este metodo sirve para actualizar la recargar lineas credito
+    @type request: recibe los campos de la tabla recarga creditos
+    @rtype: devuelve el registro actualizado, caso contrario devuelve el error generado
+    """
     request.POST._mutable = True
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
@@ -1691,7 +1894,8 @@ def actualizar_recargar_lineas_creditos(request, pk):
                 if 'estado' in request.data and 'Aprobado' == request.data['estado']:
                     enviarCorreoRecarga(serializer.data)
                     # Vamos a registrar la transacction del credito
-                    credito = CreditoPersonas.objects.filter(rucEmpresa=serializer.data['info']['rucRepresentante'], estado='Aprobado',
+                    credito = CreditoPersonas.objects.filter(rucEmpresa=serializer.data['info']['rucRepresentante'],
+                                                             estado='Aprobado',
                                                              state=1).order_by('-created_at').first()
                     Transacciones.objects.create(**{
                         'fechaTransaccion': timezone_now,
@@ -1714,6 +1918,12 @@ def actualizar_recargar_lineas_creditos(request, pk):
 
 
 def enviarCorreoRecarga(data):
+    """
+    Este metodo sirve para enviar el correo de credito negado
+    @type email: recibe el email
+    @type montoAprobado: recibe el monto aprobado
+    @rtype: no devuelve nada
+    """
     empresaIfis = Empresas.objects.filter(tipoEmpresa='ifis', state=1).order_by('-created_at').first()
     subject, from_email, to = 'RECARGA DE CUPO EN LÍNEA DE CRÉDITO', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               data['info']['correoRepresentante']
@@ -1747,6 +1957,12 @@ def enviarCorreoRecarga(data):
 
 
 def enviarCorreoNegarLineaCredito(email, motivo):
+    """
+    Este metodo sirve para enviar el correo de credito negado
+    @type email: recibe el email
+    @type montoAprobado: recibe el monto aprobado
+    @rtype: no devuelve nada
+    """
     empresaIfis = Empresas.objects.filter(tipoEmpresa='ifis', state=1).order_by('-created_at').first()
     subject, from_email, to = 'NEGAR LÍNEA DE CRÉDITO', "08d77fe1da-d09822@inbox.mailtrap.io", email
     txt_content = f"""
@@ -1781,6 +1997,11 @@ def enviarCorreoNegarLineaCredito(email, motivo):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def creditoPersonas_create_local(request):
+    """
+    Este metod sirve para crear un creditopersona
+    @type request: recibe los campos de la tabla credito persona
+    @rtype: DEvuelve el registro creado, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'create/',
@@ -1810,7 +2031,8 @@ def creditoPersonas_create_local(request):
                     usuario = serializer.data['user']
                     nombreGarante = usuario['garante']['nombres'] + ' ' + usuario['garante']['apellidos']
                     nombreSolicitante = usuario['nombres'] + ' ' + usuario['apellidos']
-                    enviarCorreoSolicitudGarante(usuario['garante']['correoGarante'], serializer.data['_id'], nombreGarante, nombreSolicitante)
+                    enviarCorreoSolicitudGarante(usuario['garante']['correoGarante'], serializer.data['_id'],
+                                                 nombreGarante, nombreSolicitante)
                 createLog(logModel, serializer.data, logTransaccion)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             createLog(logModel, serializer.errors, logExcepcion)
@@ -1822,6 +2044,12 @@ def creditoPersonas_create_local(request):
 
 
 def enviarCorreoSolicitudGarante(email, id, garante, solicitante):
+    """
+    Este metodo sirve para enviar el correo de credito negado
+    @type email: recibe el email
+    @type montoAprobado: recibe el monto aprobado
+    @rtype: no devuelve nada
+    """
     subject, from_email, to = 'Autorización de la Madrina/Padrino', "credicompra.bigpuntos@corporacionomniglobal.com", \
                               email
     txt_content = f"""
@@ -1864,6 +2092,12 @@ def enviarCorreoSolicitudGarante(email, id, garante, solicitante):
 # ACTUALIZAR SIN AUTENTICAR
 @api_view(['POST'])
 def creditoPersonas_update_sinAutenticar(request, pk):
+    """
+    Este metod sirve para actualizar un creditopersona
+    @type pk: recibe el id de la tabla credito persona
+    @type request: recibe los campos de la tabla credito personas
+    @rtype: DEvuelve el registro obtenido, caso contrario devuelve el error generado
+    """
     request.POST._mutable = True
     timezone_now = timezone.localtime(timezone.now())
     logModel = {

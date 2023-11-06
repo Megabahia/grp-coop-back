@@ -28,6 +28,11 @@ logExcepcion = datosTipoLogAux['excepcion']
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def firmaElectronica_create(request):
+    """
+    Este metodo sirve para guardar los datos del dueño de la firma electronica
+    @type request: REcibe los campos de la tabla firmaelectronica
+    @rtype: DEvuelve el registro guardado, caso contrario devuelve el error generado
+    """
     request.POST._mutable = True
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
@@ -63,6 +68,11 @@ def firmaElectronica_create(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def firmaElectronica_list(request):
+    """
+    Este metodo sirve para listar las firmas electronicas
+    @type request: recibe page, page_size, empresa_id
+    @rtype: DEvuelve una lista de las firmas elctronicas
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'list/',

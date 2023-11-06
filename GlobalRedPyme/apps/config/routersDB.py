@@ -1,3 +1,4 @@
+# Este archivo sirve para configurar las bases de datos con las app
 class GRPPERSONASRouter:
     """
     A router to control all database operations on models in the

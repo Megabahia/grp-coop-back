@@ -24,8 +24,10 @@ from .views import (
     creditoPersonas_update_sinAutenticar,
 )
 
+# Esta variable se utiliza para colocar el nombre aplicacion de corp_creditoPersonas
 app_name = 'corp_creditoPersonas'
 
+# La variable urlpatterns se utiliza para exportar las diferentes rutas a las que pueden acceder el front
 urlpatterns = [
     path('create/', creditoPersonas_create, name="creditoPersonas_create"),
     path('create/local/', creditoPersonas_create_local, name="creditoPersonas_create_local"),

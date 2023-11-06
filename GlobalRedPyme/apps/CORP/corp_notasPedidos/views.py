@@ -47,6 +47,11 @@ logExcepcion = datosTipoLogAux['excepcion']
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def factura_list(request):
+    """
+    Este metodo sirve para listar las facturas de la tabla facturas de la base datos corp
+    @type request: El campo request recibe razonSocial, identificacion, page, page_size
+    @rtype: Devuelve una lista de factura, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'list/',
@@ -95,6 +100,12 @@ def factura_list(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def factura_findOne(request, pk):
+    """
+    Este metodo sirve para obtener un registro de factura de la tabla factura de la base datos corp
+    @type pk: El campo pk recibe el id de la factura
+    @type request: El campo request no recibe nada
+    @rtype: Devuelve la factura encontrada, caso contrario devuelve error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listOne/',
@@ -128,6 +139,11 @@ def factura_findOne(request, pk):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def factura_list_latest(request):
+    """
+    Este metodo sirva para obtener la ultima factura del cliente, de la tabla factura de la base datos corp
+    @type request: El campo request recibe cliente, negocio
+    @rtype: Devuelve la ultima factura encontrada, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listLatest/',
@@ -170,6 +186,11 @@ def factura_list_latest(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def factura_create(request):
+    """
+    Este metodo sirve para crear la factura de la tabla factura de la base datos corp
+    @type request: El campo request recibe los campos de la factura y el detalla
+    @rtype: Devuelve la factura creada, caso contrario devuelve el error generado
+    """
     request.POST._mutable = True
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
@@ -209,6 +230,12 @@ def factura_create(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def factura_update(request, pk):
+    """
+    Este metodo sirve para actualizar la factura de la tabla factura de la base datos corp
+    @type pk: El campo pk recibe el id de la fatura
+    @type request: El campo request recibe los campos de la factura y los detalles
+    @rtype: DEvuelve la factura actualizada, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'update/',
@@ -259,6 +286,12 @@ def factura_update(request, pk):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def factura_findOne_credito(request, pk):
+    """
+    Este metodo sirve para obtener la factura de la tabla factura de base datos corp
+    @type pk: El campo pk recibe el id de la factura
+    @type request: El campo request no recibe nada
+    @rtype: Devuelve el obtener de la factura, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listOne/credito/',
@@ -293,6 +326,11 @@ def factura_findOne_credito(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def factura_generar_codigos_envios(request):
+    """
+    Este metodo genera los codigos de la tabla autorizacion credito de la base datos corp
+    @type request: El campo request recibe user_id,empresaComercial_id, credito_id
+    @rtype: Devuelve el codigo generado, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'generar/habilitantes/credito/',
@@ -391,6 +429,11 @@ def factura_generar_codigos_envios(request):
 @api_view(['POST'])
 # @permission_classes([IsAuthenticated])
 def factura_create_fisica(request):
+    """
+    Este metodo sirve para crear una factura de la tabla factura fisica de la base datos corp
+    @type request: El campo request recibe los campos de la tabla factura fisicca
+    @rtype: DEvuelve el registro creado, caso contrario devuelve el error generado
+    """
     request.POST._mutable = True
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
@@ -426,6 +469,12 @@ def factura_create_fisica(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def factura_update_fisica(request, pk):
+    """
+    Este metodo sirve para actulizar una factura de la tabla factura fisica de la base datos corp
+    @type pk: El campo pk recibe el id de la factura fisica
+    @type request: El campo request recibe los campos de la tabla factura fisicca
+    @rtype: DEvuelve el registro actualizado, caso contrario devuelve el error generado
+    """
     request.POST._mutable = True
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
@@ -483,6 +532,12 @@ def factura_update_fisica(request, pk):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def factura_listOne_facturaFisica(request, pk):
+    """
+    Este metodo sirve para obtener un factura de la tabla factura fisica de la base datos corp
+    @type pk: El campo pk recibe el id de la factura fisica
+    @type request: El campo request no recibe nada
+    @rtype: Devuelve el reigstro encontrado, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listOne/factura',
@@ -515,6 +570,11 @@ def factura_listOne_facturaFisica(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def factura_list_facturaFisica(request):
+    """
+    Este metodo sirve para listar las facturas de la tabla factura fisicas de la base datos corp
+    @type request: El campo request recibe page, page_size, estado
+    @rtype: Devuelve la lista de las facturas, caso contrario el error generado
+    """
     request.POST._mutable = True
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
@@ -555,6 +615,14 @@ def factura_list_facturaFisica(request):
 
 
 def enviarCorreoNegado(email, valorCompra, valorDesembolso, observacion):
+    """
+    Este metodo sirve para enviar el correo
+    @param observacion: El campo observacion recibe la observacion
+    @param valorDesembolso: El campo valorDesembolso no recibe nada
+    @param valorCompra: El campo valorCompra recibe la cantidad de compra
+    @type email: El campo email recibe el email
+    @rtype: No devuelve nada
+    """
     subject, from_email, to = 'Ha ocurrido un ERROR', "08d77fe1da-d09822@inbox.mailtrap.io", \
                               email
     txt_content = f"""

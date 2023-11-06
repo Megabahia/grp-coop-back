@@ -1,3 +1,8 @@
+"""NUBE DE BIGPUNTOS
+PORTALES: CENTER, CORP, PERSONAS, IFIS, CREDIT
+Este archivo sirve para conectar el backend de la nube de bigpuntos con la base datos de bigpuntos central
+"""
+
 import jsonfield
 from djongo import models
 
@@ -19,9 +24,11 @@ class Catalogo(models.Model):
     updated_at = models.DateTimeField(null=True)
     state = models.SmallIntegerField(default=1)
 
+    # El metodo save convierte en mayuscula el campo tipo
     def save(self, *args, **kwargs):
         self.tipo = self.tipo.upper()
         return super(Catalogo, self).save(*args, **kwargs)
 
+    # El metodo solo imprime el nombre al momento de realizar una consulta con el mapeador de Django
     def __str__(self):
         return '{}'.format(self.nombre)

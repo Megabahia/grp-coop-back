@@ -25,6 +25,11 @@ logExcepcion = datosTipoLogAux['excepcion']
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def envios_list(request):
+    """
+    Este metodo sirve para lisar los envios generado
+    @type request: recibe page, page_size
+    @rtype: Devuelve una lista de los envios, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'list/',
@@ -62,6 +67,11 @@ def envios_list(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def envios_create(request):
+    """
+    Este metodo sirve para guardar el envio
+    @type request: recibe los campos de la tabla envios
+    @rtype: DEvuelve el registro creado, caso contrario devuelve el error generado
+    """
     request.POST._mutable = True
     timezone_now = timezone.localtime(timezone.now())
     logModel = {

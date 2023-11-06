@@ -44,6 +44,11 @@ logExcepcion = datosTipoLogAux['excepcion']
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def autorizacion_list(request):
+    """
+    Este metodo sirve para listar las autorizaciones
+    @type request: recibe page, page_size
+    @rtype: DEvuelve una lista, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'list/',
@@ -85,6 +90,11 @@ def autorizacion_list(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def autorizacion_create(request):
+    """
+    Este metodo sirve para crear una autorizacion
+    @type request: recibe los campos de la tabla autorizaciones
+    @rtype: DEvuelve el registro creado, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'create/',
@@ -122,6 +132,12 @@ def autorizacion_create(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def autorizacion_listOne(request, pk):
+    """
+    Este metodo sirve para obtener un registro
+    @param pk: recibe el id la tabla autorizaciones
+    @type request: no recibe nada
+    @rtype: DEvuelve el registro, caso contrario devuelve el erro generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listOne/',
@@ -159,6 +175,12 @@ def autorizacion_listOne(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def autorizacion_update(request, pk):
+    """
+    Este metodo sirve para actualizar un registro
+    @param pk: recibe el id la tabla autorizaciones
+    @type request: recibe los campos de la tabla autorizaciones
+    @rtype: DEvuelve el registro, caso contrario devuelve el erro generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'update/',
@@ -207,6 +229,12 @@ def autorizacion_update(request, pk):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def autorizacion_delete(request, pk):
+    """
+    Este metodo sirve para eliminar un registro
+    @param pk: recibe el id la tabla autorizaciones
+    @type request: no recibe nada
+    @rtype: DEvuelve el registro elimnado, caso contrario devuelve el erro generado
+    """
     nowDate = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'delete/',

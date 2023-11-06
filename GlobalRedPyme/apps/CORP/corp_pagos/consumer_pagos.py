@@ -1,11 +1,11 @@
 import boto3
 import json
 # Importar configuraciones
-from apps.config import config
+from ...config import config
 from ..corp_pagos.models import Pagos
 from bson import ObjectId
 # logs
-from apps.CENTRAL.central_logs.methods import createLog, datosTipoLog, datosProductosMDP
+from ...CENTRAL.central_logs.methods import createLog, datosTipoLog, datosProductosMDP
 
 # declaracion variables log
 datosAux = datosProductosMDP()
@@ -17,7 +17,12 @@ logApi = datosAux['api']
 logTransaccion = datosTipoLogAux['transaccion']
 logExcepcion = datosTipoLogAux['excepcion']
 
+
 def get_queue_url():
+    """
+    ESte metodo sirve para actualizar la cola de aws pagos
+    @rtype: No devuelve nada
+    """
     print('cron')
     logModel = {
         'endPoint': logApi + 'listOne/',

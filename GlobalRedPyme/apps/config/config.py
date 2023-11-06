@@ -1,3 +1,4 @@
+# ESte archivo sirve para colocar las variables del entorno
 # environ init
 import os
 import environ

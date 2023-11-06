@@ -1,7 +1,9 @@
 from djongo import models
 
 
-# Create your models here.
+# Mundo: coop
+# Portales: COrp
+# Esta clase sirve para conectar con la tabla FirmaElectronica de la base datos corp
 class FirmaElectronica(models.Model):
     _id = models.ObjectIdField()
     nombreRepresentante = models.CharField(max_length=255, null=True, blank=True)

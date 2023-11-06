@@ -52,6 +52,11 @@ logExcepcion = datosTipoLogAux['excepcion']
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def movimientoCobros_list(request):
+    """
+    Este metodo sirve para listar los movimientos cobros de la tabla movimientos cobros de la base datos corp
+    @type request: El campo request recibe los campos identificacion,codigoCobro, correo que seran filtrado
+    @rtype: Devuelve una lista de los movimientos cobros, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'list/',
@@ -106,6 +111,11 @@ def movimientoCobros_list(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def movimientoCobros_create(request):
+    """
+    Este metodo sirve para crear los movimientos cobro de la tabla movimiento cobro de la base datos corp
+    @type request: El campo request recibe los campos de la tabla movimientos cobro
+    @rtype: Devuelve el registro creado, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'create/',
@@ -182,6 +192,12 @@ def movimientoCobros_create(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def movimientoCobros_listOne(request, pk):
+    """
+    Este metodo sirve para obtener movimientos cobro de la tabla movimientos cobros de la base datos corp
+    @type pk: El campo pk recibe el id del registro de movimiento cobro
+    @type request: El campo request no recibe nada
+    @rtype: Devuelve el registro de movimiento cobro, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'listOne/',
@@ -219,6 +235,12 @@ def movimientoCobros_listOne(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def movimientoCobros_update(request, pk):
+    """
+    Este metodo sirve para actualizar el movimiento de cobro de la tabla movimiento cobro de la base datos corp
+    @type pk: El campo pk recibe el id del movimiento de cobro
+    @type request: El campo request recibe los campos de la tabla movimiento cobro
+    @rtype: Devuelve el registro actualizado, caso contrario devuelve el error genearado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'update/',
@@ -271,6 +293,12 @@ def movimientoCobros_update(request, pk):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def movimientoCobros_delete(request, pk):
+    """
+    Este metodo sirve para eliminar los movimientos cobro de la tabla movimiento cobros de la base datos corp
+    @type pk: El campo pk recibe el id del registro
+    @type request: el campo request no recibe nada
+    @rtype: Devuelve el registro eliminado,caso contrario devuelve el error generado
+    """
     nowDate = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'delete/',
@@ -291,7 +319,6 @@ def movimientoCobros_delete(request, pk):
             err = {"error": "No existe"}
             createLog(logModel, err, logExcepcion)
             return Response(err, status=status.HTTP_404_NOT_FOUND)
-            return Response(status=status.HTTP_404_NOT_FOUND)
         # tomar el dato
         if request.method == 'DELETE':
             serializer = MovimientoCobrosSerializer(persona, data={'state': '0', 'updated_at': str(nowDate)},
@@ -311,6 +338,11 @@ def movimientoCobros_delete(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def list_transacciones(request):
+    """
+    Este metodo sirve para generar el reporte de movimientos de empresas de la tabla movimiento cobro de base datos corp
+    @type request: El campo request recibe el campo empresa_id, page, page_size
+    @rtype: Devuelve una lista del reporte, caso contrario devuelve el error generado
+    """
     timezone_now = timezone.localtime(timezone.now())
     logModel = {
         'endPoint': logApi + 'list/transacciones/',

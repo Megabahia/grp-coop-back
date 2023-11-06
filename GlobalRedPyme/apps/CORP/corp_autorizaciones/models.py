@@ -2,7 +2,9 @@ from djongo import models
 from ...CORP.corp_cobrarSupermonedas.models import CobrarSupermonedas
 
 
-# Create your models here.
+# Mundo: coop
+# Portales: PERSONAS, corp
+# Esta clase sirve para conectar con la tabla Autorizaciones de la base datos corp
 class Autorizaciones(models.Model):
     _id = models.ObjectIdField()
     codigoAutorizacion = models.CharField(max_length=200, null=False)

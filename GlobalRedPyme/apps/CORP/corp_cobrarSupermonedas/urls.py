@@ -8,8 +8,10 @@ from .views import (
     cobrarSupermonedas_search,
 )
 
+# Esta variable se utiliza para colocar el nombre aplicacion de corp_cobrarSupermonedas
 app_name = 'corp_cobrarSupermonedas'
 
+# La variable urlpatterns se utiliza para exportar las diferentes rutas a las que pueden acceder el front
 urlpatterns = [
     path('create/', cobrarSupermonedas_create, name="cobrarSupermonedas_create"),
     path('list/', cobrarSupermonedas_list, name="cobrarSupermonedas_list"),

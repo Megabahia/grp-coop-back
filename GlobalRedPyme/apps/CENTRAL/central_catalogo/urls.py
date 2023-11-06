@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from .views import (
     catalogo_list, catalogo_create, catalogo_findOne, catalogo_update, catalogo_delete,
     estado_list, pais_list, tipo_list, catalogo_list_hijo, catalogo_list_hijoNombre, catalogo_list_hijos,
@@ -9,10 +9,10 @@ from .views import (
     catalogo_filter_listOne_tipo_todo,
 )
 
-from rest_framework.authtoken.views import obtain_auth_token
-
+# Esta variable se utiliza para colocar el nombre aplicacion de catalogo
 app_name = 'catalogo'
 
+# La variable urlpatterns se utiliza para exportar las diferentes rutas a las que pueden acceder el front
 urlpatterns = [
     # catalogo
     path('list/', catalogo_list, name="catalogo_list"),

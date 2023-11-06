@@ -2,7 +2,9 @@ import jsonfield
 from djongo import models
 
 
-# Create your models here.
+# Mundo: coop
+# Portales: PERSONAS
+# Esta clase sirve para conectar con la tabla personas de la base datos personas
 class Proveedores(models.Model):
     _id = models.ObjectIdField()
     tipoPersona = models.CharField(max_length=10, null=True, blank=True)

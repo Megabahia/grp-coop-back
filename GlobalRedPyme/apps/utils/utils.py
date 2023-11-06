@@ -4,6 +4,11 @@ regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{
 
 
 def __validar_ced_ruc(nro, tipo):
+    """
+    Este metodo sirve para validar cedula o ruc
+    @type email: Recibe un texto
+    @rtype: DEvuelve verdadero o falso
+    """
     total = 0
     if tipo == 0:  # cedula y r.u.c persona natural
         base = 10
@@ -29,6 +34,11 @@ def __validar_ced_ruc(nro, tipo):
 
 
 def isValidEmail(email):
+    """
+    Este metodo sirve para validar el email
+    @type email: Recibe el email
+    @rtype: DEvuelve verdadero o falso
+    """
     if re.fullmatch(regex, email):
         return True
     else:
@@ -36,6 +46,11 @@ def isValidEmail(email):
 
 
 def isValidTelefono(telefono):
+    """
+    Este metodo sirve para validar el telefono
+    @type email: Recibe el telefono
+    @rtype: DEvuelve verdadero o falso
+    """
     if len(telefono) == 10:
         return True
     else:

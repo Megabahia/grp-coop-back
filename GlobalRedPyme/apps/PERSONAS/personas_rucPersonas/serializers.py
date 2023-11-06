@@ -6,6 +6,8 @@ from .models import (
 
 
 class RucPersonasSerializer(serializers.ModelSerializer):
+    # La clase meta se relaciona con la tabla RucPersonas
+    # el campo fields indica los campos que se devolveran
     class Meta:
         model = RucPersonas
         fields = '__all__'

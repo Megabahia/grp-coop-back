@@ -20,8 +20,10 @@ from .views import (
     empresas_delete_empleado,
 )
 
+# Esta variable se utiliza para colocar el nombre aplicacion de facturas
 app_name = 'corp_empresas'
 
+# La variable urlpatterns se utiliza para exportar las diferentes rutas a las que pueden acceder el front
 urlpatterns = [
     path('create/', empresas_create, name="empresas_create"),
     path('list/', empresas_list, name="empresas_list"),

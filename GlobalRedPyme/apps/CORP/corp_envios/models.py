@@ -1,7 +1,9 @@
 from djongo import models
 
 
-# Create your models here.
+# Mundo: coop
+# Portales: PERSONAS, corp
+# Esta clase sirve para conectar con la tabla Envios de la base datos corp
 class Envios(models.Model):
     _id = models.ObjectIdField()
     numeroEnvio = models.CharField(max_length=13, null=True, blank=True)
