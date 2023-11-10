@@ -3,9 +3,7 @@ from ...CORP.corp_autorizaciones.models import Autorizaciones
 from ...CORE.core_monedas.models import Monedas
 from ...CORP.corp_pagos.models import Pagos
 from ...CORP.corp_monedasEmpresa.models import MonedasEmpresa
-from .serializers import (
-    MovimientoCobrosSerializer, TransaccionesSerializer
-)
+from .serializers import MovimientoCobrosSerializer, TransaccionesSerializer
 from .producer import publish_monedas
 from rest_framework import status
 from rest_framework.response import Response
