@@ -16,12 +16,24 @@ def publish(data):
         region_name=config.AWS_REGION_NAME,
     )
 
-    elements_to_remove = ['reporteBuro', 'identificacion', 'papeletaVotacion', 'identificacionConyuge',
-                          'papeletaVotacionConyuge', 'planillaLuzNegocio', 'planillaLuzDomicilio', 'facturas',
-                          'matriculaVehiculo', 'impuestoPredial', 'buroCredito', 'evaluacionCrediticia', 'ruc',
-                          'rolesPago', 'panillaIESS', 'mecanizadoIess', 'fotoCarnet', 'solicitudCredito',
-                          'buroCreditoIfis', 'documentoAprobacion', 'pagare', 'contratosCuenta', 'tablaAmortizacion',
-                          'user_id']
+    elements_to_remove = [
+        'reporteBuro', 'identificacion', 'identificacionConyuge',
+        'papeletaVotacionConyuge', 'ruc', 'rolesPago', 'panillaIESS',
+        'documentoAprobacion', 'papeletaVotacion', 'planillaLuzDomicilio',
+        'planillaLuzNegocio', 'matriculaVehiculo', 'impuestoPredial',
+        'buroCredito', 'mecanizadoIess', 'fotoCarnet',
+        'facturasVentas2meses', 'facturasVentas2meses2', 'facturasVentas2meses3',
+        'facturasVentasCertificado', 'facturasCompras2meses',
+        'facturasCompras2meses2', 'nombramientoRepresentante',
+        'certificadoSuperintendencia', 'certificadoPatronales', 'nominaSocios',
+        'actaJuntaGeneral', 'certificadoBancario', 'referenciasComerciales',
+        'balancePerdidasGanancias', 'balanceResultados', 'declaracionIva',
+        'estadoCuentaTarjeta', 'facturasPendiente', 'imagen', 'imagenComercial',
+        'autorizacion', 'cedulaGarante', 'papeletaVotacionGarante', 'fotoGarante',
+        'impuestoPredialGarante', 'matriculaVehiculoGarante',
+        'planillaDomicilioGarante', 'facturas', 'evaluacionCrediticia', 'solicitudCredito',
+        'buroCreditoIfis',  'pagare', 'contratosCuenta', 'tablaAmortizacion', 'user_id',
+    ]
 
     for element in elements_to_remove:
         if element in data:
